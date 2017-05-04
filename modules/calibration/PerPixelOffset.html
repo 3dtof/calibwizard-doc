@@ -1,0 +1,252 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>calibration.PerPixelOffset &mdash; SCAW &#39;0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '&#39;0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SCAW &#39;0.1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><h1 style="font-size: 3em;">Voxel Calibration Wizard</h1></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for calibration.PerPixelOffset</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">This file calculates the phase offsets and saves it as an npy file.</span>
+<span class="sd">It also returns the bin file of the offsets. </span>
+<span class="sd">Usage:</span>
+<span class="sd">python PerPixelOffset.py -f &quot;file.vxl&quot; -n &quot;profileName&quot;</span>
+<span class="sd">or </span>
+<span class="sd">python PerPixelOffset.py --file &quot;file.vxl&quot; --name &quot;profileName&quot;</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+<span class="kn">import</span> <span class="nn">Voxel</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<div class="viewcode-block" id="computeAveragePhases"><a class="viewcode-back" href="../../calibration.html#calibration.PerPixelOffset.computeAveragePhases">[docs]</a><span class="k">def</span> <span class="nf">computeAveragePhases</span><span class="p">(</span><span class="n">camsys</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">window</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the average phases for all pixels for a given file&quot;&quot;&quot;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">Voxel</span><span class="o">.</span><span class="n">FrameStreamReader</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">camsys</span><span class="p">)</span>
+    <span class="n">bool1</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">getStreamParamu</span><span class="p">(</span><span class="s2">&quot;frameWidth&quot;</span><span class="p">)</span>
+    <span class="n">bool2</span><span class="p">,</span> <span class="n">rows</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">getStreamParamu</span><span class="p">(</span><span class="s2">&quot;frameHeight&quot;</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">cx</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">getStreamParamf</span><span class="p">(</span><span class="s1">&#39;cx&#39;</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">cy</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">getStreamParamf</span><span class="p">(</span><span class="s1">&#39;cy&#39;</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span><span class="n">fx</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">getStreamParamf</span><span class="p">(</span><span class="s1">&#39;fx&#39;</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">fy</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">getStreamParamf</span><span class="p">(</span><span class="s1">&#39;fy&#39;</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">k1</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">getStreamParamf</span><span class="p">(</span><span class="s1">&#39;k1&#39;</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">k2</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">getStreamParamf</span><span class="p">(</span><span class="s1">&#39;k2&#39;</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">k3</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">getStreamParamf</span><span class="p">(</span><span class="s1">&#39;k3&#39;</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">p1</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">getStreamParamf</span><span class="p">(</span><span class="s1">&#39;p1&#39;</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">p2</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">getStreamParamf</span><span class="p">(</span><span class="s1">&#39;p2&#39;</span><span class="p">)</span>
+    <span class="n">cx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cx</span><span class="p">)</span>
+    <span class="n">cy</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cy</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">cx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">cx</span> <span class="o">=</span> <span class="n">rows</span><span class="o">/</span><span class="mi">2</span>
+    <span class="k">if</span> <span class="n">cy</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">cy</span> <span class="o">=</span> <span class="n">cols</span><span class="o">/</span><span class="mi">2</span>
+    <span class="k">if</span> <span class="n">window</span><span class="p">:</span>
+        <span class="n">centerShape</span> <span class="o">=</span> <span class="p">[</span><span class="n">cx</span><span class="o">-</span><span class="n">window</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">cx</span><span class="o">+</span><span class="n">window</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">cy</span><span class="o">-</span><span class="n">window</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">cy</span><span class="o">+</span><span class="n">window</span><span class="o">/</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="n">centerShape</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">rows</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">cols</span><span class="p">]</span>        
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">r</span><span class="o">.</span><span class="n">isStreamGood</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">bool1</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">bool2</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Stream is not good: &quot;</span> <span class="o">+</span> <span class="n">filename</span><span class="p">)</span>
+    <span class="n">numFrames</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">window</span><span class="p">:</span>
+        <span class="n">averagePhase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">window</span><span class="p">,</span> <span class="n">window</span><span class="p">),</span> <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;complex&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">averagePhase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">),</span> <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;complex&#39;</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">numFrames</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">r</span><span class="o">.</span><span class="n">readNext</span><span class="p">():</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Failed to read frame </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">break</span>
+        <span class="n">tofFrame</span> <span class="o">=</span> <span class="n">Voxel</span><span class="o">.</span><span class="n">ToF1608Frame</span><span class="o">.</span><span class="n">typeCast</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">frames</span><span class="p">[</span><span class="n">Voxel</span><span class="o">.</span><span class="n">DepthCamera</span><span class="o">.</span><span class="n">FRAME_RAW_FRAME_PROCESSED</span><span class="p">])</span>
+        <span class="n">phase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tofFrame</span><span class="o">.</span><span class="n">_phase</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">))</span>\
+        <span class="p">[</span><span class="n">centerShape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">centerShape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">centerShape</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span><span class="n">centerShape</span><span class="p">[</span><span class="mi">3</span><span class="p">]]</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">4096</span>
+        <span class="n">amplitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tofFrame</span><span class="o">.</span><span class="n">_amplitude</span><span class="p">,</span> <span class="n">copy</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">rows</span><span class="p">,</span><span class="n">cols</span><span class="p">))</span>\
+        <span class="p">[</span><span class="n">centerShape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">centerShape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">centerShape</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span><span class="n">centerShape</span><span class="p">[</span><span class="mi">3</span><span class="p">]]</span>
+        <span class="n">averagePhase</span> <span class="o">+=</span> <span class="n">amplitude</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phase</span><span class="p">)</span><span class="o">+</span> <span class="mi">1j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phase</span><span class="p">))</span>
+    <span class="n">averagePhase</span> <span class="o">/=</span> <span class="n">numFrames</span>
+    <span class="k">if</span> <span class="n">window</span><span class="p">:</span>
+        <span class="n">averagePhase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">averagePhase</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">window</span><span class="o">*</span><span class="n">window</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">averagePhase</span> <span class="o">&lt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">averagePhase</span> <span class="o">+=</span> <span class="mi">4096</span>
+    <span class="n">averagePhase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">averagePhase</span><span class="p">)</span><span class="o">*</span> <span class="mi">4096</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+    
+    <span class="n">r</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">k1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k3</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">])</span>
+    <span class="n">mtx</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">fx</span><span class="p">,</span> <span class="mi">0</span> <span class="p">,</span> <span class="n">cx</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">fy</span><span class="p">,</span> <span class="n">cy</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span> <span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
+    <span class="k">return</span> <span class="n">averagePhase</span><span class="p">,</span> <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="n">mtx</span><span class="p">,</span> <span class="n">dist</span>
+</div>
+<span class="n">MAX_PHASE_VALUE</span> <span class="o">=</span> <span class="mi">4096</span>
+<span class="n">PHASE_FILENAME</span> <span class="o">=</span> <span class="s1">&#39;per-pixel-offset.npy&#39;</span>
+<span class="n">PHASE_OFFSET_FILE</span> <span class="o">=</span> <span class="s1">&#39;phaseOffset.bin&#39;</span>
+
+<div class="viewcode-block" id="wrapPhaseToSignedInteger"><a class="viewcode-back" href="../../calibration.html#calibration.PerPixelOffset.wrapPhaseToSignedInteger">[docs]</a><span class="k">def</span> <span class="nf">wrapPhaseToSignedInteger</span><span class="p">(</span><span class="n">phase</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">phase</span> <span class="o">&gt;=</span> <span class="n">MAX_PHASE_VALUE</span><span class="o">/</span><span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="p">(</span><span class="n">MAX_PHASE_VALUE</span> <span class="o">-</span> <span class="n">phase</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">phase</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">MAX_PHASE_VALUE</span><span class="o">/</span><span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">MAX_PHASE_VALUE</span> <span class="o">+</span> <span class="n">phase</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">phase</span>
+</div>
+<div class="viewcode-block" id="perPixelOffset"><a class="viewcode-back" href="../../calibration.html#calibration.PerPixelOffset.perPixelOffset">[docs]</a><span class="k">def</span> <span class="nf">perPixelOffset</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="n">pathToSave</span><span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">profileName</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes pixelwise phase offset for all pixels. Returns a numpy file containing the pixelwise offsets as well as the bin file</span>
+<span class="sd">    </span>
+<span class="sd">    .. note: Copy the bin file to the /path/to/.voxel/conf folder path before using it in the conf file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">camsys</span> <span class="o">=</span> <span class="n">Voxel</span><span class="o">.</span><span class="n">CameraSystem</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">profileName</span><span class="p">:</span>
+        <span class="n">profileName</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">computeAveragePhases</span><span class="p">(</span><span class="n">camsys</span><span class="p">,</span> <span class="n">fileName</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s2">&quot;Can&#39;t calculate the phase offsets. Check file&quot;</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">phases</span><span class="p">,</span> <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="n">mtx</span><span class="p">,</span> <span class="n">dist</span> <span class="o">=</span> <span class="n">ret</span>
+    <span class="k">if</span> <span class="n">pathToSave</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">newFile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fileName</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">PHASE_FILENAME</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">newFile</span> <span class="o">=</span> <span class="n">pathToSave</span> <span class="o">+</span> <span class="n">profileName</span> <span class="o">+</span> <span class="n">PHASE_FILENAME</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">newFile</span><span class="p">,</span> <span class="n">phases</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">cGrid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">rows</span><span class="p">,</span><span class="mi">0</span><span class="p">:</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">cGrid1D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">cGrid</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span> <span class="p">(</span><span class="n">rows</span><span class="o">*</span><span class="n">cols</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">cGridCorrected1D</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">undistortPoints</span><span class="p">(</span><span class="n">cGrid1D</span><span class="p">,</span> <span class="n">mtx</span><span class="p">,</span> <span class="n">dist</span><span class="p">)</span>
+    <span class="n">cGridCorrected</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">cGridCorrected1D</span><span class="p">,</span> <span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="mi">2</span><span class="p">)),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">ry</span> <span class="o">=</span> <span class="n">cGridCorrected</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">rx</span> <span class="o">=</span> <span class="n">cGridCorrected</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="c1"># Uncomment to get undistortion mapping</span>
+    <span class="c1">#with open(&#39;temp2.txt&#39;, &#39;w&#39;) as f:</span>
+      <span class="c1">#for r in range(0, self.rows):</span>
+        <span class="c1">#for c in range(0, self.columns):</span>
+          <span class="c1">#f.write(&#39;(%d, %d) -&gt; (%.2f, %.2f)\n&#39;%(self.cGrid[1, r, c], self.cGrid[0, r, c], rx[r, c], ry[r, c]))</span>
+        
+    <span class="n">rad2DSquare</span> <span class="o">=</span> <span class="p">((</span><span class="n">rx</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">ry</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+
+    <span class="n">cosA</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">((</span><span class="n">rad2DSquare</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span><span class="p">)</span>
+    
+    <span class="n">deltaPhase</span> <span class="o">=</span> <span class="n">phases</span> <span class="o">-</span> <span class="n">phases</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">mtx</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">mtx</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">])]</span><span class="o">/</span><span class="n">cosA</span>
+    <span class="k">if</span> <span class="n">pathToSave</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">phaseOffsetFileName</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fileName</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">PHASE_OFFSET_FILE</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">phaseOffsetFileName</span> <span class="o">=</span> <span class="n">pathToSave</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="n">profileName</span> <span class="o">+</span><span class="n">PHASE_OFFSET_FILE</span>
+    <span class="k">with</span> <span class="nb">open</span> <span class="p">(</span><span class="n">phaseOffsetFileName</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s1">&#39;H&#39;</span><span class="p">,</span> <span class="n">rows</span><span class="p">))</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s1">&#39;H&#39;</span><span class="p">,</span> <span class="n">cols</span><span class="p">))</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s1">&#39;H&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">deltaPhase</span><span class="p">,</span> <span class="n">rows</span><span class="o">*</span><span class="n">cols</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">short</span><span class="p">)</span><span class="o">.</span><span class="n">tofile</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>    
+    <span class="k">return</span> <span class="bp">True</span><span class="p">,</span> <span class="n">phaseOffsetFileName</span><span class="p">,</span> <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span>
+</div>
+<div class="viewcode-block" id="parseArgs"><a class="viewcode-back" href="../../calibration.html#calibration.PerPixelOffset.parseArgs">[docs]</a><span class="k">def</span> <span class="nf">parseArgs</span> <span class="p">(</span><span class="n">args</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Calculate Per Pixel Offsets&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-f&#39;</span><span class="p">,</span> <span class="s1">&#39;--file&#39;</span><span class="p">,</span> <span class="n">help</span> <span class="o">=</span> <span class="s1">&#39;Filename&#39;</span><span class="p">,</span> <span class="n">required</span> <span class="o">=</span> <span class="s1">&#39;True&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span> <span class="bp">None</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-n&#39;</span><span class="p">,</span> <span class="s1">&#39;--name&#39;</span><span class="p">,</span> <span class="n">help</span> <span class="o">=</span> <span class="s1">&#39;Profile Name&#39;</span><span class="p">,</span> <span class="n">default</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">required</span> <span class="o">=</span> <span class="bp">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>    
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="n">parseArgs</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">perPixelOffset</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">file</span><span class="p">,</span> <span class="n">profileName</span><span class="o">=</span><span class="n">val</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s2">&quot;Can&#39;t compute the phase offsets&quot;</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+    <span class="n">boo</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">ret</span>
+    <span class="k">print</span> <span class="p">(</span><span class="s2">&quot;Successfully saved the offsets to &quot;</span> <span class="o">+</span> <span class="n">text</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s2">&quot;Can&#39;t compute the phase offsets&quot;</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+    <span class="n">boo</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">ret</span>
+    <span class="k">print</span> <span class="p">(</span><span class="s2">&quot;Successfully saved the offsets to &quot;</span> <span class="o">+</span> <span class="n">text</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, &#39;Suramya&#39;.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>calibration.NonLinearityCalibration &mdash; SCAW &#39;0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '&#39;0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SCAW &#39;0.1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><h1 style="font-size: 3em;">Voxel Calibration Wizard</h1></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for calibration.NonLinearityCalibration</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;The following program computes the non-linearity correction coefficients using csv as the input&#39;&#39;&#39;</span>
+<span class="sd">&#39;&#39;&#39;Example: python NonLinearityCalibration.py --file filename --phaseCorr 0 --modFreq 48 &#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+
+<div class="viewcode-block" id="NonLinearityCalibration"><a class="viewcode-back" href="../../calibration.html#calibration.NonLinearityCalibration.NonLinearityCalibration">[docs]</a><span class="k">def</span> <span class="nf">NonLinearityCalibration</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">modFreq</span><span class="p">,</span> <span class="n">modFreq2</span><span class="p">,</span> <span class="n">phaseCorr</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">phaseCorr2</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This function computes non linearity coefficients. </span>
+<span class="sd">    </span>
+<span class="sd">    **Parameters**::</span>
+<span class="sd">        -fileName: CSV file containing data of measured distance and captured phase</span>
+<span class="sd">        -phaseCorr: The phase offset value for the given modulation frequency</span>
+<span class="sd">        -modFreq: The modulation frequency at which data is captured. </span>
+<span class="sd">        </span>
+<span class="sd">    **Returns**::</span>
+<span class="sd">        -Non linearity coefficients for the given profile</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="mi">299792458</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+        <span class="k">return</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">distances</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">phases</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">phases2</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">:</span>
+            <span class="n">distances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="n">phases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">((</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">])))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">phases2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">distances</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">phases</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Data missing&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="n">distances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">distances</span><span class="p">)</span>
+    <span class="n">phases</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">phases</span><span class="p">)</span>
+    
+    <span class="n">distancesToPhase</span> <span class="o">=</span> <span class="n">distances</span><span class="o">*</span><span class="n">modFreq</span><span class="o">*</span><span class="mi">4096</span><span class="o">*</span><span class="mf">2e6</span><span class="o">/</span><span class="p">(</span><span class="mi">100</span><span class="o">*</span><span class="n">c</span><span class="p">)</span>
+    <span class="n">distancesToPhase</span> <span class="o">=</span> <span class="n">distancesToPhase</span><span class="p">[</span><span class="n">distances</span><span class="o">.</span><span class="n">argsort</span><span class="p">()]</span>
+    <span class="n">measuredPhase</span> <span class="o">=</span> <span class="n">phases</span><span class="p">[</span><span class="n">distances</span><span class="o">.</span><span class="n">argsort</span><span class="p">()]</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">measuredPhase</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">getCoefficients</span><span class="p">(</span><span class="n">measuredPhase</span><span class="p">,</span> <span class="n">distancesToPhase</span><span class="p">,</span> <span class="n">phaseCorr</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">phases2</span><span class="p">:</span>
+        <span class="n">phases2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">phases2</span><span class="p">)</span>
+        <span class="n">distancesToPhase2</span> <span class="o">=</span> <span class="n">distances</span><span class="o">*</span><span class="n">modFreq2</span><span class="o">*</span><span class="mi">4096</span><span class="o">*</span><span class="mf">2e6</span><span class="o">/</span><span class="p">(</span><span class="mi">100</span><span class="o">*</span><span class="n">c</span><span class="p">)</span>
+        <span class="n">distancesToPhase2</span> <span class="o">=</span> <span class="n">distancesToPhase2</span><span class="p">[</span><span class="n">distances</span><span class="o">.</span><span class="n">argsort</span><span class="p">()]</span>
+        <span class="n">measuredPhase2</span> <span class="o">=</span> <span class="n">phases2</span><span class="p">[</span><span class="n">distances</span><span class="o">.</span><span class="n">argsort</span><span class="p">()]</span>
+        <span class="n">y1</span> <span class="o">=</span> <span class="n">getCoefficients</span><span class="p">(</span><span class="n">measuredPhase2</span><span class="p">,</span> <span class="n">distancesToPhase2</span><span class="p">,</span> <span class="n">phaseCorr2</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">y1</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">return</span> <span class="bp">True</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">y1</span>
+</div>
+<div class="viewcode-block" id="getCoefficients"><a class="viewcode-back" href="../../calibration.html#calibration.NonLinearityCalibration.getCoefficients">[docs]</a><span class="k">def</span> <span class="nf">getCoefficients</span><span class="p">(</span><span class="n">measuredPhase</span><span class="p">,</span> <span class="n">distancesToPhase</span><span class="p">,</span> <span class="n">phaseCorr</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">phaseCorr</span><span class="p">:</span>
+        <span class="n">phaseCorr1</span> <span class="o">=</span> <span class="o">-</span><span class="n">distancesToPhase</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">measuredPhase</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">measuredPhase</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">measuredPhase</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">print</span> <span class="n">phaseCorr1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">phaseCorr1</span> <span class="o">=</span> <span class="mi">0</span>              
+    <span class="n">expectedPhase</span> <span class="o">=</span> <span class="n">distancesToPhase</span> <span class="o">+</span> <span class="n">phaseCorr</span> <span class="o">+</span> <span class="n">phaseCorr1</span>
+    <span class="n">expectedPhase</span> <span class="o">=</span> <span class="n">expectedPhase</span><span class="o">%</span><span class="mi">4096</span>    
+    <span class="n">measuredPhase</span> <span class="o">=</span> <span class="n">measuredPhase</span> <span class="o">+</span> <span class="n">phaseCorr</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">measuredPhase</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
+    <span class="n">measuredPhase</span> <span class="o">=</span> <span class="n">measuredPhase</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span>
+    <span class="n">expectedPhase</span> <span class="o">=</span> <span class="n">expectedPhase</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">expectedPhase</span><span class="p">)</span>
+    <span class="k">print</span> <span class="p">(</span><span class="n">measuredPhase</span><span class="p">)</span>
+    <span class="n">offsetPoints</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">4096.</span><span class="p">,</span> <span class="mf">256.</span><span class="p">)</span>        
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">around</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">offsetPoints</span><span class="p">,</span> <span class="n">measuredPhase</span><span class="p">,</span> <span class="n">expectedPhase</span><span class="p">))</span>
+    <span class="n">indexes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">val</span><span class="p">]</span> <span class="o">==</span> <span class="n">y</span><span class="p">[</span><span class="n">val</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">indexes</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">indexes</span><span class="p">[</span><span class="n">val</span><span class="p">]</span> <span class="o">==</span> <span class="bp">True</span> <span class="ow">and</span> <span class="n">indexes</span><span class="p">[</span><span class="n">val</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>
+            <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">val</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">offsetPoints</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">val</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">indexes</span><span class="p">[</span><span class="n">val</span><span class="p">]</span> <span class="o">==</span> <span class="bp">False</span> <span class="ow">and</span> <span class="n">indexes</span><span class="p">[</span><span class="n">val</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">y</span><span class="p">[</span><span class="n">val</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="n">offsetPoints</span><span class="p">[</span><span class="n">val</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>          
+    <span class="k">return</span> <span class="n">y</span>
+            </div>
+<div class="viewcode-block" id="parseArgs"><a class="viewcode-back" href="../../calibration.html#calibration.NonLinearityCalibration.parseArgs">[docs]</a><span class="k">def</span> <span class="nf">parseArgs</span> <span class="p">(</span><span class="n">args</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+    
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Calculate Common Phase Offsets&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-f&#39;</span><span class="p">,</span> <span class="s1">&#39;--file&#39;</span><span class="p">,</span> <span class="n">help</span> <span class="o">=</span> <span class="s1">&#39;CSV file&#39;</span><span class="p">,</span> <span class="n">required</span> <span class="o">=</span> <span class="s1">&#39;True&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span> <span class="bp">None</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="s1">&#39;--modFreq&#39;</span><span class="p">,</span> <span class="nb">type</span> <span class="o">=</span> <span class="nb">float</span><span class="p">,</span> <span class="n">help</span> <span class="o">=</span> <span class="s1">&#39;Modulation Frequency&#39;</span><span class="p">,</span> <span class="n">required</span> <span class="o">=</span> <span class="s1">&#39;True&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-p&#39;</span><span class="p">,</span> <span class="s1">&#39;--phaseCorr&#39;</span><span class="p">,</span> <span class="n">help</span> <span class="o">=</span> <span class="s1">&#39;Phase Corr Value&#39;</span><span class="p">,</span> <span class="nb">type</span> <span class="o">=</span> <span class="nb">int</span><span class="p">,</span>  <span class="n">required</span> <span class="o">=</span> <span class="s1">&#39;True&#39;</span><span class="p">,</span> <span class="n">default</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>     
+    <span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>           
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="n">parseArgs</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">NonLinearityCalibration</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">file</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">phaseCorr</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">modFreq</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+        <span class="k">print</span><span class="s2">&quot;Can&#39;t get the nonlinearity coefficients&quot;</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="n">boo</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">,</span> <span class="n">expectedPhase</span><span class="p">,</span> <span class="n">measuredPhase</span> <span class="o">=</span> <span class="n">ret</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">coefficients</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span>
+    
+    <span class="k">print</span> <span class="s2">&quot;phase_lin_coeff0 = &quot;</span> <span class="o">+</span> <span class="n">data</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, &#39;Suramya&#39;.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+    </div>
+  </body>
+</html>

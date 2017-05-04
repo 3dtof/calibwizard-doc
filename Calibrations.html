@@ -1,0 +1,395 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Calibration Wizard &mdash; SCAW &#39;0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="static/default.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '&#39;0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/underscore.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SCAW &#39;0.1.0 documentation" href="index.html" />
+    <link rel="next" title="CalibrationWizard" href="CalibrationWizard.html" />
+    <link rel="prev" title="Requirements" href="Requirements.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="index.html"><h1 style="font-size: 3em;">Voxel Calibration Wizard</h1></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="CalibrationWizard.html" title="CalibrationWizard"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Requirements.html" title="Requirements"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">home</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+ 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Calibration Wizard</a><ul>
+<li><a class="reference internal" href="#starting-the-wizard">Starting the wizard</a><ul>
+<li><a class="reference internal" href="#capture-from-camera">Capture From Camera</a></li>
+<li><a class="reference internal" href="#select-files-from-pc">Select Files From PC</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#selecting-the-strategy-for-calibration">Selecting the strategy for calibration</a></li>
+<li><a class="reference internal" href="#lens-calibration">Lens Calibration</a><ul>
+<li><a class="reference internal" href="#data-required">Data Required</a></li>
+<li><a class="reference internal" href="#calibration-using-a-camera">Calibration using a camera</a></li>
+<li><a class="reference internal" href="#calibration-using-existing-data">Calibration Using Existing Data</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#non-linearity-calibration">Non-Linearity Calibration</a><ul>
+<li><a class="reference internal" href="#data-capture">Data Capture</a></li>
+<li><a class="reference internal" href="#calibration">Calibration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#temperature-calibration">Temperature Calibration</a></li>
+<li><a class="reference internal" href="#common-phase-offset-calibration">Common Phase Offset Calibration</a><ul>
+<li><a class="reference internal" href="#id1">Data Required</a></li>
+<li><a class="reference internal" href="#id2">Calibration using existing data</a></li>
+<li><a class="reference internal" href="#id3">Calibration Using a camera</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pixelwise-phase-offset-calibration">PixelWise Phase Offset Calibration</a><ul>
+<li><a class="reference internal" href="#id4">Data Required</a></li>
+<li><a class="reference internal" href="#id5">Calibration</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Requirements.html"
+                        title="previous chapter">Requirements</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="CalibrationWizard.html"
+                        title="next chapter">CalibrationWizard</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="sources/Calibrations.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="calibration-wizard">
+<h1>Calibration Wizard<a class="headerlink" href="#calibration-wizard" title="Permalink to this headline">¶</a></h1>
+<p>The calibration wizard can be used for calibration using existing files as well as by capturing data in place. The following data is required for offline calibration :</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="81%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Calibration</th>
+<th class="head">Data Required</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Lens</td>
+<td>Checkerboard images</td>
+</tr>
+<tr class="row-odd"><td>Common Phase</td>
+<td>VXL of a camera pointing to a flat wall</td>
+</tr>
+<tr class="row-even"><td>Per Pixel Offset</td>
+<td>VXL of a camera pointing to a flat wall</td>
+</tr>
+<tr class="row-odd"><td>Non Linearity</td>
+<td>CSV file containing measured distance and phase values at the center pixel</td>
+</tr>
+<tr class="row-even"><td>Temperature</td>
+<td>CSV file containing temperatures vs phase values, in a temperature chamber</td>
+</tr>
+</tbody>
+</table>
+<p>Data for lens, common phase and pixelwise phase offset calibration can be captured live, using a depth camera. For all other calibrations, it is advised to use existing data captured using voxel viewer.</p>
+<div class="section" id="starting-the-wizard">
+<h2>Starting the wizard<a class="headerlink" href="#starting-the-wizard" title="Permalink to this headline">¶</a></h2>
+<p>The wizard can be started by running the CalibrationWizard.py file. The first page that comes up is the following:</p>
+<a class="reference internal image-reference" href="images/firstpage.PNG"><img alt="images/firstpage.PNG" src="images/firstpage.PNG" style="width: 300pt;" /></a>
+<p>Here, you can select which calibrations are required to be performed. Also, if you already have captured data, you can select the &#8220;Select files from PC&#8221; parameter. Otherwise, choose &#8220;Capture from Camera.&#8221;</p>
+<div class="section" id="capture-from-camera">
+<h3>Capture From Camera<a class="headerlink" href="#capture-from-camera" title="Permalink to this headline">¶</a></h3>
+<p>Once you select a camera, you&#8217;ll be asked to select a new profile or edit an existing profile present in the camera. If you create a new profile, you need to select a parent. Else, if you&#8217;re editing an existing profile, the conf file of that profile is changed.</p>
+<a class="reference internal image-reference" href="images/selectDepthcamera.PNG"><img alt="images/selectDepthcamera.PNG" src="images/selectDepthcamera.PNG" style="width: 300pt;" /></a>
+<dl class="docutils">
+<dt>Once you select a depth camera connected to the device, you&#8217;re asked if you want to create a new profile or edit an existing one.</dt>
+<dd><ul class="first last simple">
+<li><em>Create a new profile:</em> This option will ask for a profile name as well as a profile to inherit from. Select the profile you want to inherit from and continue with the calibration.</li>
+<li><em>Edit an existing profile</em>: if you select a profile which is already present from the dropdown menu, the existing profile will get edited. This should NOT be used for the profiles present in the hardware (the profiles present in the hardware will have (HW) written in the end).</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="select-files-from-pc">
+<h3>Select Files From PC<a class="headerlink" href="#select-files-from-pc" title="Permalink to this headline">¶</a></h3>
+<p>If you choose to select files from PC, you need to provide the information for the chipset being used. The wizard currently supports the use of <strong>TintinCDKCamera</strong> and <strong>CalculusCDKCamera</strong> chipsets. To know the camera chipset, open Voxel Viewer and look for the camera name. It can be seen in the following image:</p>
+<a class="reference internal image-reference" href="images/cameraName.PNG"><img alt="images/cameraName.PNG" src="images/cameraName.PNG" style="width: 800pt;" /></a>
+<p>Apart from the camera name, you need to provide the conf file which was used for capturing the data. You have the option to edit this file or create a new profile, whose parent will be the conf file you pick.</p>
+<blockquote>
+<div><ul class="simple">
+<li>Selecting an existing conf file will result in overwriting of the calibration parameters for the given profile.</li>
+<li>Creating a new profile and selecting a parent will result in the creation of a new profile. All the missing calibrations in the selected profile will be obtained from the parent profile.</li>
+</ul>
+</div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>Offline calibration requires you to change the id of the profile you&#8217;ve created. Currently, an id of 150 is being used. You need to open the conf file and change the id manually for the profile to work with the camera.</li>
+<li>Offline calibration does not add the new profile to the main configuration file of a chipset. To do so, go to the conf directory, open the main configuration chipset (TintinCDKCamera.conf in case of Tintin and CalculusCDKCamera.conf in case of Calculus) and add the profile name to the main conf file.</li>
+</ul>
+</div>
+<a class="reference internal image-reference" href="images/selectConfFile.PNG"><img alt="images/selectConfFile.PNG" src="images/selectConfFile.PNG" style="width: 700pt;" /></a>
+</div>
+</div>
+<div class="section" id="selecting-the-strategy-for-calibration">
+<h2>Selecting the strategy for calibration<a class="headerlink" href="#selecting-the-strategy-for-calibration" title="Permalink to this headline">¶</a></h2>
+<p>The second page of the wizard asks for the specific strategy with which you wan to do a particular calibration. The different types of calibrations are as follows:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="81%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Strategy</th>
+<th class="head">Calibration(s)</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>FlatWall</td>
+<td>Common Phase Offset, PixelWise Phase Offset, HDR common phase offset</td>
+</tr>
+<tr class="row-odd"><td>Checkerboard</td>
+<td>Lens Calibration</td>
+</tr>
+<tr class="row-even"><td>Piecewise</td>
+<td>Non Linearity Calibration</td>
+</tr>
+<tr class="row-odd"><td>Temperature</td>
+<td>Temperature Calibration</td>
+</tr>
+</tbody>
+</table>
+<a class="reference internal image-reference" href="images/SelectMethodForCalibration.PNG"><img alt="images/SelectMethodForCalibration.PNG" src="images/SelectMethodForCalibration.PNG" style="width: 300pt;" /></a>
+</div>
+<div class="section" id="lens-calibration">
+<h2>Lens Calibration<a class="headerlink" href="#lens-calibration" title="Permalink to this headline">¶</a></h2>
+<p>Lens calibration aims at overcoming optical distortions introduced by the lens.  In absence of any optical distortions, each pixel (u_i,v_i )  can be converted to the equivalent world coordinates (x_i,y_i,z_i ) by applying the pin-hole camera model shown in Figure 18.  The goal of lens calibration is to transform the distorted pixel coordinates to an equivalent coordinates that can be used under the pin-hole camera model.</p>
+<a class="reference internal image-reference" href="images/pinhole.png"><img alt="images/pinhole.png" src="images/pinhole.png" style="width: 300pt;" /></a>
+<p>The process extracts a set of parameters commonly known as intrinsics that include nine values [k1, k2, k3, pi, p2], where [k1,k2 k3] are the radial distortion coefficients, [p1,p2 ] are the tangential distortion coefficients, and [cx,cy ] are the coordinates of the image center, and [fx,fy ] are the x and y focal distances.</p>
+<p>The procedure takes several amplitude images of a checkerboard pattern, similar to the one shown in the figure below.  The checkerboard corners are extracted as data points used in computing the intrinsics through least-square minimization.  Users wishing to learn about the theory behind lens calibration are encouraged to review the  OpenCV tutorial link in the Reference section.</p>
+<div class="section" id="data-required">
+<h3>Data Required<a class="headerlink" href="#data-required" title="Permalink to this headline">¶</a></h3>
+<p>-Checkerboard images at various orientations. Images (or vxls) with the checkerboard should be present in the directory. The default path is /path/to/.Voxel/profiles. It is advised to keep the files under the chipset same in the camera id folder. See the image below for reference.</p>
+<a class="reference internal image-reference" href="images/directory.PNG"><img alt="images/directory.PNG" src="images/directory.PNG" style="width: 600pt;" /></a>
+<p>-Number of rows in the checkerboard
+-Number of columns in the checkerboard</p>
+</div>
+<div class="section" id="calibration-using-a-camera">
+<h3>Calibration using a camera<a class="headerlink" href="#calibration-using-a-camera" title="Permalink to this headline">¶</a></h3>
+<p>When a chipset is used for calibration, it uses the /path/to/.Voxel/profiles/CameraType/cameraid folder as default. If there are existing images in the folder, those can be used. Further images can be added using the &#8216;Add&#8217; icon (Refer to the image).</p>
+<a class="reference internal image-reference" href="images/checkerBoardLive.PNG"><img alt="images/checkerBoardLive.PNG" src="images/checkerBoardLive.PNG" style="width: 300pt;" /></a>
+</div>
+<div class="section" id="calibration-using-existing-data">
+<h3>Calibration Using Existing Data<a class="headerlink" href="#calibration-using-existing-data" title="Permalink to this headline">¶</a></h3>
+<p>If existing data is available, calibration can be done using the files available. You need to provide the directory containing the images/vxls along with the rows and columns in the checkerboard. There is an option to view the checkerboard corners and discard images where the algorithm isn&#8217;t able to find the corners. This will directly delete the file from the system.</p>
+</div>
+</div>
+<div class="section" id="non-linearity-calibration">
+<h2>Non-Linearity Calibration<a class="headerlink" href="#non-linearity-calibration" title="Permalink to this headline">¶</a></h2>
+<p>For best accuracy, the relatively small nonlinear relationship that exists between the raw phase measurement and actual depth must be taken into consideration. Such relationship requires taking small steps between the starting position, and the end position, such that the travel spans the full <span class="math">\(2\pi\)</span> phase interval (The <span class="math">\(2\pi\)</span> interval corresponds to the distance which is equal to around 300/(2*modulation frequency), and data is required for the desired modulation frequency). The wizard can take in calibration data in <tt class="docutils literal"><span class="pre">*</span></tt>.csv format collected at calibrated optical center (cx,cy), in the following form:</p>
+<p>&lt;Actual Distance&gt;, &lt;Phase1&gt;, &lt; Phase2&gt;</p>
+<p>Here,  &lt;Actual Distance&gt; is the actual distance, &lt;Phase1&gt; is the phase measured at the first modulation frequency, and &lt;Phase2&gt; is phase measured at second modulation frequency.  These two modulation frequencies work together in the de-aliasing operation. If there is no de-aliasing operation, just &lt;Actual Distance&gt; and &lt;Phase1&gt; parameters are required.</p>
+<p>An example file can be seen at <cite>NonLinearityExample &lt;https://example.com&gt;_</cite>.</p>
+<p>The following image shows how the non linearity page looks like:</p>
+<a class="reference internal image-reference" href="images/nonLinearityPage.png"><img alt="images/nonLinearityPage.png" src="images/nonLinearityPage.png" style="width: 300pt;" /></a>
+<div class="section" id="data-capture">
+<h3>Data Capture<a class="headerlink" href="#data-capture" title="Permalink to this headline">¶</a></h3>
+<p>To capture data, put the camera on a rail that is parallel to a flat wall. Measure the distance of the camera from the wall. At fixed distances, note the value of the phase for both modulation frequencies. For taking data for individual modulation frequencies, set the ind_freq_data_en parameter to 1. For modulation frequency 1, set ind_freq_data_sel parameter to 0 and capture data. For the second modulation frequency, set the ind_freq_data_sel parameter to 1. If just one modulation frequency is being used, just record the data for the first modulation frequency.</p>
+</div>
+<div class="section" id="calibration">
+<h3>Calibration<a class="headerlink" href="#calibration" title="Permalink to this headline">¶</a></h3>
+<p>In the wizard, both in live capture as well as using existing files, the calibration for non linearity is identical. You need to upload a CSV file containing the measured distance v/s phase. Data can be entered in place as well, and the wizard will save the CSV file.</p>
+</div>
+</div>
+<div class="section" id="temperature-calibration">
+<h2>Temperature Calibration<a class="headerlink" href="#temperature-calibration" title="Permalink to this headline">¶</a></h2>
+<p>The goal of temperature calibration is to derive a set of curve-fitting coefficients used in compensating phase drift due to temperature. Normally temperature calibration only needs to be done once per design.  A thermal chamber is required to collect temperature-vs-phase data into a <tt class="docutils literal"><span class="pre">*</span></tt>.csv file format.  Then the <tt class="docutils literal"><span class="pre">*</span></tt>.csv file is imported into the wizard in this step to compute the compensation coefficients.  Each row of the <tt class="docutils literal"><span class="pre">*</span></tt>.csv file must contain three numbers separated by comma, with the following meaning:</p>
+<p>&lt;Tsensor&gt;, &lt;Tillum&gt;, &lt;Measured Phase&gt;</p>
+<p>&lt;Tsensor&gt; is the imaging sensor’s temperature; &lt;Tillum&gt; is the temperature of the illumination driver, both in °C.  Typically the data is collected in about 1°C interval.
+Once the <tt class="docutils literal"><span class="pre">*</span></tt>.csv file is imported, click Calibrate, and the computed temperature coefficients will be displayed at the bottom of the window, as is shown in the figure.</p>
+<a class="reference internal image-reference" href="images/temperaturePage.png"><img alt="images/temperaturePage.png" src="images/temperaturePage.png" style="width: 300pt;" /></a>
+<p>An example file can be seen at <cite>TemperatureExample &lt;https://example.com&gt;_</cite>.</p>
+</div>
+<div class="section" id="common-phase-offset-calibration">
+<h2>Common Phase Offset Calibration<a class="headerlink" href="#common-phase-offset-calibration" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>Common phase calibration assumes the phase-to-depth relationship is linearized by other calibration by the time it runs. The conversion of phase to depth can then be summarized by the linear equation</dt>
+<dd><div class="first last math">
+\[d_{i}= \frac {c*(φ_i-φ_0i)}{2fη}+d_{0i}\]</div>
+</dd>
+</dl>
+<p>The common phase calibration correlates measured phase with actual depth at a single point (φ_0i,d_0i ).  This is done for all pixels indexed by i.  Only the center pixel is correlated, and the average of 200 samples (default) is used.</p>
+<a class="reference internal image-reference" href="images/commonPhase.png"><img alt="images/commonPhase.png" src="images/commonPhase.png" style="width: 300pt;" /></a>
+<div class="section" id="id1">
+<h3>Data Required<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>VXL files of a flat wall (the camera must be approximately parallel to the wall)</li>
+<li>Modulation Frequency(ies)</li>
+<li>Distance of the camera from the wall</li>
+</ul>
+</div>
+<div class="section" id="id2">
+<h3>Calibration using existing data<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt>Data Capture - to be done previously</dt>
+<dd><ul class="first last simple">
+<li>Point the camera to a flat wall and capture data. The camera should be almost parallel to the wall.</li>
+<li>You need to take care to record existing data. For common phase offsets, <strong>ensure that the phase_corr1 and phase_corr2 values are set to zero. In case of TintinCDKCamera, ensure that hdr_phase_corr1 and hdr_phase_corr2 parameters are also 0</strong>. The wizard will give unexpected results if this is not ensured.</li>
+<li>For dealias enabled (dealias_en = 1), record data using ind_freq_data_en parameter as 1. For the first modulation frequency, set the ind_freq_data_sel parameter to 0 and for using the second modulation frequency, set the ind_freq_data_sel parameter to 1.</li>
+<li>Distance at which the VXL is captured is required. Ensure that you measure the distance of the camera from the flat wall.</li>
+<li>Along with the distance, note down the modulation frequency values as well.</li>
+</ul>
+</dd>
+</dl>
+<p>Calibration using existing files</p>
+<blockquote>
+<div><ul class="simple">
+<li>If the dealias_en parameter is set to 1, click on the checkbox beside dealias_en. In case of CalculusCDKCamera, ignore this parameter.</li>
+<li>Choose the file path for the VXL consisting of modulation frequency data. Also choose the modulation frequency and distance (do it for both the files if the dealias_en parameter is on)</li>
+<li>Click on calibrate. If the data is recorded correctly, the wizard will show the values of phase_corr1 and phase_corr2. In case of an error, the program will give an error and you need to use different VXL files.</li>
+</ul>
+</div></blockquote>
+<p>The page for existing files can be seen from the following image:</p>
+<a class="reference internal image-reference" href="images/commonPhaseOffline.png"><img alt="images/commonPhaseOffline.png" src="images/commonPhaseOffline.png" style="width: 300pt;" /></a>
+</div>
+<div class="section" id="id3">
+<h3>Calibration Using a camera<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>When a camera is directly used for calibration, the wizard asks for the permission to record the vxls by itself. The vxl(s) are located in the /path/to/profiles/&lt;Camera_Name&gt;/&lt;Camera_id&gt;/ folder. When dealias_en is 1, the wizard asks the user to click capture again before recording the vxl for the second modulation frequency.</p>
+<p>Then, if the recordings are good, click on calibrate to get the coefficients. If Per pixel calibration is required, it will be calibrated using the same vxl captured for per pixel offsets.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>Ensure that lens calibration is done before Common Phase Offset Calibration. Otherwise, the offset may be incorrect and there will be an error in the computed distance.</li>
+</ul>
+</div>
+<p>The live capture of the common phase offset can be seen in the following image:</p>
+<a class="reference internal image-reference" href="images/commonPhaseLive.png"><img alt="images/commonPhaseLive.png" src="images/commonPhaseLive.png" style="width: 300pt;" /></a>
+</div>
+</div>
+<div class="section" id="pixelwise-phase-offset-calibration">
+<h2>PixelWise Phase Offset Calibration<a class="headerlink" href="#pixelwise-phase-offset-calibration" title="Permalink to this headline">¶</a></h2>
+<p>For high-precision applications, pixel-to-pixel calibration is recommended.  This calibration step attempts to overcome the finer pixel-to-pixel variation.  Since the variation is compensated for each pixel, this calibration requires a larger storage space on the EEPROM; and only one copy of the pixel variation map can be stored.</p>
+<div class="section" id="id4">
+<h3>Data Required<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>VXL file of the camera pointing to a flat wall.</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>Ensure that the lens (<strong>required</strong>) and non linearity calibration (if needed) is done before the pixelwise phase offset calibration</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id5">
+<h3>Calibration<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>For both live capture and calibration using a camera, the data required is just a VXL file. Record data (in case of capture) or give the file path (in case of existing data) and hit on calibrate.</p>
+<p>For offline capture, the page looks as follows:</p>
+<a class="reference internal image-reference" href="images/perPixel.png"><img alt="images/perPixel.png" src="images/perPixel.png" style="width: 300pt;" /></a>
+<p>And for online data capture, the page looks as follows:</p>
+<a class="reference internal image-reference" href="images/perPixelLive.png"><img alt="images/perPixelLive.png" src="images/perPixelLive.png" style="width: 300pt;" /></a>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If common phase offset calibration is selected along with pixelwise phase offset calibration, there is no need to specify the file path. The code will use the file for common phase offset correction for calibrating the pixelwise offsets.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="CalibrationWizard.html" title="CalibrationWizard"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Requirements.html" title="Requirements"
+             >previous</a> |</li>
+        <li><a href="index.html">home</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+ 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, &#39;Suramya&#39;.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+    </div>
+  </body>
+</html>

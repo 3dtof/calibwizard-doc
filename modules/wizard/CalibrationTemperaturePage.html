@@ -1,0 +1,398 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>wizard.CalibrationTemperaturePage &mdash; SCAW &#39;0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '&#39;0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SCAW &#39;0.1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><h1 style="font-size: 3em;">Voxel Calibration Wizard</h1></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for wizard.CalibrationTemperaturePage</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># TI Voxel Viewer component.</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2014 Texas Instruments Inc.</span>
+<span class="c1">#</span>
+
+<span class="kn">from</span> <span class="nn">PySide</span> <span class="kn">import</span> <span class="n">QtCore</span><span class="p">,</span> <span class="n">QtGui</span>
+<span class="kn">from</span> <span class="nn">CalibrationPage</span> <span class="kn">import</span> <span class="n">CalibrationPage</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">wizard.Calibrations</span> <span class="kn">import</span> <span class="n">CALIB_SHOW</span>
+<span class="c1"># from wizard import CalibrationPage</span>
+
+<div class="viewcode-block" id="CalibratePhaseTableDelegate"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationTemperaturePage.CalibratePhaseTableDelegate">[docs]</a><span class="k">class</span> <span class="nc">CalibratePhaseTableDelegate</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QItemDelegate</span><span class="p">):</span>
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">CalibratePhaseTableDelegate</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+  
+<div class="viewcode-block" id="CalibratePhaseTableDelegate.createEditor"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationTemperaturePage.CalibratePhaseTableDelegate.createEditor">[docs]</a>  <span class="k">def</span> <span class="nf">createEditor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+    <span class="n">spinbox</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSpinBox</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">column</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">index</span><span class="o">.</span><span class="n">column</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+      <span class="n">spinbox</span><span class="o">.</span><span class="n">setRange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4095</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">spinbox</span><span class="o">.</span><span class="n">setRange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span> <span class="c1"># 200 degree celcius</span>
+      
+    <span class="k">return</span> <span class="n">spinbox</span>
+</div></div>
+<div class="viewcode-block" id="CalibrationTemperaturePage"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationTemperaturePage.CalibrationTemperaturePage">[docs]</a><span class="k">class</span> <span class="nc">CalibrationTemperaturePage</span><span class="p">(</span><span class="n">CalibrationPage</span><span class="p">):</span>
+  
+  <span class="n">CSV_FILE_NAME</span> <span class="o">=</span> <span class="s1">&#39;temperature-phase-offset.csv&#39;</span>
+  <span class="n">MAX_PHASE_VALUE</span> <span class="o">=</span> <span class="mi">4096</span>
+  
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">calibrationWizard</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">CalibrationTemperaturePage</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+          
+    <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span> <span class="o">=</span> <span class="n">calibrationWizard</span>
+    <span class="k">if</span> <span class="n">CALIB_SHOW</span><span class="p">[</span><span class="s1">&#39;temperature&#39;</span><span class="p">]</span> <span class="o">==</span><span class="bp">True</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">doShow</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">setTitle</span><span class="p">(</span><span class="s1">&#39;Temperature Calibration&#39;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">setSubTitle</span><span class="p">(</span><span class="s1">&#39;Computation of influence of temperature on phase. Please measure the phase value at cx, cy&#39;</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    
+    <span class="n">hlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">centerPointText</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">()</span>
+    <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">centerPointText</span><span class="p">)</span>
+    
+    <span class="n">hlayout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">calibrateButton</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s1">&#39;&amp;Calibrate&#39;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">calibrateButton</span><span class="o">.</span><span class="n">pressed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrate</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">calibrateButton</span><span class="o">.</span><span class="n">setShortcut</span><span class="p">(</span><span class="s1">&#39;Alt+C&#39;</span><span class="p">)</span>
+    <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrateButton</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">hlayout</span><span class="p">)</span>
+    
+    <span class="n">groupbox</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QGroupBox</span><span class="p">()</span>
+    <span class="n">groupbox</span><span class="o">.</span><span class="n">setTitle</span><span class="p">(</span><span class="s1">&#39;Temperature Measurements&#39;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">groupbox</span><span class="p">)</span>
+    <span class="n">vglayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+    <span class="n">groupbox</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">vglayout</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QTableWidget</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">calibParams</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="c1">#     if self.chipset == CalibrationPage.CHIPSET_HADDOCK:</span>
+<span class="c1">#       self.temperatureMeasurements.setColumnCount(4)</span>
+<span class="c1">#       self.temperatureMeasurements.setHorizontalHeaderLabels([&#39;Tsensor&#39;, &#39;Tillum&#39;, &#39;Phase 1&#39;, &#39;Phase 2&#39;])</span>
+<span class="c1">#     else:</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="o">.</span><span class="n">setColumnCount</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="o">.</span><span class="n">setHorizontalHeaderLabels</span><span class="p">([</span><span class="s1">&#39;Tsensor&#39;</span><span class="p">,</span> <span class="s1">&#39;Tillum&#39;</span><span class="p">,</span> <span class="s1">&#39;Phase 1&#39;</span><span class="p">])</span>
+      
+    <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="o">.</span><span class="n">setContextMenuPolicy</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ActionsContextMenu</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="o">.</span><span class="n">setToolTip</span><span class="p">(</span><span class="s1">&#39;Please ensure that entries are in increasing order of temperature values&#39;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="o">.</span><span class="n">setItemDelegate</span><span class="p">(</span><span class="n">CalibratePhaseTableDelegate</span><span class="p">())</span>
+    <span class="n">vglayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="p">)</span>
+    
+    <span class="n">insertRowAction</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QAction</span><span class="p">(</span><span class="s1">&#39;Insert Row&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="p">)</span>
+    <span class="n">insertRowAction</span><span class="o">.</span><span class="n">setShortcut</span><span class="p">(</span><span class="s1">&#39;Insert&#39;</span><span class="p">)</span>
+    <span class="n">insertRowAction</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">insertRow</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">insertRowAction</span><span class="p">)</span>
+    
+    <span class="n">removeRowAction</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QAction</span><span class="p">(</span><span class="s1">&#39;Remove Row&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="p">)</span>
+    <span class="n">removeRowAction</span><span class="o">.</span><span class="n">setShortcut</span><span class="p">(</span><span class="s1">&#39;Del&#39;</span><span class="p">)</span>
+    <span class="n">removeRowAction</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">removeRow</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">removeRowAction</span><span class="p">)</span>
+    
+    <span class="n">removeAllRowsAction</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QAction</span><span class="p">(</span><span class="s1">&#39;Remove All Rows&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="p">)</span>
+    <span class="n">removeAllRowsAction</span><span class="o">.</span><span class="n">setShortcut</span><span class="p">(</span><span class="s1">&#39;Shift+Del&#39;</span><span class="p">)</span>
+    <span class="n">removeAllRowsAction</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">removeAllRows</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">removeAllRowsAction</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">importCSVButton</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s1">&#39;&amp;Import From CSV&#39;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">importCSVButton</span><span class="o">.</span><span class="n">setShortcut</span><span class="p">(</span><span class="s1">&#39;Alt+I&#39;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">importCSVButton</span><span class="o">.</span><span class="n">pressed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">importCSV</span><span class="p">)</span>
+    <span class="n">vglayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">importCSVButton</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">paramsGroupbox</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QGroupBox</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">paramsGroupbox</span><span class="o">.</span><span class="n">setTitle</span><span class="p">(</span><span class="s1">&#39;Temperature Parameters&#39;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paramsGroupbox</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">paramsText</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">()</span>
+    
+    <span class="n">vglayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+    <span class="n">vglayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paramsText</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">paramsGroupbox</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">vglayout</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">paramsGroupbox</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">calibrated</span> <span class="o">=</span> <span class="bp">False</span>
+    
+<div class="viewcode-block" id="CalibrationTemperaturePage.isComplete"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.isComplete">[docs]</a>  <span class="k">def</span> <span class="nf">isComplete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrated</span>
+    </div>
+<div class="viewcode-block" id="CalibrationTemperaturePage.insertRow"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.insertRow">[docs]</a>  <span class="k">def</span> <span class="nf">insertRow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="o">.</span><span class="n">currentRow</span><span class="p">()</span>
+    
+    <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="o">.</span><span class="n">rowCount</span><span class="p">():</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="o">.</span><span class="n">insertRow</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="o">.</span><span class="n">rowCount</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="o">.</span><span class="n">insertRow</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+      </div>
+<div class="viewcode-block" id="CalibrationTemperaturePage.removeRow"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.removeRow">[docs]</a>  <span class="k">def</span> <span class="nf">removeRow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="o">.</span><span class="n">currentRow</span><span class="p">()</span>
+    
+    <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="o">.</span><span class="n">rowCount</span><span class="p">():</span>
+      
+      <span class="n">r</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">question</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Remove Row&#39;</span><span class="p">,</span> <span class="s1">&#39;Are you sure you want to remove the current row?&#39;</span><span class="p">,</span> \
+            <span class="n">buttons</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">Yes</span> <span class="o">|</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">No</span><span class="p">)</span>
+      
+      <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">Yes</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="o">.</span><span class="n">removeRow</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        </div>
+<div class="viewcode-block" id="CalibrationTemperaturePage.removeAllRows"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.removeAllRows">[docs]</a>  <span class="k">def</span> <span class="nf">removeAllRows</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">question</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Remove All Rows&#39;</span><span class="p">,</span> <span class="s1">&#39;Are you sure you want to remove all rows?&#39;</span><span class="p">,</span> \
+            <span class="n">buttons</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">Yes</span> <span class="o">|</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">No</span><span class="p">)</span>
+      
+    <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">Yes</span><span class="p">:</span>
+      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="o">.</span><span class="n">rowCount</span><span class="p">()):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="o">.</span><span class="n">removeRow</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="CalibrationTemperaturePage.writeCSV"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.writeCSV">[docs]</a>  <span class="k">def</span> <span class="nf">writeCSV</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">csvFile</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">csvFile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+      <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">format</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s2">&quot;.0f&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">r</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="CalibrationTemperaturePage.importCSV"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.importCSV">[docs]</a>  <span class="k">def</span> <span class="nf">importCSV</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csvFile</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+    
+    <span class="k">if</span> <span class="n">csvFile</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">name</span><span class="p">,</span> <span class="nb">filter</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Select CSV File&#39;</span><span class="p">,</span> <span class="nb">filter</span> <span class="o">=</span> <span class="s1">&#39;CSV Files (*.csv)&#39;</span><span class="p">)</span>
+      
+      <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
+        <span class="n">csvFile</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span>
+      
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">csvFile</span><span class="p">):</span>
+      <span class="k">return</span>
+    
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">csvFile</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+      <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+      
+      <span class="n">c</span> <span class="o">=</span> <span class="mi">0</span>
+      <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="o">.</span><span class="n">columnCount</span><span class="p">():</span>
+          <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Invalid row count&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;Expected </span><span class="si">%d</span><span class="s1"> columns per row,&#39;</span> <span class="o">+</span> \
+                                     <span class="s1">&#39; but got </span><span class="si">%d</span><span class="s1"> for row </span><span class="si">%d</span><span class="s1">.&#39;</span><span class="p">)</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="o">.</span><span class="n">columnCount</span><span class="p">(),</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">),</span> <span class="n">c</span><span class="p">))</span>
+          <span class="k">return</span>
+        
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="o">.</span><span class="n">rowCount</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="o">.</span><span class="n">insertRow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="o">.</span><span class="n">rowCount</span><span class="p">())</span>
+        
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)):</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="o">.</span><span class="n">setItem</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QTableWidgetItem</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        
+        <span class="n">c</span> <span class="o">+=</span> <span class="mi">1</span>
+      
+  </div>
+<div class="viewcode-block" id="CalibrationTemperaturePage.initializePage"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.initializePage">[docs]</a>  <span class="k">def</span> <span class="nf">initializePage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">CalibrationTemperaturePage</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">initializePage</span><span class="p">()</span>
+    
+<span class="c1">#     if os.path.exists(self.basePath + os.sep + CalibrationTemperaturePage.CSV_FILE_NAME):</span>
+<span class="c1">#       self.importCSV(self.basePath + os.sep + CalibrationTemperaturePage.CSV_FILE_NAME)</span>
+    </div>
+<div class="viewcode-block" id="CalibrationTemperaturePage.getData"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.getData">[docs]</a>  <span class="k">def</span> <span class="nf">getData</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="o">.</span><span class="n">rowCount</span><span class="p">()):</span>
+      <span class="n">x</span> <span class="o">=</span> <span class="p">[]</span>
+      <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="o">.</span><span class="n">columnCount</span><span class="p">()):</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperatureMeasurements</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
+        
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+          <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Data Missing&#39;</span><span class="p">,</span> <span class="s1">&#39;Data at row = </span><span class="si">%d</span><span class="s1">, column = </span><span class="si">%d</span><span class="s1"> is empty&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">))</span>
+          <span class="k">return</span> <span class="p">[]</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+      
+      <span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+      
+    <span class="k">return</span> <span class="n">d</span>
+      
+    </div>
+<div class="viewcode-block" id="CalibrationTemperaturePage.calibrate"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.calibrate">[docs]</a>  <span class="k">def</span> <span class="nf">calibrate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    
+    <span class="n">d1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span>
+    
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">d1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Data Missing&#39;</span><span class="p">,</span> <span class="s1">&#39;Cannot perform calibration with missing data&#39;</span><span class="p">)</span>
+      <span class="k">return</span>
+    
+    <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">d1</span><span class="p">)</span>
+    
+    <span class="n">d</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="n">d</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">argsort</span><span class="p">()]</span>
+    
+    <span class="n">A</span> <span class="o">=</span> <span class="n">d</span><span class="p">[:,</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+    
+    <span class="n">b1</span> <span class="o">=</span> <span class="n">d</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span>
+    
+    <span class="n">tSensorCalib</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">tIllumCalib</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">phaseCorr1</span> <span class="o">=</span> <span class="n">b1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    
+    <span class="n">A</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">-=</span> <span class="n">tSensorCalib</span>
+    <span class="n">A</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">-=</span> <span class="n">tIllumCalib</span>
+    
+    <span class="n">b1</span> <span class="o">-=</span> <span class="n">phaseCorr1</span>
+    
+<span class="c1">#     if self.chipset == CalibrationPage.CHIPSET_HADDOCK:</span>
+<span class="c1">#       b2 = d[:,3]</span>
+<span class="c1">#       phaseCorr2 = b2[0]</span>
+<span class="c1">#       b2 -= phaseCorr2</span>
+    
+    <span class="n">At</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    
+    <span class="k">try</span><span class="p">:</span>
+      <span class="n">APsuedo</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">At</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>
+      
+      <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">APsuedo</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1E-6</span><span class="p">:</span> <span class="c1"># singular?</span>
+        <span class="k">if</span> <span class="n">APsuedo</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">1E-6</span><span class="p">:</span>
+          <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Invalid data&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="n">t1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">APsuedo</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">At</span><span class="p">[</span><span class="mi">0</span><span class="p">,:],</span> <span class="n">b1</span><span class="p">),</span> <span class="mi">0</span><span class="p">])</span>
+          
+<span class="c1">#           if self.chipset == CalibrationPage.CHIPSET_HADDOCK:</span>
+<span class="c1">#             t2 = np.array([np.dot(1/APsuedo[0, 0]*At[0,:], b2), 0])</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">APsuedoInv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">APsuedo</span><span class="p">),</span> <span class="n">At</span><span class="p">)</span>
+        <span class="n">t1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">APsuedoInv</span><span class="p">,</span> <span class="n">b1</span><span class="p">)</span>
+        
+<span class="c1">#         if self.chipset == CalibrationPage.CHIPSET_HADDOCK:</span>
+<span class="c1">#           t2 = np.array([np.dot(1/APsuedo[0, 0]*At[0,:], b2), 0])</span>
+          
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+      <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Data Singularity&#39;</span><span class="p">,</span> <span class="s1">&#39;Temperature data provided is singular. Please provide more indepedent measurements.&#39;</span><span class="p">)</span>
+      <span class="k">return</span>
+    
+<span class="c1">#     if self.chipset == CalibrationPage.CHIPSET_HADDOCK:</span>
+<span class="c1">#       self.calibParams[&#39;coeff_illum_1&#39;] = int(round(t1[1], 0))</span>
+<span class="c1">#       self.calibParams[&#39;coeff_sensor_1&#39;] = int(round(t1[0], 0))</span>
+<span class="c1">#       self.calibParams[&#39;coeff_illum_2&#39;] = int(round(t2[1], 0))</span>
+<span class="c1">#       self.calibParams[&#39;coeff_sensor_2&#39;] = int(round(t2[0], 0))</span>
+<span class="c1">#       </span>
+<span class="c1">#       self.paramsText.setText((&#39;coeff_illum_1 = %d, coeff_sensor_1 = %d,&#39; +\</span>
+<span class="c1">#         &#39;\ncoeff_illum_2 = %d, coeff_sensor_2 = %d,\n&#39;)%\</span>
+<span class="c1">#           (int(round(t1[1], 0)), int(round(t1[0], 0)), int(round(t2[1], 0)), int(round(t2[0], 0))))</span>
+<span class="c1">#     else:</span>
+    <span class="n">t1</span> <span class="o">*=</span> <span class="mi">16</span> <span class="c1"># for calib_prec = 1</span>
+    <span class="n">calibPrec</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">t1</span> <span class="o">&gt;=</span> <span class="mi">2048</span><span class="p">)</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">t1</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">2048</span><span class="p">):</span>
+      <span class="n">t1</span> <span class="o">/=</span> <span class="mi">16</span>
+      <span class="n">calibPrec</span> <span class="o">=</span> <span class="mi">0</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">[</span><span class="s1">&#39;coeff_illum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">t1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">[</span><span class="s1">&#39;coeff_sensor&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">t1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">[</span><span class="s1">&#39;calib_prec&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calibPrec</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">paramsText</span><span class="o">.</span><span class="n">setText</span><span class="p">((</span><span class="s1">&#39;coeff_illum_1 = </span><span class="si">%d</span><span class="s1">, coeff_sensor_1 = </span><span class="si">%d</span><span class="s1">,</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
+                            <span class="s1">&#39;calib_prec = </span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">%</span>\
+        <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">t1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">t1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">)),</span> <span class="n">calibPrec</span><span class="p">))</span>
+
+      
+    <span class="bp">self</span><span class="o">.</span><span class="n">paramsGroupbox</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">calibrated</span> <span class="o">=</span> <span class="bp">True</span>
+    
+<span class="c1">#     self.writeCSV(d1, self.basePath + os.sep + CalibrationTemperaturePage.CSV_FILE_NAME)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">completeChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+  </div>
+<div class="viewcode-block" id="CalibrationTemperaturePage.wrapPhaseToSignedInteger"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.wrapPhaseToSignedInteger">[docs]</a>  <span class="k">def</span> <span class="nf">wrapPhaseToSignedInteger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phase</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">phase</span> <span class="o">&gt;=</span> <span class="n">CalibrationTemperaturePage</span><span class="o">.</span><span class="n">MAX_PHASE_VALUE</span><span class="o">/</span><span class="mi">2</span><span class="p">:</span>
+      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="p">(</span><span class="n">CalibrationTemperaturePage</span><span class="o">.</span><span class="n">MAX_PHASE_VALUE</span> <span class="o">-</span> <span class="n">phase</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">phase</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, &#39;Suramya&#39;.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+    </div>
+  </body>
+</html>

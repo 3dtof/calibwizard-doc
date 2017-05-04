@@ -1,0 +1,126 @@
+calibration package
+===================
+
+Submodules
+----------
+
+calibration.CalibrationsCommandLine 
+------------------------------------------
+
+.. automodule:: calibration.CalibrationsCommandLine
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+calibration.CheckerboardLensCalibration 
+----------------------------------------------
+
+.. automodule:: calibration.CheckerboardLensCalibration
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+calibration.CommonPhaseOffsetComplexAverage 
+--------------------------------------------------
+
+.. automodule:: calibration.CommonPhaseOffsetComplexAverage
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+calibration.CommonPhaseOffsetRawDataComplexAverage 
+---------------------------------------------------------
+
+.. automodule:: calibration.CommonPhaseOffsetRawDataComplexAverage
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+calibration.CommonPhaseOffsetRawDataSimpleAverage 
+--------------------------------------------------------
+
+.. automodule:: calibration.CommonPhaseOffsetRawDataSimpleAverage
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+calibration.CommonPhaseOffsetSimpleAverage 
+-------------------------------------------------
+
+.. automodule:: calibration.CommonPhaseOffsetSimpleAverage
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+calibration.ComputeAveragePhase 
+--------------------------------------
+
+.. automodule:: calibration.ComputeAveragePhase
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+calibration.FlatWallLensCalib 
+------------------------------------
+
+.. automodule:: calibration.FlatWallLensCalib
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+calibration.HDRcommonphaseoffset 
+---------------------------------------
+
+.. automodule:: calibration.HDRcommonphaseoffset
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+calibration.NonLinearityCalibration 
+------------------------------------------
+
+.. automodule:: calibration.NonLinearityCalibration
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+calibration.PerPixelOffset 
+---------------------------------
+
+.. automodule:: calibration.PerPixelOffset
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+calibration.TemperatureCalibration 
+-----------------------------------------
+
+.. automodule:: calibration.TemperatureCalibration
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+calibration.VxlToPng 
+---------------------------
+
+.. automodule:: calibration.VxlToPng
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+calibration.saveConfigFile 
+---------------------------------
+
+.. automodule:: calibration.saveConfigFile
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+ contents
+---------------
+
+.. automodule:: calibration
+    :members:
+    :undoc-members:
+    :show-inheritance:

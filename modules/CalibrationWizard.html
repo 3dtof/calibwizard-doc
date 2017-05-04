@@ -1,0 +1,212 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>CalibrationWizard &mdash; SCAW &#39;0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '&#39;0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SCAW &#39;0.1.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../index.html"><h1 style="font-size: 3em;">Voxel Calibration Wizard</h1></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">home</a>|&nbsp;</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for CalibrationWizard</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">PySide</span> <span class="kn">import</span> <span class="n">QtGui</span>
+<span class="kn">from</span> <span class="nn">PySide</span> <span class="kn">import</span> <span class="n">QtCore</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">Voxel</span>
+<span class="kn">from</span> <span class="nn">wizard.CalibrationInitPage</span> <span class="kn">import</span> <span class="n">CalibrationInitPage</span>
+<span class="kn">from</span> <span class="nn">wizard.CalibrationSelectPage</span> <span class="kn">import</span> <span class="n">CalibrationSelectPage</span>
+<span class="kn">from</span> <span class="nn">wizard.CalibrationLensPage</span> <span class="kn">import</span> <span class="n">CalibrationLensPage</span>
+<span class="kn">from</span> <span class="nn">wizard.CalibrationConclusionsPage</span> <span class="kn">import</span> <span class="n">CalibrationConclusionPage</span>
+<span class="kn">from</span> <span class="nn">wizard.CalibrationTemperaturePage</span> <span class="kn">import</span> <span class="n">CalibrationTemperaturePage</span>
+<span class="c1"># from CalibrationCommonPhase import CalibrationCommonPhasePage</span>
+<span class="kn">from</span> <span class="nn">wizard.CalibrationPerPixelOffsetPage</span> <span class="kn">import</span> <span class="n">CalibrationPerPixelOffsetPage</span>
+<span class="kn">from</span> <span class="nn">wizard.CalibrationCommonPhase</span> <span class="kn">import</span> <span class="n">CalibrationCommonPhasePage</span>
+<span class="kn">from</span> <span class="nn">wizard.CalibrationNonLinearityPage</span> <span class="kn">import</span> <span class="n">CalibrationNonLinearityPage</span>
+<span class="c1"># from CalibrationDataCaptureDialog import CalibrationDataCaptureDialog</span>
+<span class="kn">from</span> <span class="nn">wizard.CalibrationHDRCommonPhaseOffset</span> <span class="kn">import</span> <span class="n">CalibrationHDRCommonPhasePage</span>
+<span class="kn">from</span> <span class="nn">wizard.CalibrationCaptureData</span> <span class="kn">import</span> <span class="n">CalibrationDataCapturePage</span>
+<span class="kn">from</span> <span class="nn">wizard.CalibrationPage</span> <span class="kn">import</span> <span class="n">CalibrationPage</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="c1"># import ConfigParser</span>
+
+
+<div class="viewcode-block" id="CalibrationWizard"><a class="viewcode-back" href="../CalibrationWizard.html#CalibrationWizard.CalibrationWizard">[docs]</a><span class="k">class</span> <span class="nc">CalibrationWizard</span> <span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QWizard</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Run this file to start the wizard</span>
+<span class="sd">    </span>
+<span class="sd">    This file contains the main code which runs the wizard. Includes all calibrations and all calibration pages</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span> <span class="p">(</span><span class="n">CalibrationWizard</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+<span class="c1">#         self.depthCamera = Voxel.DepthCamera()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cameraSystem</span> <span class="o">=</span> <span class="n">Voxel</span><span class="o">.</span><span class="n">CameraSystem</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">devices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cameraSystem</span><span class="o">.</span><span class="n">scan</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">devices</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cameraSystem</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">devices</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span> <span class="o">=</span> <span class="bp">None</span>    
+        <span class="n">ret</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">profilePath</span> <span class="o">=</span> <span class="n">Voxel</span><span class="o">.</span><span class="n">Configuration</span><span class="p">()</span><span class="o">.</span><span class="n">getLocalPath</span><span class="p">(</span><span class="s1">&#39;profiles&#39;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">configPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span>  <span class="s1">&#39;..&#39;</span>
+<span class="c1">#         self.editIndex = editIndex</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setMinimumHeight</span><span class="p">(</span><span class="mi">600</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setMinimumWidth</span><span class="p">(</span><span class="mi">400</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWizardStyle</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QWizard</span><span class="o">.</span><span class="n">ModernStyle</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="s1">&#39;Calibration Wizard&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addPage</span> <span class="p">(</span><span class="n">CalibrationInitPage</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addPage</span><span class="p">(</span><span class="n">CalibrationSelectPage</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">profileName</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibs</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paths</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataCapture</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pages</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibParams</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chipset</span> <span class="o">=</span> <span class="bp">None</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">previousConfiguration</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previousConfigurations</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibPages</span> <span class="o">=</span> <span class="p">[</span>
+      <span class="p">(</span><span class="s1">&#39;lens&#39;</span><span class="p">,</span> <span class="n">CalibrationLensPage</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span>  
+      <span class="p">(</span><span class="s1">&#39;capture&#39;</span><span class="p">,</span> <span class="n">CalibrationDataCapturePage</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span>
+      <span class="p">(</span><span class="s1">&#39;nonLinearity&#39;</span><span class="p">,</span> <span class="n">CalibrationNonLinearityPage</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> 
+      <span class="p">(</span><span class="s1">&#39;temperature&#39;</span><span class="p">,</span> <span class="n">CalibrationTemperaturePage</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span>
+      <span class="p">(</span><span class="s1">&#39;commonPhase&#39;</span><span class="p">,</span> <span class="n">CalibrationCommonPhasePage</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span>
+      <span class="p">(</span><span class="s1">&#39;hdrCommonPhase&#39;</span><span class="p">,</span> <span class="n">CalibrationHDRCommonPhasePage</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s1">&#39;perPixel&#39;</span><span class="p">,</span> <span class="n">CalibrationPerPixelOffsetPage</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+    <span class="p">]</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">page</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibPages</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">addCalibrationPage</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">page</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addPage</span><span class="p">(</span><span class="n">CalibrationConclusionPage</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+<div class="viewcode-block" id="CalibrationWizard.addCalibrationPage"><a class="viewcode-back" href="../CalibrationWizard.html#CalibrationWizard.CalibrationWizard.addCalibrationPage">[docs]</a>    <span class="k">def</span> <span class="nf">addCalibrationPage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">page</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pages</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addPage</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
+        </div>
+<div class="viewcode-block" id="CalibrationWizard.setPreviousConfiguration"><a class="viewcode-back" href="../CalibrationWizard.html#CalibrationWizard.CalibrationWizard.setPreviousConfiguration">[docs]</a>    <span class="k">def</span> <span class="nf">setPreviousConfiguration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">configFile</span><span class="o">.</span><span class="n">getCameraProfile</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+    
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">c</span><span class="p">:</span>
+            <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Calibration Wizard&#39;</span><span class="p">,</span> <span class="s1">&#39;Could not get configuration for camera profile &quot;&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">getCurrentCameraProfileID</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+    
+        <span class="bp">self</span><span class="o">.</span><span class="n">previousConfiguration</span> <span class="o">=</span> <span class="n">Voxel</span><span class="o">.</span><span class="n">ConfigurationFile</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previousProfileID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">getCurrentCameraProfileID</span><span class="p">()</span>
+    
+    </div>
+<div class="viewcode-block" id="CalibrationWizard.nextId"><a class="viewcode-back" href="../CalibrationWizard.html#CalibrationWizard.CalibrationWizard.nextId">[docs]</a>    <span class="k">def</span> <span class="nf">nextId</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentId</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">nextPage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">page</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">nextPage</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nextPage</span><span class="p">,</span> <span class="n">CalibrationPage</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">id</span>
+        <span class="k">while</span> <span class="n">nextPage</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">nextPage</span><span class="o">.</span><span class="n">doShow</span><span class="p">:</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="nb">id</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">nextPage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">page</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nextPage</span><span class="p">,</span> <span class="n">CalibrationPage</span><span class="p">):</span>
+                <span class="k">return</span> <span class="nb">id</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">nextPage</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">id</span>    
+        </div>
+<div class="viewcode-block" id="CalibrationWizard.close"><a class="viewcode-back" href="../CalibrationWizard.html#CalibrationWizard.CalibrationWizard.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div></div>
+<span class="n">a</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QApplication</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span>
+<span class="n">app</span> <span class="o">=</span> <span class="n">CalibrationWizard</span><span class="p">()</span>
+<span class="n">app</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">a</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span>
+
+                    
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">home</a>|&nbsp;</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, &#39;Suramya&#39;.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+    </div>
+  </body>
+</html>

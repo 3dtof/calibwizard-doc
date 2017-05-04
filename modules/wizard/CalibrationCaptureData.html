@@ -1,0 +1,494 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>wizard.CalibrationCaptureData &mdash; SCAW &#39;0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '&#39;0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SCAW &#39;0.1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><h1 style="font-size: 3em;">Voxel Calibration Wizard</h1></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for wizard.CalibrationCaptureData</h1><div class="highlight"><pre>
+<span></span><span class="c1"># from capture.CalibrationDataCaptureDialog import CalibrationDataCaptureDialog</span>
+<span class="kn">from</span> <span class="nn">PySide</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">calibration.FlatWallLensCalib</span> <span class="kn">import</span> <span class="n">flatWallLensCalibration</span>
+<span class="kn">from</span> <span class="nn">calibration.CommonPhaseOffsetRawDataSimpleAverage</span> <span class="kn">import</span> <span class="n">commonPhaseOffset</span>
+<span class="kn">from</span> <span class="nn">calibration.PerPixelOffset</span> <span class="kn">import</span> <span class="n">perPixelOffset</span>
+<span class="kn">from</span> <span class="nn">models.DataEngine</span> <span class="kn">import</span> <span class="n">DataEngine</span>
+<span class="kn">from</span> <span class="nn">models.DepthCameraStreamController</span> <span class="kn">import</span> <span class="n">DepthCameraStreamController</span>
+<span class="kn">from</span> <span class="nn">views.DataViewContainer</span> <span class="kn">import</span> <span class="n">DataViewContainer</span>
+<span class="kn">from</span> <span class="nn">CalibrationPage</span> <span class="kn">import</span> <span class="n">CalibrationPage</span>
+<span class="kn">import</span> <span class="nn">Voxel</span>
+
+<div class="viewcode-block" id="CalibrationDataCapturePage"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationCaptureData.CalibrationDataCapturePage">[docs]</a><span class="k">class</span> <span class="nc">CalibrationDataCapturePage</span><span class="p">(</span><span class="n">CalibrationPage</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This code is used for live capture</span>
+<span class="sd">    </span>
+<span class="sd">     This code  captures data and calibrates, saving files into the profile path. Profile path = /path/to/.Voxel/profiles. &quot;&quot;&quot;</span>
+    <span class="n">STATE_START</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">STATE_NEAR_CAPTURED</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">STATE_FAR_CAPTURED</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">STATE_COMMON_PHASE_CAPTURED</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">STATE_PER_PIXEL_CAPTURED</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">STRATEGY</span> <span class="o">=</span> <span class="s1">&#39;FlatWall&#39;</span>
+    <span class="n">BUTTON_TEXTS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;lens&#39;</span><span class="p">:[</span><span class="s2">&quot;Capture Far View&quot;</span><span class="p">,</span> <span class="s2">&quot;Capture Near View&quot;</span><span class="p">,</span><span class="s2">&quot;Capture Common Phase OFfset Data&quot;</span><span class="p">,</span> <span class="s2">&quot;Capture Per Pixel Data&quot;</span><span class="p">,</span> <span class="s2">&quot;Calibrate&quot;</span><span class="p">],</span> 
+                    <span class="s1">&#39;commonPhase&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Capture Phase Data&quot;</span><span class="p">,</span> <span class="s2">&quot;Capture Phase Data for Second Modulation Frequency&quot;</span><span class="p">,</span><span class="s2">&quot;Capture Per Pixel Offset Data&quot;</span><span class="p">,</span> <span class="s2">&quot;Calibrate&quot;</span><span class="p">],</span> 
+                    <span class="s1">&#39;perPixel&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Capture Pixel Data&quot;</span><span class="p">,</span> <span class="s2">&quot;Calibrate&quot;</span><span class="p">]}</span>
+    
+    <span class="n">MESSAGE_TEXTS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;lens&#39;</span><span class="p">:[</span>
+        <span class="s2">&quot;Point the depth camera flat to a wall. Make sure you only see the flat wall in the camera view below and nothing else. This will be for far view capture. Later you&#39;ll need to capture near view. Now, for far view click on the capture button.&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Maintain the depth camera orientation to the flat wall but move it closer. Make sure you only see the flat wall in the camera view below and nothing else. Now, click on the capture button to the right.&quot;</span><span class="p">,</span> 
+        <span class="s2">&quot;Capture Data for Common Phase and Per Pixel Offset Calculation. &quot;</span><span class="p">,</span>
+         <span class="s2">&quot;Capture Data for Per Pixel Offset Calculation&quot;</span><span class="p">,</span> 
+         <span class="s2">&quot;Great! You&#39;ve got all views captured. Now, click on the calibrate button to compute the calibration coefficents.&quot;</span><span class="p">],</span> 
+                     <span class="s1">&#39;commonPhase&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Point the depth camera flat to a wall. Make sure you only see the flat wall in the camera view below and nothing else.&quot;</span><span class="p">,</span>
+                                     <span class="s2">&quot;dealias_en is turned on. Please click on capture to record data with the second modulation frequency.&quot;</span><span class="p">,</span>
+                                     <span class="s2">&quot;Capture Data for Per Pixel Offset Calculation&quot;</span><span class="p">,</span>
+                                     <span class="s2">&quot;All views captured. Click on calibrate to calibrate&quot;</span><span class="p">],</span> 
+                     <span class="s1">&#39;perPixel&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Point the camera to a flat wall and capture data for calculating per pixel offsets.&#39;</span><span class="p">,</span>
+                                <span class="s2">&quot;Great! you have all the data captured. CLick on calibrate. &quot;</span><span class="p">]}</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">calibrationWizard</span><span class="p">):</span>
+        <span class="nb">super</span> <span class="p">(</span><span class="n">CalibrationDataCapturePage</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span> <span class="o">=</span> <span class="n">calibrationWizard</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setTitle</span><span class="p">(</span><span class="s2">&quot;Capture Data and Calibrate Using Depth Camera&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setSubTitle</span><span class="p">(</span><span class="s2">&quot;Please Follow the instructions to calibrate the camera&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">captureGroupBox</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QGroupBox</span><span class="p">(</span><span class="s2">&quot;Data Capture&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">captureGroupBox</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataView</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progressBar</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progressText</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hlayout</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataEngine</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">depthCameraController</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lensCaptured</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">farCaptured</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nearCaptured</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">commonPhaseCaptured</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">perPixelCaptured</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nearFileName</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">farFileName</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">commonPhaseFileName</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">perPixelFileName</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">complete</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">CalibrationDataCapturePage</span><span class="o">.</span><span class="n">STATE_START</span>
+        <span class="c1">#layouts for groupboxes</span>
+        <span class="n">captureLayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">captureGroupBox</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">captureLayout</span><span class="p">)</span>
+        <span class="n">hlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">setAlignment</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">AlignTop</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Expanding</span><span class="p">,</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Preferred</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">setWordWrap</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">setAlignment</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">AlignTop</span><span class="p">)</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+        <span class="n">captureLayout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">hlayout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">captureButton</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">()</span>
+        <span class="n">captureLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">captureButton</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">captureButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">captureDataAndCalibrate</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paramsGroupBox</span> <span class="o">=</span> <span class="bp">None</span>    
+        <span class="bp">self</span><span class="o">.</span><span class="n">paramsText</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        
+<div class="viewcode-block" id="CalibrationDataCapturePage.initializePage"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationCaptureData.CalibrationDataCapturePage.initializePage">[docs]</a>    <span class="k">def</span> <span class="nf">initializePage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">depthCamera</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrations</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">calibration</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibs</span><span class="p">[</span><span class="n">calibration</span><span class="p">]</span> <span class="o">==</span> <span class="n">CalibrationDataCapturePage</span><span class="o">.</span><span class="n">STRATEGY</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">calibration</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;lens&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrations</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationToDo</span> <span class="o">=</span> <span class="s1">&#39;lens&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">buttonTexts</span> <span class="o">=</span> <span class="n">CalibrationDataCapturePage</span><span class="o">.</span><span class="n">BUTTON_TEXTS</span><span class="p">[</span><span class="s1">&#39;lens&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">messageTexts</span> <span class="o">=</span> <span class="n">CalibrationDataCapturePage</span><span class="o">.</span><span class="n">MESSAGE_TEXTS</span><span class="p">[</span><span class="s1">&#39;lens&#39;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="s1">&#39;commonPhase&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrations</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationToDo</span> <span class="o">=</span> <span class="s1">&#39;commonPhase&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">buttonTexts</span> <span class="o">=</span> <span class="n">CalibrationDataCapturePage</span><span class="o">.</span><span class="n">BUTTON_TEXTS</span><span class="p">[</span><span class="s1">&#39;commonPhase&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">messageTexts</span> <span class="o">=</span> <span class="n">CalibrationDataCapturePage</span><span class="o">.</span><span class="n">MESSAGE_TEXTS</span><span class="p">[</span><span class="s1">&#39;commonPhase&#39;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="s1">&#39;perPixel&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrations</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationToDo</span> <span class="o">=</span> <span class="s1">&#39;perPixel&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">buttonTexts</span> <span class="o">=</span>  <span class="n">CalibrationDataCapturePage</span><span class="o">.</span><span class="n">BUTTON_TEXTS</span><span class="p">[</span><span class="s1">&#39;perPixel&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">messageTexts</span> <span class="o">=</span> <span class="n">CalibrationDataCapturePage</span><span class="o">.</span><span class="n">MESSAGE_TEXTS</span><span class="p">[</span><span class="s1">&#39;perPixel&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">captureButton</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buttonTexts</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">messageTexts</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">hlayout</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">numberOfFrames</span> <span class="o">=</span> <span class="mi">100</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Number of frames to capture: &#39;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">frameCount</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSpinBox</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">frameCount</span><span class="o">.</span><span class="n">setRange</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">frameCount</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numberOfFrames</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">frameCount</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setNumberOfFrames</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frameCount</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hlayout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+             
+            <span class="bp">self</span><span class="o">.</span><span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39; Distance from flat wall: &#39;</span><span class="p">))</span>
+           
+            <span class="bp">self</span><span class="o">.</span><span class="n">distance</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QDoubleSpinBox</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">setRange</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">5000</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">setSingleStep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="mf">25.0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">distanceValue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">setDecimals</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setDistance</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">distance</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;cm&#39;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hlayout</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataEngine</span><span class="p">:</span>   
+            <span class="bp">self</span><span class="o">.</span><span class="n">depthCameraController</span> <span class="o">=</span> <span class="n">DepthCameraStreamController</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">cameraSystem</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">depthCamera</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataEngine</span> <span class="o">=</span> <span class="n">DataEngine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">depthCameraController</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataEngine</span><span class="o">.</span><span class="n">disableStatistics</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">captureRunning</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataEngine</span><span class="o">.</span><span class="n">connectData</span><span class="p">(</span><span class="s2">&quot;phase&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">captureData</span><span class="p">,</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">QueuedConnection</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataView</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataView</span> <span class="o">=</span> <span class="n">DataViewContainer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataEngine</span><span class="p">,</span> <span class="s1">&#39;phase&#39;</span><span class="p">,</span> <span class="n">shouldLinkViewBox</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span> <span class="n">showFormatMenu</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataView</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">progressBar</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">progressBar</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QProgressBar</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">currentProgressValue</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">progressBar</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">progressBar</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">progressText</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">progressText</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">progressText</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">paramsGroupBox</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">paramsGroupBox</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QGroupBox</span><span class="p">(</span><span class="s2">&quot;Calibration Parameters&quot;</span><span class="p">)</span>
+        <span class="n">vlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paramsGroupBox</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">vlayout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paramsLabel</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">()</span>
+        <span class="n">vlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paramsLabel</span><span class="p">)</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">paramsGroupBox</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paramsGroupBox</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">depthCameraController</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        </div>
+<div class="viewcode-block" id="CalibrationDataCapturePage.captureData"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationCaptureData.CalibrationDataCapturePage.captureData">[docs]</a>    <span class="k">def</span> <span class="nf">captureData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">captureRunning</span><span class="p">:</span>
+            <span class="k">return</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">profilePath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">profilePath</span>\
+             <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">name</span><span class="p">()</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">id</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;)&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        
+        <span class="n">fileNames</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;lens&#39;</span><span class="p">:[</span><span class="s2">&quot;far.vxl&quot;</span><span class="p">,</span> <span class="s2">&quot;near.vxl&quot;</span><span class="p">,</span> <span class="s2">&quot;commonPhase.vxl&quot;</span><span class="p">,</span> <span class="s2">&quot;perPixel.vxl&quot;</span><span class="p">],</span> 
+                     <span class="s1">&#39;commonPhase&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;commonPhase.vxl&quot;</span> <span class="p">,</span><span class="s2">&quot;commonPhase2.vxl&quot;</span><span class="p">],</span> 
+                     <span class="s1">&#39;perPixel&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;perPixel.vxl&quot;</span><span class="p">]}</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">fileNames</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrationToDo</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">profilePath</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentFrameCount</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">numberOfFrames</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">closeFrameStream</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stopCapture</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">isSavingFrameStream</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">currentFrameCount</span> <span class="o">+=</span><span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">progressBar</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">currentFrameCount</span><span class="o">*</span><span class="mi">100</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">numberOfFrames</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ret</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">modFreq1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">getf</span><span class="p">(</span><span class="s2">&quot;mod_freq1&quot;</span><span class="p">)</span>
+                <span class="n">ret</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">modFreq2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">getf</span><span class="p">(</span><span class="s2">&quot;mod_freq2&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="n">value</span><span class="p">]</span>
+                <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="n">value</span><span class="p">]</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">saveFrameStream</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="n">value</span><span class="p">]):</span>
+                    <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Can&#39;t save stream&quot;</span><span class="p">,</span> <span class="s2">&quot;Cannot save the current stream&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="CalibrationDataCapturePage.startCapture"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationCaptureData.CalibrationDataCapturePage.startCapture">[docs]</a>    <span class="k">def</span> <span class="nf">startCapture</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">captureButton</span><span class="o">.</span><span class="n">setDisabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frameCount</span><span class="o">.</span><span class="n">setDisabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">average</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">captureRunning</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">currentFrameCount</span> <span class="o">=</span> <span class="mi">0</span>
+        </div>
+<div class="viewcode-block" id="CalibrationDataCapturePage.captureDataAndCalibrate"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationCaptureData.CalibrationDataCapturePage.captureDataAndCalibrate">[docs]</a>    <span class="k">def</span> <span class="nf">captureDataAndCalibrate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">r</span><span class="p">,</span> <span class="n">dealiasEnabled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">getb</span><span class="p">(</span><span class="s2">&quot;dealias_en&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">r</span><span class="p">:</span>
+            <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Can&#39;t get parameter&quot;</span><span class="p">,</span> <span class="s2">&quot;Cannot get the dealias_en parameter&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dealiasEnabled</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">setb</span><span class="p">(</span><span class="s1">&#39;ind_freq_data_en&#39;</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+            <span class="n">r1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">setb</span><span class="p">(</span><span class="s1">&#39;ind_freq_data_sel&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationToDo</span> <span class="o">==</span> <span class="s1">&#39;lens&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">farCaptured</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">startCapture</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">captureData</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">farFileName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">farDistance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distanceValue</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">farCaptured</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">messageTexts</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">captureButton</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buttonTexts</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">nearCaptured</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>                
+                <span class="bp">self</span><span class="o">.</span><span class="n">startCapture</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">captureData</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">nearFileName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">nearDistance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distanceValue</span>
+                <span class="k">if</span> <span class="s1">&#39;commonPhase&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrations</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">commonPhaseDistance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distanceValue</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">commonPhaseFileName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">commonPhaseFileName1</span> <span class="o">=</span> <span class="bp">None</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">dealiasEnabled</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">commonPhaseCaptured</span> <span class="o">=</span> <span class="bp">True</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">nearCaptured</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="k">if</span> <span class="s1">&#39;perPixel&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrations</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">perPixelFileName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nearFileName</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">perPixelCaptured</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">messageTexts</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">captureButton</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buttonTexts</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+                <span class="k">if</span> <span class="s1">&#39;commonPhase&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrations</span> <span class="ow">and</span> <span class="n">dealiasEnabled</span> <span class="ow">is</span> <span class="bp">True</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">commonPhaseCaptured</span> <span class="o">==</span><span class="bp">False</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">messageTexts</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">captureButton</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buttonTexts</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">nearCaptured</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">messageTexts</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">captureButton</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buttonTexts</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+            
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">commonPhaseCaptured</span> <span class="ow">is</span> <span class="bp">False</span> <span class="ow">and</span> <span class="s1">&#39;commonPhase&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrations</span><span class="p">:</span>                
+                <span class="n">r1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">setb</span><span class="p">(</span><span class="s1">&#39;ind_freq_data_sel&#39;</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">startCapture</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">captureData</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">commonPhaseFileName1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">commonPhaseCaptured</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">messageTexts</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">captureButton</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buttonTexts</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">perPixelCaptured</span> <span class="ow">is</span> <span class="bp">False</span> <span class="ow">and</span> <span class="s1">&#39;perPixel&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrations</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">startCapture</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">captureData</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">perPixelFileName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">messageTexts</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">captureButton</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buttonTexts</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrate</span><span class="p">()</span>
+                
+                
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationToDo</span> <span class="o">==</span> <span class="s2">&quot;commonPhase&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">commonPhaseCaptured</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">startCapture</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">commonPhaseFileName</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">captureData</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">commonPhaseFileName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">commonPhaseFileName1</span> <span class="o">=</span> <span class="bp">None</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">dealiasEnabled</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">commonPhaseCaptured</span> <span class="o">=</span> <span class="bp">True</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">messageTexts</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">captureButton</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buttonTexts</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">messageTexts</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">captureButton</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buttonTexts</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                        <span class="n">r1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">setb</span><span class="p">(</span><span class="s1">&#39;ind_freq_data_sel&#39;</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">dealiasEnabled</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">captureData</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">commonPhaseFileName1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">messageTexts</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">captureButton</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buttonTexts</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">commonPhaseCaptured</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">commonPhaseDistance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distanceValue</span>
+
+                   
+                    
+                <span class="k">if</span> <span class="s1">&#39;perPixel&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrations</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">perPixelFileName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">perPixelCaptured</span> <span class="o">=</span> <span class="bp">True</span>
+                    
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">perPixelCaptured</span> <span class="ow">is</span> <span class="bp">False</span> <span class="ow">and</span> <span class="s1">&#39;perPixel&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrations</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">startCapture</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">captureData</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">perPixelFileName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">perPixelCaptured</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">messageTexts</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">captureButton</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buttonTexts</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">messageTexts</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">captureButton</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buttonTexts</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrate</span><span class="p">()</span>
+                
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationToDo</span> <span class="o">==</span> <span class="s1">&#39;perPixel&#39;</span><span class="p">:</span>
+            
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">perPixelCaptured</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">startCapture</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">captureData</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">perPixelCaptured</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">perPixelFileName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">messageTexts</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">captureButton</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buttonTexts</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrate</span><span class="p">()</span>
+                
+                </div>
+<div class="viewcode-block" id="CalibrationDataCapturePage.calibrate"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationCaptureData.CalibrationDataCapturePage.calibrate">[docs]</a>    <span class="k">def</span> <span class="nf">calibrate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nearCaptured</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">farCaptured</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">ret</span><span class="p">,</span> <span class="n">mtx</span><span class="p">,</span> <span class="n">dist</span> <span class="o">=</span> <span class="n">flatWallLensCalibration</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nearFileName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nearDistance</span><span class="o">/</span><span class="mi">100</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">farFileName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">farDistance</span><span class="o">/</span><span class="mi">100</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">if</span> <span class="n">ret</span><span class="p">:</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">paramsText</span> <span class="o">+=</span> <span class="s2">&quot;cx = </span><span class="si">%f</span><span class="se">\n</span><span class="s2"> cy = </span><span class="si">%f</span><span class="s2">/n fx = fy = </span><span class="si">%f</span><span class="s2">/n k1 = </span><span class="si">%f</span><span class="se">\n</span><span class="s2"> k2 = </span><span class="si">%f</span><span class="s2">/n k3 = </span><span class="si">%f</span><span class="se">\n</span><span class="s2">&quot;</span>\
+                                    <span class="o">%</span><span class="p">(</span><span class="n">mtx</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="n">mtx</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="n">mtx</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">dist</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dist</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dist</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;Calibration Done. Click on next to proceed&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">[</span><span class="s1">&#39;cx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mtx</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">[</span><span class="s1">&#39;cy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mtx</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">[</span><span class="s1">&#39;fx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mtx</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">[</span><span class="s1">&#39;fy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mtx</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">[</span><span class="s1">&#39;k1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">[</span><span class="s1">&#39;k2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dist</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">[</span><span class="s1">&#39;k3&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dist</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">[</span><span class="s1">&#39;p1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">[</span><span class="s1">&#39;p1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">completed</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">completeChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Check Data&quot;</span><span class="p">,</span> <span class="s2">&quot;Can&#39;t get the coefficients&quot;</span><span class="p">)</span>
+         
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">commonPhaseCaptured</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;cx&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">:</span>\
+                    <span class="n">cx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">[</span><span class="s1">&#39;cx&#39;</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">cx</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">if</span> <span class="s1">&#39;cy&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">:</span>
+                    <span class="n">cy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">[</span><span class="s1">&#39;cy&#39;</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">cy</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">ret</span><span class="p">,</span> <span class="n">phaseCorr1</span><span class="p">,</span> <span class="n">phaseCorr2</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">commonPhaseOffset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">commonPhaseFileName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">commonPhaseDistance</span><span class="o">/</span><span class="mi">100</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">modFreq1</span><span class="p">,</span> <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">commonPhaseFileName1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">modFreq2</span><span class="p">,</span> <span class="n">chipset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">chipset</span><span class="p">())</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">paramsText</span> <span class="o">+=</span> <span class="s2">&quot;phase_corr_1 = </span><span class="si">%d</span><span class="se">\n</span><span class="s2"> phase_corr_2 = </span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">phaseCorr1</span><span class="p">,</span> <span class="n">phaseCorr2</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">[</span><span class="s1">&#39;phase_corr1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">phaseCorr1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">[</span><span class="s1">&#39;phase_corr2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">phaseCorr2</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Check Data&quot;</span><span class="p">,</span> <span class="s2">&quot;Can&#39;t get the coefficients&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">perPixelCaptured</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="n">Voxel</span><span class="o">.</span><span class="n">Configuration</span><span class="p">()</span>
+                <span class="n">r</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">getLocalConfPath</span><span class="p">()</span>
+                <span class="n">ret</span><span class="p">,</span> <span class="n">phaseOffsetFileName</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">perPixelOffset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">perPixelFileName</span><span class="p">,</span> <span class="n">pathToSave</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">profileName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">profileName</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="k">print</span> <span class="n">e</span>
+            <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">paramsText</span> <span class="o">+=</span> <span class="s2">&quot;phaseOffsetFileName: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">phaseOffsetFileName</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">[</span><span class="s1">&#39;phasecorrection&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;file:&#39;</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">phaseOffsetFileName</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Check Data&quot;</span><span class="p">,</span> <span class="s2">&quot;Can&#39;t get the coefficients&quot;</span><span class="p">)</span>
+             
+        <span class="bp">self</span><span class="o">.</span><span class="n">paramsLabel</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paramsText</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paramsGroupBox</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">paramsText</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">complete</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">completeChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>    </div>
+<div class="viewcode-block" id="CalibrationDataCapturePage.isComplete"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationCaptureData.CalibrationDataCapturePage.isComplete">[docs]</a>    <span class="k">def</span> <span class="nf">isComplete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">complete</span>
+    </div>
+<div class="viewcode-block" id="CalibrationDataCapturePage.setNumberOfFrames"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationCaptureData.CalibrationDataCapturePage.setNumberOfFrames">[docs]</a>    <span class="k">def</span> <span class="nf">setNumberOfFrames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numberOfFrames</span> <span class="o">=</span> <span class="n">value</span>
+        </div>
+<div class="viewcode-block" id="CalibrationDataCapturePage.stopCapture"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationCaptureData.CalibrationDataCapturePage.stopCapture">[docs]</a>    <span class="k">def</span> <span class="nf">stopCapture</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">captureRunning</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">captureButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">captureButton</span><span class="o">.</span><span class="n">text</span><span class="p">()</span><span class="o">!=</span><span class="s1">&#39;Calibrate&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">frameCount</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">progressBar</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            </div>
+<div class="viewcode-block" id="CalibrationDataCapturePage.cleanupPage"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationCaptureData.CalibrationDataCapturePage.cleanupPage">[docs]</a>    <span class="k">def</span> <span class="nf">cleanupPage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">depthCameraController</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nearCaptured</span> <span class="o">=</span><span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">farCaptured</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">commonPhaseCaptured</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">perPixelCaptured</span> <span class="o">=</span> <span class="bp">False</span>
+    </div>
+<div class="viewcode-block" id="CalibrationDataCapturePage.closeEvent"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationCaptureData.CalibrationDataCapturePage.closeEvent">[docs]</a>    <span class="k">def</span> <span class="nf">closeEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">depthCameraController</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+        </div>
+<div class="viewcode-block" id="CalibrationDataCapturePage.setDistance"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationCaptureData.CalibrationDataCapturePage.setDistance">[docs]</a>    <span class="k">def</span> <span class="nf">setDistance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">distanceValue</span> <span class="o">=</span> <span class="n">value</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, &#39;Suramya&#39;.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+    </div>
+  </body>
+</html>

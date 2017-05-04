@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>capture.dataCapture &mdash; SCAW &#39;0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '&#39;0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SCAW &#39;0.1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><h1 style="font-size: 3em;">Voxel Calibration Wizard</h1></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for capture.dataCapture</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">Voxel</span>
+
+<div class="viewcode-block" id="DataCapture"><a class="viewcode-back" href="../../capture.html#capture.dataCapture.DataCapture">[docs]</a><span class="k">class</span> <span class="nc">DataCapture</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span> <span class="p">(</span><span class="n">DataCapture</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+<span class="c1">#         camsys = Voxel.CameraSystem()</span>
+        
+<span class="c1">#  </span>
+<div class="viewcode-block" id="DataCapture.captureData"><a class="viewcode-back" href="../../capture.html#capture.dataCapture.DataCapture.captureData">[docs]</a>    <span class="k">def</span> <span class="nf">captureData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numFrames</span><span class="p">,</span> <span class="n">fileName</span><span class="p">):</span>
+        <span class="n">camsys</span> <span class="o">=</span> <span class="n">Voxel</span><span class="o">.</span><span class="n">CameraSystem</span><span class="p">()</span>
+
+        <span class="n">CHIPSET_TINTIN</span> <span class="o">=</span> <span class="s1">&#39;tintin.ti&#39;</span>
+        <span class="n">CHIPSET_HADDOCK</span> <span class="o">=</span> <span class="s1">&#39;haddock.ti&#39;</span>
+        <span class="n">CHIPSET_CALCULUS</span> <span class="o">=</span> <span class="s1">&#39;calculus.ti&#39;</span>
+        <span class="n">devices</span> <span class="o">=</span> <span class="n">camsys</span><span class="o">.</span><span class="n">scan</span><span class="p">()</span>
+        <span class="n">dev</span> <span class="o">=</span> <span class="n">devices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">camera</span> <span class="o">=</span> <span class="n">camsys</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">dev</span><span class="p">)</span>
+<span class="c1">#         if self.camera.isRunning():</span>
+<span class="c1">#             self.camera.stop()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="o">.</span><span class="n">id</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="o">.</span><span class="n">isInitialized</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="o">.</span><span class="n">clearAllCallbacks</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span> <span class="o">=</span> <span class="n">fileName</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numFrames</span> <span class="o">=</span> <span class="n">numFrames</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frameCount</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="o">.</span><span class="n">saveFrameStream</span><span class="p">(</span><span class="n">fileName</span><span class="p">):</span>
+            <span class="k">print</span> <span class="s2">&quot;Can&#39;t save Data&quot;</span>
+        <span class="k">else</span><span class="p">:</span>        
+            <span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="o">.</span><span class="n">registerCallback</span><span class="p">(</span><span class="n">Voxel</span><span class="o">.</span><span class="n">DepthCamera</span><span class="o">.</span><span class="n">FRAME_RAW_FRAME_UNPROCESSED</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">callBackFunction</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="o">.</span><span class="n">isRunning</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span> 
+<span class="c1">#             print self.frameCount</span>
+</div>
+<div class="viewcode-block" id="DataCapture.callBackFunction"><a class="viewcode-back" href="../../capture.html#capture.dataCapture.DataCapture.callBackFunction">[docs]</a>    <span class="k">def</span> <span class="nf">callBackFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depthCamera</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frameCount</span> <span class="o">+=</span><span class="mi">1</span>
+<span class="c1">#         print self.frameCount</span>
+        <span class="k">print</span> <span class="s1">&#39;capturing frame </span><span class="si">%d</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frameCount</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameCount</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numFrames</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s1">&#39;data captured&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+</div></div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">DataCapture</span><span class="p">()</span>
+    <span class="n">capture</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">captureData</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;tintin10.vxl&#39;</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, &#39;Suramya&#39;.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+    </div>
+  </body>
+</html>

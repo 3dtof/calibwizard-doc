@@ -1,0 +1,837 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>models package &mdash; SCAW &#39;0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="static/default.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '&#39;0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/underscore.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SCAW &#39;0.1.0 documentation" href="index.html" />
+    <link rel="next" title="views package" href="views.html" />
+    <link rel="prev" title="capture package" href="capture.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="index.html"><h1 style="font-size: 3em;">Voxel Calibration Wizard</h1></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="views.html" title="views package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="capture.html" title="capture package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">home</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+ 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">models package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-models.DataEngine">models.DataEngine</a></li>
+<li><a class="reference internal" href="#module-models.DataQueue">models.DataQueue</a></li>
+<li><a class="reference internal" href="#module-models.DepthCameraStreamController">models.DepthCameraStreamController</a></li>
+<li><a class="reference internal" href="#module-models.FrameQueue">models.FrameQueue</a></li>
+<li><a class="reference internal" href="#models-producerconsumerthread">models.ProducerConsumerThread</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="capture.html"
+                        title="previous chapter">capture package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="views.html"
+                        title="next chapter">views package</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="sources/models.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="models-package">
+<h1>models package<a class="headerlink" href="#models-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-models.DataEngine">
+<span id="models-dataengine"></span><h2>models.DataEngine<a class="headerlink" href="#module-models.DataEngine" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="models.DataEngine.DataEngine">
+<em class="property">class </em><tt class="descclassname">models.DataEngine.</tt><tt class="descname">DataEngine</tt><big>(</big><em>depthCameraController</em>, <em>queueLength=3</em><big>)</big><a class="reference internal" href="modules/models/DataEngine.html#DataEngine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DataEngine.DataEngine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PySide.QtCore.QObject</span></tt></p>
+<dl class="method">
+<dt id="models.DataEngine.DataEngine.captureDepthFrame">
+<tt class="descname">captureDepthFrame</tt><big>(</big><em>depthCamera</em>, <em>frame</em>, <em>type</em><big>)</big><a class="reference internal" href="modules/models/DataEngine.html#DataEngine.captureDepthFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DataEngine.DataEngine.captureDepthFrame" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DataEngine.DataEngine.capturePointCloudFrame">
+<tt class="descname">capturePointCloudFrame</tt><big>(</big><em>depthCamera</em>, <em>frame</em>, <em>type</em><big>)</big><a class="reference internal" href="modules/models/DataEngine.html#DataEngine.capturePointCloudFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DataEngine.DataEngine.capturePointCloudFrame" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DataEngine.DataEngine.captureToFFrame">
+<tt class="descname">captureToFFrame</tt><big>(</big><em>depthCamera</em>, <em>frame</em>, <em>type</em><big>)</big><a class="reference internal" href="modules/models/DataEngine.html#DataEngine.captureToFFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DataEngine.DataEngine.captureToFFrame" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DataEngine.DataEngine.clearData">
+<tt class="descname">clearData</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DataEngine.html#DataEngine.clearData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DataEngine.DataEngine.clearData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DataEngine.DataEngine.computeRateFactor">
+<tt class="descname">computeRateFactor</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DataEngine.html#DataEngine.computeRateFactor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DataEngine.DataEngine.computeRateFactor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DataEngine.DataEngine.connectData">
+<tt class="descname">connectData</tt><big>(</big><em>type</em>, <em>function</em>, <em>connectionType=PySide.QtCore.Qt.ConnectionType.AutoConnection</em><big>)</big><a class="reference internal" href="modules/models/DataEngine.html#DataEngine.connectData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DataEngine.DataEngine.connectData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DataEngine.DataEngine.dataAvailableAmbient">
+<tt class="descname">dataAvailableAmbient</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5BA298&gt;</em><a class="headerlink" href="#models.DataEngine.DataEngine.dataAvailableAmbient" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DataEngine.DataEngine.dataAvailableAmplitude">
+<tt class="descname">dataAvailableAmplitude</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5BA2D0&gt;</em><a class="headerlink" href="#models.DataEngine.DataEngine.dataAvailableAmplitude" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DataEngine.DataEngine.dataAvailableAmplitudeAverage">
+<tt class="descname">dataAvailableAmplitudeAverage</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5BA308&gt;</em><a class="headerlink" href="#models.DataEngine.DataEngine.dataAvailableAmplitudeAverage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DataEngine.DataEngine.dataAvailableAmplitudeStandardDeviation">
+<tt class="descname">dataAvailableAmplitudeStandardDeviation</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5BA340&gt;</em><a class="headerlink" href="#models.DataEngine.DataEngine.dataAvailableAmplitudeStandardDeviation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DataEngine.DataEngine.dataAvailableDepth">
+<tt class="descname">dataAvailableDepth</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5BA378&gt;</em><a class="headerlink" href="#models.DataEngine.DataEngine.dataAvailableDepth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DataEngine.DataEngine.dataAvailableDepthAverage">
+<tt class="descname">dataAvailableDepthAverage</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5BA3B0&gt;</em><a class="headerlink" href="#models.DataEngine.DataEngine.dataAvailableDepthAverage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DataEngine.DataEngine.dataAvailableDepthStandardDeviation">
+<tt class="descname">dataAvailableDepthStandardDeviation</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5BA3E8&gt;</em><a class="headerlink" href="#models.DataEngine.DataEngine.dataAvailableDepthStandardDeviation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DataEngine.DataEngine.dataAvailableDistance">
+<tt class="descname">dataAvailableDistance</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5BA420&gt;</em><a class="headerlink" href="#models.DataEngine.DataEngine.dataAvailableDistance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DataEngine.DataEngine.dataAvailableFlags">
+<tt class="descname">dataAvailableFlags</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5BA458&gt;</em><a class="headerlink" href="#models.DataEngine.DataEngine.dataAvailableFlags" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DataEngine.DataEngine.dataAvailablePhase">
+<tt class="descname">dataAvailablePhase</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5BA1F0&gt;</em><a class="headerlink" href="#models.DataEngine.DataEngine.dataAvailablePhase" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DataEngine.DataEngine.dataAvailablePhaseAverage">
+<tt class="descname">dataAvailablePhaseAverage</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5BA228&gt;</em><a class="headerlink" href="#models.DataEngine.DataEngine.dataAvailablePhaseAverage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DataEngine.DataEngine.dataAvailablePhaseStandardDeviation">
+<tt class="descname">dataAvailablePhaseStandardDeviation</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5BA260&gt;</em><a class="headerlink" href="#models.DataEngine.DataEngine.dataAvailablePhaseStandardDeviation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DataEngine.DataEngine.dataAvailablePointCloud">
+<tt class="descname">dataAvailablePointCloud</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5BA490&gt;</em><a class="headerlink" href="#models.DataEngine.DataEngine.dataAvailablePointCloud" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DataEngine.DataEngine.dataFormats">
+<tt class="descname">dataFormats</tt><em class="property"> = {'amplitude_avg': &lt;models.DataEngine.DataFormat object at 0x0000000006AA4748&gt;, 'depth_std': &lt;models.DataEngine.DataFormat object at 0x000000001C53DFD0&gt;, 'amplitude_std': &lt;models.DataEngine.DataFormat object at 0x0000000006AA47B8&gt;, 'ambient': &lt;models.DataEngine.DataFormat object at 0x0000000006AA4668&gt;, 'phase': &lt;models.DataEngine.DataFormat object at 0x0000000006AA44E0&gt;, 'distance': &lt;models.DataEngine.DataFormat object at 0x000000001C5BA080&gt;, 'depth': &lt;models.DataEngine.DataFormat object at 0x000000001C53D278&gt;, 'phase_std': &lt;models.DataEngine.DataFormat object at 0x0000000006AA45F8&gt;, 'flags': &lt;models.DataEngine.DataFormat object at 0x000000001C5BA0F0&gt;, 'amplitude': &lt;models.DataEngine.DataFormat object at 0x0000000006AA46D8&gt;, 'phase_avg': &lt;models.DataEngine.DataFormat object at 0x0000000006AA4518&gt;, 'pointcloud': &lt;models.DataEngine.DataFormat object at 0x000000001C5BA160&gt;, 'depth_avg': &lt;models.DataEngine.DataFormat object at 0x000000001C53DF60&gt;}</em><a class="headerlink" href="#models.DataEngine.DataEngine.dataFormats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DataEngine.DataEngine.disableStatistics">
+<tt class="descname">disableStatistics</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DataEngine.html#DataEngine.disableStatistics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DataEngine.DataEngine.disableStatistics" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DataEngine.DataEngine.disconnectData">
+<tt class="descname">disconnectData</tt><big>(</big><em>type</em>, <em>function</em><big>)</big><a class="reference internal" href="modules/models/DataEngine.html#DataEngine.disconnectData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DataEngine.DataEngine.disconnectData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DataEngine.DataEngine.enableStatistics">
+<tt class="descname">enableStatistics</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DataEngine.html#DataEngine.enableStatistics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DataEngine.DataEngine.enableStatistics" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DataEngine.DataEngine.getDataFormats">
+<tt class="descname">getDataFormats</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DataEngine.html#DataEngine.getDataFormats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DataEngine.DataEngine.getDataFormats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DataEngine.DataEngine.getDepthCameraController">
+<tt class="descname">getDepthCameraController</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DataEngine.html#DataEngine.getDepthCameraController"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DataEngine.DataEngine.getDepthCameraController" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DataEngine.DataEngine.getFrameSize">
+<tt class="descname">getFrameSize</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DataEngine.html#DataEngine.getFrameSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DataEngine.DataEngine.getFrameSize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DataEngine.DataEngine.processDepthFrame">
+<tt class="descname">processDepthFrame</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DataEngine.html#DataEngine.processDepthFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DataEngine.DataEngine.processDepthFrame" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DataEngine.DataEngine.processPointCloudFrame">
+<tt class="descname">processPointCloudFrame</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DataEngine.html#DataEngine.processPointCloudFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DataEngine.DataEngine.processPointCloudFrame" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DataEngine.DataEngine.processToFFrame">
+<tt class="descname">processToFFrame</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DataEngine.html#DataEngine.processToFFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DataEngine.DataEngine.processToFFrame" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DataEngine.DataEngine.rateFactorChanged">
+<tt class="descname">rateFactorChanged</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x0000000006AA4490&gt;</em><a class="headerlink" href="#models.DataEngine.DataEngine.rateFactorChanged" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DataEngine.DataEngine.setSettlingTime">
+<tt class="descname">setSettlingTime</tt><big>(</big><em>settlingTime</em><big>)</big><a class="reference internal" href="modules/models/DataEngine.html#DataEngine.setSettlingTime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DataEngine.DataEngine.setSettlingTime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DataEngine.DataEngine.staticMetaObject">
+<tt class="descname">staticMetaObject</tt><em class="property"> = &lt;PySide.QtCore.QMetaObject object at 0x000000001C546D48&gt;</em><a class="headerlink" href="#models.DataEngine.DataEngine.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DataEngine.DataEngine.statisticsChanged">
+<tt class="descname">statisticsChanged</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x0000000006AA4458&gt;</em><a class="headerlink" href="#models.DataEngine.DataEngine.statisticsChanged" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DataEngine.DataEngine.stop">
+<tt class="descname">stop</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DataEngine.html#DataEngine.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DataEngine.DataEngine.stop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="models.DataEngine.DataFormat">
+<em class="property">class </em><tt class="descclassname">models.DataEngine.</tt><tt class="descname">DataFormat</tt><big>(</big><em>name</em>, <em>title</em>, <em>dataType</em>, <em>elementType</em>, <em>colorMapType</em>, <em>levels</em>, <em>numPoints</em>, <em>levels2=None</em>, <em>isDepthType=False</em>, <em>scalingFactor=1</em><big>)</big><a class="reference internal" href="modules/models/DataEngine.html#DataFormat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DataEngine.DataFormat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dl class="attribute">
+<dt id="models.DataEngine.DataFormat.COLOR_MAP_BW">
+<tt class="descname">COLOR_MAP_BW</tt><em class="property"> = 0</em><a class="headerlink" href="#models.DataEngine.DataFormat.COLOR_MAP_BW" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DataEngine.DataFormat.COLOR_MAP_FULL">
+<tt class="descname">COLOR_MAP_FULL</tt><em class="property"> = 1</em><a class="headerlink" href="#models.DataEngine.DataFormat.COLOR_MAP_FULL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DataEngine.DataFormat.DATA_2D">
+<tt class="descname">DATA_2D</tt><em class="property"> = 0</em><a class="headerlink" href="#models.DataEngine.DataFormat.DATA_2D" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DataEngine.DataFormat.DATA_3D">
+<tt class="descname">DATA_3D</tt><em class="property"> = 1</em><a class="headerlink" href="#models.DataEngine.DataFormat.DATA_3D" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DataEngine.DataFormat.init">
+<tt class="descname">init</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DataEngine.html#DataFormat.init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DataEngine.DataFormat.init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DataEngine.DataFormat.setColorMapType">
+<tt class="descname">setColorMapType</tt><big>(</big><em>colorMapType</em><big>)</big><a class="reference internal" href="modules/models/DataEngine.html#DataFormat.setColorMapType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DataEngine.DataFormat.setColorMapType" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DataEngine.DataFormat.setLevels">
+<tt class="descname">setLevels</tt><big>(</big><em>levels</em><big>)</big><a class="reference internal" href="modules/models/DataEngine.html#DataFormat.setLevels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DataEngine.DataFormat.setLevels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DataEngine.DataFormat.setScalingFactor">
+<tt class="descname">setScalingFactor</tt><big>(</big><em>scalingFactor</em><big>)</big><a class="reference internal" href="modules/models/DataEngine.html#DataFormat.setScalingFactor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DataEngine.DataFormat.setScalingFactor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-models.DataQueue">
+<span id="models-dataqueue"></span><h2>models.DataQueue<a class="headerlink" href="#module-models.DataQueue" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="models.DataQueue.DataQueue">
+<em class="property">class </em><tt class="descclassname">models.DataQueue.</tt><tt class="descname">DataQueue</tt><big>(</big><em>maxlen=3</em><big>)</big><a class="reference internal" href="modules/models/DataQueue.html#DataQueue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DataQueue.DataQueue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dl class="method">
+<dt id="models.DataQueue.DataQueue.clear">
+<tt class="descname">clear</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DataQueue.html#DataQueue.clear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DataQueue.DataQueue.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DataQueue.DataQueue.get">
+<tt class="descname">get</tt><big>(</big><em>timeout=None</em><big>)</big><a class="reference internal" href="modules/models/DataQueue.html#DataQueue.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DataQueue.DataQueue.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DataQueue.DataQueue.put">
+<tt class="descname">put</tt><big>(</big><em>item</em><big>)</big><a class="reference internal" href="modules/models/DataQueue.html#DataQueue.put"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DataQueue.DataQueue.put" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DataQueue.DataQueue.tryGet">
+<tt class="descname">tryGet</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DataQueue.html#DataQueue.tryGet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DataQueue.DataQueue.tryGet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-models.DepthCameraStreamController">
+<span id="models-depthcamerastreamcontroller"></span><h2>models.DepthCameraStreamController<a class="headerlink" href="#module-models.DepthCameraStreamController" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamController">
+<em class="property">class </em><tt class="descclassname">models.DepthCameraStreamController.</tt><tt class="descname">DepthCameraStreamController</tt><big>(</big><em>cameraSystem</em>, <em>depthCamera=None</em><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamController"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamController" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PySide.QtCore.QObject</span></tt></p>
+<dl class="method">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamController.addDepthCameraSource">
+<tt class="descname">addDepthCameraSource</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamController.addDepthCameraSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamController.addDepthCameraSource" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamController.addFileStreamSource">
+<tt class="descname">addFileStreamSource</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamController.addFileStreamSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamController.addFileStreamSource" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamController.beforestart">
+<tt class="descname">beforestart</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x0000000006A95B90&gt;</em><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamController.beforestart" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamController.callbackInternal">
+<tt class="descname">callbackInternal</tt><big>(</big><em>depthCamera</em>, <em>frame</em>, <em>type</em><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamController.callbackInternal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamController.callbackInternal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamController.clearCallback">
+<tt class="descname">clearCallback</tt><big>(</big><em>type</em>, <em>callback</em><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamController.clearCallback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamController.clearCallback" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamController.disconnectDepthCamera">
+<tt class="descname">disconnectDepthCamera</tt><big>(</big><em>onlyFromUI=False</em><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamController.disconnectDepthCamera"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamController.disconnectDepthCamera" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamController.getCameraSystem">
+<tt class="descname">getCameraSystem</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamController.getCameraSystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamController.getCameraSystem" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamController.getCurrentSource">
+<tt class="descname">getCurrentSource</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamController.getCurrentSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamController.getCurrentSource" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamController.getDepthCamera">
+<tt class="descname">getDepthCamera</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamController.getDepthCamera"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamController.getDepthCamera" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamController.getSources">
+<tt class="descname">getSources</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamController.getSources"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamController.getSources" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamController.isPaused">
+<tt class="descname">isPaused</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamController.isPaused"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamController.isPaused" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamController.isRunning">
+<tt class="descname">isRunning</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamController.isRunning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamController.isRunning" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamController.onDepthCameraSet">
+<tt class="descname">onDepthCameraSet</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x0000000006A95D18&gt;</em><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamController.onDepthCameraSet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamController.pause">
+<tt class="descname">pause</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamController.pause"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamController.pause" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamController.paused">
+<tt class="descname">paused</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x0000000006A95C00&gt;</em><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamController.paused" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamController.registerCallback">
+<tt class="descname">registerCallback</tt><big>(</big><em>type</em>, <em>callback</em><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamController.registerCallback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamController.registerCallback" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamController.removeStreamSource">
+<tt class="descname">removeStreamSource</tt><big>(</big><em>index</em><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamController.removeStreamSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamController.removeStreamSource" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamController.resumed">
+<tt class="descname">resumed</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x0000000006A95C38&gt;</em><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamController.resumed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamController.setCurrentSource">
+<tt class="descname">setCurrentSource</tt><big>(</big><em>pos</em><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamController.setCurrentSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamController.setCurrentSource" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamController.setDepthCamera">
+<tt class="descname">setDepthCamera</tt><big>(</big><em>depthCamera</em><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamController.setDepthCamera"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamController.setDepthCamera" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamController.sourceListChanged">
+<tt class="descname">sourceListChanged</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x0000000006A95C70&gt;</em><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamController.sourceListChanged" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamController.sourceSelected">
+<tt class="descname">sourceSelected</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x0000000006A95CE0&gt;</em><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamController.sourceSelected" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamController.start">
+<tt class="descname">start</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamController.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamController.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamController.started">
+<tt class="descname">started</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x0000000006A95B58&gt;</em><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamController.started" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamController.staticMetaObject">
+<tt class="descname">staticMetaObject</tt><em class="property"> = &lt;PySide.QtCore.QMetaObject object at 0x0000000006A9C088&gt;</em><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamController.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamController.stop">
+<tt class="descname">stop</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamController.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamController.stop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamController.stopped">
+<tt class="descname">stopped</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x0000000006A95BC8&gt;</em><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamController.stopped" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamSource">
+<em class="property">class </em><tt class="descclassname">models.DepthCameraStreamController.</tt><tt class="descname">DepthCameraStreamSource</tt><big>(</big><em>depthCamera</em><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.DepthCameraStreamController.StreamSource" title="models.DepthCameraStreamController.StreamSource"><tt class="xref py py-class docutils literal"><span class="pre">models.DepthCameraStreamController.StreamSource</span></tt></a></p>
+<dl class="method">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamSource.callbackInternal">
+<tt class="descname">callbackInternal</tt><big>(</big><em>depthCamera</em>, <em>frame</em>, <em>type</em><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamSource.callbackInternal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamSource.callbackInternal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamSource.isInitialized">
+<tt class="descname">isInitialized</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamSource.isInitialized"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamSource.isInitialized" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamSource.isLiveStream">
+<tt class="descname">isLiveStream</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamSource.isLiveStream"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamSource.isLiveStream" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamSource.isPaused">
+<tt class="descname">isPaused</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamSource.isPaused"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamSource.isPaused" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamSource.isRunning">
+<tt class="descname">isRunning</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamSource.isRunning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamSource.isRunning" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamSource.pause">
+<tt class="descname">pause</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamSource.pause"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamSource.pause" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamSource.resume">
+<tt class="descname">resume</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamSource.resume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamSource.resume" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamSource.setDepthCamera">
+<tt class="descname">setDepthCamera</tt><big>(</big><em>depthCamera</em><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamSource.setDepthCamera"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamSource.setDepthCamera" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamSource.start">
+<tt class="descname">start</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamSource.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamSource.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamSource.staticMetaObject">
+<tt class="descname">staticMetaObject</tt><em class="property"> = &lt;PySide.QtCore.QMetaObject object at 0x0000000006A89F88&gt;</em><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamSource.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.DepthCameraStreamSource.stop">
+<tt class="descname">stop</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#DepthCameraStreamSource.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.DepthCameraStreamSource.stop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="models.DepthCameraStreamController.FileStreamSource">
+<em class="property">class </em><tt class="descclassname">models.DepthCameraStreamController.</tt><tt class="descname">FileStreamSource</tt><big>(</big><em>filename</em>, <em>cameraSystem</em><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#FileStreamSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.FileStreamSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.DepthCameraStreamController.StreamSource" title="models.DepthCameraStreamController.StreamSource"><tt class="xref py py-class docutils literal"><span class="pre">models.DepthCameraStreamController.StreamSource</span></tt></a></p>
+<dl class="method">
+<dt id="models.DepthCameraStreamController.FileStreamSource.currentPosition">
+<tt class="descname">currentPosition</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#FileStreamSource.currentPosition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.FileStreamSource.currentPosition" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.FileStreamSource.currentTimestamp">
+<tt class="descname">currentTimestamp</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#FileStreamSource.currentTimestamp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.FileStreamSource.currentTimestamp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.FileStreamSource.isInitialized">
+<tt class="descname">isInitialized</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#FileStreamSource.isInitialized"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.FileStreamSource.isInitialized" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.FileStreamSource.isLiveStream">
+<tt class="descname">isLiveStream</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#FileStreamSource.isLiveStream"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.FileStreamSource.isLiveStream" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.FileStreamSource.isRunning">
+<tt class="descname">isRunning</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#FileStreamSource.isRunning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.FileStreamSource.isRunning" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.FileStreamSource.isSeekable">
+<tt class="descname">isSeekable</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#FileStreamSource.isSeekable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.FileStreamSource.isSeekable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.FileStreamSource.length">
+<tt class="descname">length</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#FileStreamSource.length"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.FileStreamSource.length" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.FileStreamSource.pause">
+<tt class="descname">pause</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#FileStreamSource.pause"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.FileStreamSource.pause" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.FileStreamSource.processNext">
+<tt class="descname">processNext</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#FileStreamSource.processNext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.FileStreamSource.processNext" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.FileStreamSource.runLoop">
+<tt class="descname">runLoop</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#FileStreamSource.runLoop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.FileStreamSource.runLoop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.FileStreamSource.seek">
+<tt class="descname">seek</tt><big>(</big><em>pos</em><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#FileStreamSource.seek"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.FileStreamSource.seek" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.FileStreamSource.start">
+<tt class="descname">start</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#FileStreamSource.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.FileStreamSource.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DepthCameraStreamController.FileStreamSource.staticMetaObject">
+<tt class="descname">staticMetaObject</tt><em class="property"> = &lt;PySide.QtCore.QMetaObject object at 0x0000000006A9C048&gt;</em><a class="headerlink" href="#models.DepthCameraStreamController.FileStreamSource.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.FileStreamSource.stop">
+<tt class="descname">stop</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#FileStreamSource.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.FileStreamSource.stop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="models.DepthCameraStreamController.StreamSource">
+<em class="property">class </em><tt class="descclassname">models.DepthCameraStreamController.</tt><tt class="descname">StreamSource</tt><big>(</big><em>name</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#StreamSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.StreamSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PySide.QtCore.QObject</span></tt></p>
+<dl class="attribute">
+<dt id="models.DepthCameraStreamController.StreamSource.beforestart">
+<tt class="descname">beforestart</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x0000000006A95A08&gt;</em><a class="headerlink" href="#models.DepthCameraStreamController.StreamSource.beforestart" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.StreamSource.currentPosition">
+<tt class="descname">currentPosition</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#StreamSource.currentPosition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.StreamSource.currentPosition" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.StreamSource.currentTimestamp">
+<tt class="descname">currentTimestamp</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#StreamSource.currentTimestamp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.StreamSource.currentTimestamp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.StreamSource.getAmplitudeScalingFactor">
+<tt class="descname">getAmplitudeScalingFactor</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#StreamSource.getAmplitudeScalingFactor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.StreamSource.getAmplitudeScalingFactor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.StreamSource.getBinning">
+<tt class="descname">getBinning</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#StreamSource.getBinning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.StreamSource.getBinning" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.StreamSource.getDepthScalingFactor">
+<tt class="descname">getDepthScalingFactor</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#StreamSource.getDepthScalingFactor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.StreamSource.getDepthScalingFactor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.StreamSource.getName">
+<tt class="descname">getName</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#StreamSource.getName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.StreamSource.getName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.StreamSource.getROI">
+<tt class="descname">getROI</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#StreamSource.getROI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.StreamSource.getROI" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.StreamSource.getStreamParamf">
+<tt class="descname">getStreamParamf</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#StreamSource.getStreamParamf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.StreamSource.getStreamParamf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.StreamSource.isInitialized">
+<tt class="descname">isInitialized</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#StreamSource.isInitialized"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.StreamSource.isInitialized" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.StreamSource.isLiveStream">
+<tt class="descname">isLiveStream</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#StreamSource.isLiveStream"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.StreamSource.isLiveStream" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.StreamSource.isPaused">
+<tt class="descname">isPaused</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#StreamSource.isPaused"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.StreamSource.isPaused" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.StreamSource.isRunning">
+<tt class="descname">isRunning</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#StreamSource.isRunning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.StreamSource.isRunning" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.StreamSource.isSeekable">
+<tt class="descname">isSeekable</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#StreamSource.isSeekable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.StreamSource.isSeekable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.StreamSource.length">
+<tt class="descname">length</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#StreamSource.length"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.StreamSource.length" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.StreamSource.pause">
+<tt class="descname">pause</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#StreamSource.pause"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.StreamSource.pause" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DepthCameraStreamController.StreamSource.paused">
+<tt class="descname">paused</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x0000000006A95960&gt;</em><a class="headerlink" href="#models.DepthCameraStreamController.StreamSource.paused" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.StreamSource.removeCallback">
+<tt class="descname">removeCallback</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#StreamSource.removeCallback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.StreamSource.removeCallback" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.StreamSource.resume">
+<tt class="descname">resume</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#StreamSource.resume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.StreamSource.resume" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DepthCameraStreamController.StreamSource.resumed">
+<tt class="descname">resumed</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x0000000006A95998&gt;</em><a class="headerlink" href="#models.DepthCameraStreamController.StreamSource.resumed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.StreamSource.seek">
+<tt class="descname">seek</tt><big>(</big><em>pos</em><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#StreamSource.seek"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.StreamSource.seek" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.StreamSource.setCallback">
+<tt class="descname">setCallback</tt><big>(</big><em>callback</em><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#StreamSource.setCallback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.StreamSource.setCallback" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.StreamSource.start">
+<tt class="descname">start</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#StreamSource.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.StreamSource.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DepthCameraStreamController.StreamSource.started">
+<tt class="descname">started</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x0000000006A95A40&gt;</em><a class="headerlink" href="#models.DepthCameraStreamController.StreamSource.started" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DepthCameraStreamController.StreamSource.staticMetaObject">
+<tt class="descname">staticMetaObject</tt><em class="property"> = &lt;PySide.QtCore.QMetaObject object at 0x0000000006A89F48&gt;</em><a class="headerlink" href="#models.DepthCameraStreamController.StreamSource.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="models.DepthCameraStreamController.StreamSource.stop">
+<tt class="descname">stop</tt><big>(</big><big>)</big><a class="reference internal" href="modules/models/DepthCameraStreamController.html#StreamSource.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.DepthCameraStreamController.StreamSource.stop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="models.DepthCameraStreamController.StreamSource.stopped">
+<tt class="descname">stopped</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x0000000006A959D0&gt;</em><a class="headerlink" href="#models.DepthCameraStreamController.StreamSource.stopped" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-models.FrameQueue">
+<span id="models-framequeue"></span><h2>models.FrameQueue<a class="headerlink" href="#module-models.FrameQueue" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="models.FrameQueue.FrameQueue">
+<em class="property">class </em><tt class="descclassname">models.FrameQueue.</tt><tt class="descname">FrameQueue</tt><big>(</big><em>maxlen=3</em><big>)</big><a class="reference internal" href="modules/models/FrameQueue.html#FrameQueue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.FrameQueue.FrameQueue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#models.DataQueue.DataQueue" title="models.DataQueue.DataQueue"><tt class="xref py py-class docutils literal"><span class="pre">models.DataQueue.DataQueue</span></tt></a></p>
+<dl class="method">
+<dt id="models.FrameQueue.FrameQueue.release">
+<tt class="descname">release</tt><big>(</big><em>item</em><big>)</big><a class="reference internal" href="modules/models/FrameQueue.html#FrameQueue.release"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#models.FrameQueue.FrameQueue.release" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="models-producerconsumerthread">
+<h2>models.ProducerConsumerThread<a class="headerlink" href="#models-producerconsumerthread" title="Permalink to this headline">¶</a></h2>
+<hr class="docutils" />
+<span class="target" id="module-models"></span></div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="views.html" title="views package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="capture.html" title="capture package"
+             >previous</a> |</li>
+        <li><a href="index.html">home</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+ 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, &#39;Suramya&#39;.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+    </div>
+  </body>
+</html>

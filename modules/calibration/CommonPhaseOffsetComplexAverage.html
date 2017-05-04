@@ -1,0 +1,244 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>calibration.CommonPhaseOffsetComplexAverage &mdash; SCAW &#39;0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '&#39;0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SCAW &#39;0.1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><h1 style="font-size: 3em;">Voxel Calibration Wizard</h1></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for calibration.CommonPhaseOffsetComplexAverage</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">CommonPhaseOffset.py - takes vxl file as input along with modulation frequency and distance to give phaseCorr values. </span>
+<span class="sd">Requires two vxl files - one for each frequency to calculate phase corr 1 and phase corr 2</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">&#39;&#39;&#39;Example Script:</span>
+<span class="sd">python CommonPhaseOffset.py -f &quot;file.vxl&quot; -d 0.7 -m 20  -c tintin.ti (-n 10 -g &quot;file2.vxl&quot;)</span>
+<span class="sd">or </span>
+<span class="sd">python CommonPhaseOffset.py --file1 &quot;file.vxl&quot; --distance 0.7 --modFreq1 20 --chipset tintin.ti (--modFreq2 10 --file2 &quot;file2.vxl&quot;)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">Voxel</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+
+<span class="n">MAX_PHASE_VALUE</span> <span class="o">=</span> <span class="mi">4096</span>
+
+<div class="viewcode-block" id="wrapPhaseToSignedInteger"><a class="viewcode-back" href="../../calibration.html#calibration.CommonPhaseOffsetComplexAverage.wrapPhaseToSignedInteger">[docs]</a><span class="k">def</span> <span class="nf">wrapPhaseToSignedInteger</span><span class="p">(</span><span class="n">phase</span><span class="p">):</span>
+   <span class="sd">&quot;&quot;&quot;Keeps the phase offset value between -2048 and 2048 &quot;&quot;&quot;</span> 
+   <span class="k">if</span> <span class="n">phase</span> <span class="o">&gt;=</span> <span class="n">MAX_PHASE_VALUE</span><span class="o">/</span><span class="mi">2</span><span class="p">:</span>
+     <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="p">(</span><span class="n">MAX_PHASE_VALUE</span> <span class="o">-</span> <span class="n">phase</span><span class="p">)</span>
+   <span class="k">elif</span> <span class="n">phase</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">MAX_PHASE_VALUE</span><span class="o">/</span><span class="mi">2</span><span class="p">:</span>
+     <span class="k">return</span> <span class="p">(</span><span class="n">MAX_PHASE_VALUE</span> <span class="o">+</span> <span class="n">phase</span><span class="p">)</span>
+   <span class="k">else</span><span class="p">:</span>
+     <span class="k">return</span> <span class="n">phase</span>
+ </div>
+<div class="viewcode-block" id="computeAveragePhases"><a class="viewcode-back" href="../../calibration.html#calibration.CommonPhaseOffsetComplexAverage.computeAveragePhases">[docs]</a><span class="k">def</span> <span class="nf">computeAveragePhases</span><span class="p">(</span><span class="n">camsys</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">cx</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">cy</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">window</span> <span class="o">=</span> <span class="mi">4</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Computes the average phases for a given file. Uses the complex average for getting phase value &quot;&quot;&quot;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">Voxel</span><span class="o">.</span><span class="n">FrameStreamReader</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">camsys</span><span class="p">)</span>
+    <span class="n">bool1</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">getStreamParamu</span><span class="p">(</span><span class="s2">&quot;frameWidth&quot;</span><span class="p">)</span>
+    <span class="n">bool2</span><span class="p">,</span> <span class="n">rows</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">getStreamParamu</span><span class="p">(</span><span class="s2">&quot;frameHeight&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cx</span><span class="p">:</span>
+        <span class="n">bool3</span><span class="p">,</span> <span class="n">cx</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">getStreamParamf</span><span class="p">(</span><span class="s2">&quot;cx&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">bool3</span><span class="p">:</span>
+            <span class="n">cx</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cy</span><span class="p">:</span>
+        <span class="n">bool4</span><span class="p">,</span> <span class="n">cy</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">getStreamParamf</span><span class="p">(</span><span class="s2">&quot;cy&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">bool4</span><span class="p">:</span>
+            <span class="n">cy</span> <span class="o">=</span> <span class="mi">0</span>
+   
+    <span class="n">cx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cx</span><span class="p">)</span>
+    <span class="n">cy</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cy</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">cx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">cx</span> <span class="o">=</span> <span class="n">rows</span><span class="o">/</span><span class="mi">2</span>
+    <span class="k">if</span> <span class="n">cy</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">cy</span> <span class="o">=</span> <span class="n">cols</span><span class="o">/</span><span class="mi">2</span>
+    <span class="k">if</span> <span class="n">window</span><span class="p">:</span>
+        <span class="n">centerShape</span> <span class="o">=</span> <span class="p">[</span><span class="n">cx</span><span class="o">-</span><span class="n">window</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">cx</span><span class="o">+</span><span class="n">window</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">cy</span><span class="o">-</span><span class="n">window</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">cy</span><span class="o">+</span><span class="n">window</span><span class="o">/</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="n">centerShape</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">rows</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">cols</span><span class="p">]</span>        
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">r</span><span class="o">.</span><span class="n">isStreamGood</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">bool1</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">bool2</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Stream is not good: &quot;</span> <span class="o">+</span> <span class="n">filename</span><span class="p">)</span>
+    <span class="n">numFrames</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">window</span><span class="p">:</span>
+        <span class="n">averagePhase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">window</span><span class="p">,</span> <span class="n">window</span><span class="p">),</span> <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;complex&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">averagePhase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">),</span> <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;complex&#39;</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">numFrames</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">r</span><span class="o">.</span><span class="n">readNext</span><span class="p">():</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Failed to read frame </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">break</span>
+        <span class="n">tofFrame</span> <span class="o">=</span> <span class="n">Voxel</span><span class="o">.</span><span class="n">ToF1608Frame</span><span class="o">.</span><span class="n">typeCast</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">frames</span><span class="p">[</span><span class="n">Voxel</span><span class="o">.</span><span class="n">DepthCamera</span><span class="o">.</span><span class="n">FRAME_RAW_FRAME_PROCESSED</span><span class="p">])</span>
+        <span class="n">phase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tofFrame</span><span class="o">.</span><span class="n">_phase</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">))</span>\
+        <span class="p">[</span><span class="n">centerShape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">centerShape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">centerShape</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span><span class="n">centerShape</span><span class="p">[</span><span class="mi">3</span><span class="p">]]</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">4096</span>
+        <span class="n">amplitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tofFrame</span><span class="o">.</span><span class="n">_amplitude</span><span class="p">,</span> <span class="n">copy</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">rows</span><span class="p">,</span><span class="n">cols</span><span class="p">))</span>\
+        <span class="p">[</span><span class="n">centerShape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">centerShape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">centerShape</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span><span class="n">centerShape</span><span class="p">[</span><span class="mi">3</span><span class="p">]]</span>
+        <span class="n">averagePhase</span> <span class="o">+=</span> <span class="n">amplitude</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phase</span><span class="p">)</span><span class="o">+</span> <span class="mi">1j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phase</span><span class="p">))</span>
+    <span class="n">averagePhase</span> <span class="o">/=</span> <span class="n">numFrames</span>
+    <span class="k">if</span> <span class="n">window</span><span class="p">:</span>
+        <span class="n">averagePhase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">averagePhase</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">window</span><span class="o">*</span><span class="n">window</span><span class="p">)</span>
+    <span class="n">averagePhase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">averagePhase</span><span class="p">)</span><span class="o">*</span> <span class="mi">4096</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+    
+    <span class="n">r</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">averagePhase</span><span class="p">,</span> <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> 
+</div>
+<div class="viewcode-block" id="commonPhaseOffset"><a class="viewcode-back" href="../../calibration.html#calibration.CommonPhaseOffsetComplexAverage.commonPhaseOffset">[docs]</a><span class="k">def</span> <span class="nf">commonPhaseOffset</span><span class="p">(</span><span class="n">file1</span><span class="p">,</span> <span class="n">distance</span><span class="p">,</span> <span class="n">modFreq1</span><span class="p">,</span> <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">file2</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">modFreq2</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">window</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">chipset</span> <span class="o">=</span> <span class="s1">&#39;ti.tinitn&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Computes the common phase offsets. </span>
+<span class="sd">    </span>
+<span class="sd">    This function calculates the common phase offsets for a given file, taking VXL as input. </span>
+<span class="sd">    </span>
+<span class="sd">    **Parameters**::</span>
+<span class="sd">    </span>
+<span class="sd">        - file1, file2: File(s) for computing common phase offsets. These should be vxl files of a flat wall. The camera should be almost parallel to the wall.</span>
+<span class="sd">        - modFreq1, modFreq2 : Modulation Frequency (ies) when the data is captured. If dealiasing is enabled, two modulation frequencies are required</span>
+<span class="sd">        - cx, cy: The coordinates of the center pixel, found during lens calibration. If cx and cy are not available, the central value (120,160) is taken.</span>
+<span class="sd">        - window: The window size. By default, a window of 4x4 is required. </span>
+<span class="sd">        - chipset: The chipset being used. </span>
+<span class="sd">        </span>
+<span class="sd">    **Returns**::</span>
+<span class="sd">    </span>
+<span class="sd">        - phase_Corr1: Phase offset value for the first modulation frequency</span>
+<span class="sd">        - phase_Corr2: Phase offset value for the second modulation frequency</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="mi">299792458</span> <span class="c1"># m/s</span>
+    <span class="n">camsys</span> <span class="o">=</span> <span class="n">Voxel</span><span class="o">.</span><span class="n">CameraSystem</span><span class="p">()</span>
+    <span class="n">averagePhase1</span><span class="p">,</span> <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">computeAveragePhases</span><span class="p">(</span><span class="n">camsys</span><span class="p">,</span> <span class="n">file1</span><span class="p">,</span> <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">window</span><span class="p">)</span> <span class="c1">#default window size = 4</span>
+    <span class="n">ds1</span> <span class="o">=</span> <span class="n">c</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">modFreq1</span><span class="o">*</span><span class="mf">1E6</span><span class="p">)</span>
+    <span class="n">phaseActual1</span> <span class="o">=</span> <span class="n">distance</span><span class="o">/</span><span class="n">ds1</span><span class="o">*</span><span class="mi">4096</span>
+    <span class="n">phaseAverage1</span> <span class="o">=</span> <span class="n">averagePhase1</span>
+    <span class="n">phaseCorr</span> <span class="o">=</span> <span class="n">wrapPhaseToSignedInteger</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">phaseAverage1</span> <span class="o">-</span> <span class="n">phaseActual1</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">file2</span> <span class="ow">and</span> <span class="n">modFreq2</span><span class="p">:</span>
+        <span class="n">averagePhase2</span><span class="p">,</span> <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span>  <span class="n">computeAveragePhases</span><span class="p">(</span><span class="n">camsys</span><span class="p">,</span> <span class="n">file2</span><span class="p">,</span> <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">window</span><span class="p">)</span>
+        <span class="n">ds2</span> <span class="o">=</span> <span class="n">c</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">modFreq2</span><span class="o">*</span><span class="mf">1E6</span><span class="p">)</span>
+        <span class="n">phaseActual2</span> <span class="o">=</span> <span class="n">distance</span><span class="o">/</span><span class="n">ds2</span><span class="o">*</span><span class="mi">4096</span>
+        <span class="n">phaseAverage2</span> <span class="o">=</span> <span class="n">averagePhase2</span>
+        <span class="n">phaseCorr2</span> <span class="o">=</span> <span class="n">wrapPhaseToSignedInteger</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">phaseAverage2</span><span class="o">-</span><span class="n">phaseActual2</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">phaseCorr2</span> <span class="o">=</span> <span class="mi">0</span>    
+    <span class="k">if</span> <span class="n">chipset</span> <span class="o">==</span> <span class="s1">&#39;ti.calculus&#39;</span><span class="p">:</span> <span class="c1">#additive phase</span>
+        <span class="n">phaseCorr</span> <span class="o">=</span> <span class="o">-</span><span class="n">phaseCorr</span>
+        <span class="n">phaseCorr2</span> <span class="o">=</span> <span class="o">-</span><span class="n">phaseCorr2</span>
+    <span class="k">return</span> <span class="bp">True</span><span class="p">,</span> <span class="n">phaseCorr</span><span class="p">,</span> <span class="n">phaseCorr2</span><span class="p">,</span> <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span></div>
+<div class="viewcode-block" id="parseArgs"><a class="viewcode-back" href="../../calibration.html#calibration.CommonPhaseOffsetComplexAverage.parseArgs">[docs]</a><span class="k">def</span> <span class="nf">parseArgs</span> <span class="p">(</span><span class="n">args</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Parsing the arguments in the command line - this is used to get the parameters using this script&quot;&quot;&quot;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Calculate Common Phase Offsets&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-f&#39;</span><span class="p">,</span> <span class="s1">&#39;--file1&#39;</span><span class="p">,</span> <span class="n">help</span> <span class="o">=</span> <span class="s1">&#39;Filename1&#39;</span><span class="p">,</span> <span class="n">required</span> <span class="o">=</span> <span class="s1">&#39;True&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span> <span class="bp">None</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-d&#39;</span><span class="p">,</span> <span class="s1">&#39;--distance&#39;</span><span class="p">,</span> <span class="nb">type</span> <span class="o">=</span> <span class="nb">float</span><span class="p">,</span> <span class="n">help</span> <span class="o">=</span> <span class="s1">&#39;Distance in meters&#39;</span><span class="p">,</span> <span class="n">required</span> <span class="o">=</span> <span class="s1">&#39;True&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="s1">&#39;--modFreq1&#39;</span><span class="p">,</span> <span class="n">help</span> <span class="o">=</span> <span class="s1">&#39;Modulation Frequency 1&#39;</span><span class="p">,</span> <span class="nb">type</span> <span class="o">=</span> <span class="nb">float</span><span class="p">,</span>  <span class="n">required</span> <span class="o">=</span> <span class="s1">&#39;True&#39;</span><span class="p">,</span> <span class="n">default</span> <span class="o">=</span> <span class="mi">40</span><span class="p">)</span>     
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-g&#39;</span><span class="p">,</span> <span class="s1">&#39;--file2&#39;</span><span class="p">,</span> <span class="n">help</span> <span class="o">=</span> <span class="s1">&#39;Filename2&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span> <span class="bp">None</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-n&#39;</span><span class="p">,</span> <span class="s1">&#39;--modFreq2&#39;</span><span class="p">,</span> <span class="n">help</span> <span class="o">=</span> <span class="s1">&#39;Modulation Frequency 2&#39;</span><span class="p">,</span> <span class="nb">type</span> <span class="o">=</span> <span class="nb">float</span><span class="p">,</span> <span class="n">default</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-x&#39;</span><span class="p">,</span> <span class="s1">&#39;--cx&#39;</span><span class="p">,</span> <span class="n">help</span> <span class="o">=</span> <span class="s1">&#39;cx&#39;</span><span class="p">,</span> <span class="nb">type</span> <span class="o">=</span> <span class="nb">float</span><span class="p">,</span> <span class="n">default</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-y&#39;</span><span class="p">,</span> <span class="s1">&#39;--cy&#39;</span><span class="p">,</span> <span class="n">help</span> <span class="o">=</span> <span class="s1">&#39;cy&#39;</span><span class="p">,</span> <span class="nb">type</span> <span class="o">=</span> <span class="nb">float</span><span class="p">,</span> <span class="n">default</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-w&#39;</span><span class="p">,</span> <span class="s1">&#39;--window&#39;</span><span class="p">,</span> <span class="n">help</span> <span class="o">=</span> <span class="s1">&#39;Window Size&#39;</span><span class="p">,</span> <span class="nb">type</span> <span class="o">=</span> <span class="nb">int</span><span class="p">,</span> <span class="n">default</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="s1">&#39;--chipset&#39;</span><span class="p">,</span> <span class="n">help</span> <span class="o">=</span> <span class="s1">&#39;Chipset&#39;</span><span class="p">,</span> <span class="n">default</span> <span class="o">=</span> <span class="s1">&#39;tintin.ti&#39;</span><span class="p">,</span> <span class="n">required</span> <span class="o">=</span> <span class="s1">&#39;True&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="n">parseArgs</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">commonPhaseOffset</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">file1</span><span class="p">,</span><span class="n">val</span><span class="o">.</span><span class="n">distance</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">modFreq1</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">cx</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">cy</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">file2</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">modFreq2</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">window</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">chipset</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s2">&quot;Cannot compute phase offsets&quot;</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+    <span class="n">boo</span><span class="p">,</span> <span class="n">phaseCorr1</span><span class="p">,</span> <span class="n">phaseCorr2</span><span class="p">,</span> <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">ret</span>
+                                               
+                                        
+    <span class="k">print</span> <span class="s1">&#39;phase_corr_1 = </span><span class="si">%d</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">phaseCorr1</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s1">&#39;phase_corr_2 = </span><span class="si">%d</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">phaseCorr2</span><span class="p">)</span> 
+<span class="c1">##    </span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, &#39;Suramya&#39;.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+    </div>
+  </body>
+</html>

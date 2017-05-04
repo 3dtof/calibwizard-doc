@@ -1,0 +1,815 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>views package &mdash; SCAW &#39;0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="static/default.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '&#39;0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/underscore.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SCAW &#39;0.1.0 documentation" href="index.html" />
+    <link rel="next" title="wizard package" href="wizard.html" />
+    <link rel="prev" title="models package" href="models.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="index.html"><h1 style="font-size: 3em;">Voxel Calibration Wizard</h1></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="wizard.html" title="wizard package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="models.html" title="models package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">home</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+ 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">views package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-views.CustomAction">views.CustomAction</a></li>
+<li><a class="reference internal" href="#module-views.CustomHistogramLUTWidget">views.CustomHistogramLUTWidget</a></li>
+<li><a class="reference internal" href="#module-views.CustomViewBox">views.CustomViewBox</a></li>
+<li><a class="reference internal" href="#module-views.DataView">views.DataView</a></li>
+<li><a class="reference internal" href="#module-views.DataView2D">views.DataView2D</a></li>
+<li><a class="reference internal" href="#module-views.DataViewContainer">views.DataViewContainer</a></li>
+<li><a class="reference internal" href="#module-views.QxtSpanSlider">views.QxtSpanSlider</a></li>
+<li><a class="reference internal" href="#views-selectdepthcameradialog">views.SelectDepthCameraDialog</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="models.html"
+                        title="previous chapter">models package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="wizard.html"
+                        title="next chapter">wizard package</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="sources/views.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="views-package">
+<h1>views package<a class="headerlink" href="#views-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-views.CustomAction">
+<span id="views-customaction"></span><h2>views.CustomAction<a class="headerlink" href="#module-views.CustomAction" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="views.CustomAction.CustomAction">
+<em class="property">class </em><tt class="descclassname">views.CustomAction.</tt><tt class="descname">CustomAction</tt><big>(</big><em>title</em>, <em>data</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="modules/views/CustomAction.html#CustomAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.CustomAction.CustomAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PySide.QtGui.QAction</span></tt></p>
+<dl class="attribute">
+<dt id="views.CustomAction.CustomAction.staticMetaObject">
+<tt class="descname">staticMetaObject</tt><em class="property"> = &lt;PySide.QtCore.QMetaObject object at 0x000000001C5D0888&gt;</em><a class="headerlink" href="#views.CustomAction.CustomAction.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.CustomAction.CustomAction.triggerObject">
+<tt class="descname">triggerObject</tt><big>(</big><em>checked=True</em><big>)</big><a class="reference internal" href="modules/views/CustomAction.html#CustomAction.triggerObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.CustomAction.CustomAction.triggerObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.CustomAction.CustomAction.triggeredObject">
+<tt class="descname">triggeredObject</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5D3340&gt;</em><a class="headerlink" href="#views.CustomAction.CustomAction.triggeredObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-views.CustomHistogramLUTWidget">
+<span id="views-customhistogramlutwidget"></span><h2>views.CustomHistogramLUTWidget<a class="headerlink" href="#module-views.CustomHistogramLUTWidget" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="views.CustomHistogramLUTWidget.CustomHistogramLUTWidget">
+<em class="property">class </em><tt class="descclassname">views.CustomHistogramLUTWidget.</tt><tt class="descname">CustomHistogramLUTWidget</tt><big>(</big><em>parent=None</em>, <em>fillHistogram=True</em><big>)</big><a class="reference internal" href="modules/views/CustomHistogramLUTWidget.html#CustomHistogramLUTWidget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.CustomHistogramLUTWidget.CustomHistogramLUTWidget" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pyqtgraph.widgets.HistogramLUTWidget.HistogramLUTWidget</span></tt></p>
+<dl class="attribute">
+<dt id="views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.autoHistogram">
+<tt class="descname">autoHistogram</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5D3148&gt;</em><a class="headerlink" href="#views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.autoHistogram" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.export">
+<tt class="descname">export</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5D31B8&gt;</em><a class="headerlink" href="#views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.export" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.gradientChanged">
+<tt class="descname">gradientChanged</tt><big>(</big><big>)</big><a class="reference internal" href="modules/views/CustomHistogramLUTWidget.html#CustomHistogramLUTWidget.gradientChanged"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.gradientChanged" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.gradientMouseClickEvent">
+<tt class="descname">gradientMouseClickEvent</tt><big>(</big><em>ev</em><big>)</big><a class="reference internal" href="modules/views/CustomHistogramLUTWidget.html#CustomHistogramLUTWidget.gradientMouseClickEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.gradientMouseClickEvent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.histogramToggle">
+<tt class="descname">histogramToggle</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5D3180&gt;</em><a class="headerlink" href="#views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.histogramToggle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.imageChanged">
+<tt class="descname">imageChanged</tt><big>(</big><em>autoLevel=False</em>, <em>autoRange=False</em><big>)</big><a class="reference internal" href="modules/views/CustomHistogramLUTWidget.html#CustomHistogramLUTWidget.imageChanged"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.imageChanged" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.keyPressEvent">
+<tt class="descname">keyPressEvent</tt><big>(</big><em>ev</em><big>)</big><a class="reference internal" href="modules/views/CustomHistogramLUTWidget.html#CustomHistogramLUTWidget.keyPressEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.keyPressEvent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.resetView">
+<tt class="descname">resetView</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5D3110&gt;</em><a class="headerlink" href="#views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.resetView" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.setData">
+<tt class="descname">setData</tt><big>(</big><em>*args</em>, <em>**kargs</em><big>)</big><a class="reference internal" href="modules/views/CustomHistogramLUTWidget.html#CustomHistogramLUTWidget.setData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.setData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.setImageItem">
+<tt class="descname">setImageItem</tt><big>(</big><em>img</em><big>)</big><a class="reference internal" href="modules/views/CustomHistogramLUTWidget.html#CustomHistogramLUTWidget.setImageItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.setImageItem" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.setMenu">
+<tt class="descname">setMenu</tt><big>(</big><em>menu</em><big>)</big><a class="reference internal" href="modules/views/CustomHistogramLUTWidget.html#CustomHistogramLUTWidget.setMenu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.setMenu" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.staticMetaObject">
+<tt class="descname">staticMetaObject</tt><em class="property"> = &lt;PySide.QtCore.QMetaObject object at 0x000000001C5D0648&gt;</em><a class="headerlink" href="#views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.updateItems">
+<tt class="descname">updateItems</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="reference internal" href="modules/views/CustomHistogramLUTWidget.html#CustomHistogramLUTWidget.updateItems"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.updateItems" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-views.CustomViewBox">
+<span id="views-customviewbox"></span><h2>views.CustomViewBox<a class="headerlink" href="#module-views.CustomViewBox" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="views.CustomViewBox.CustomViewBox">
+<em class="property">class </em><tt class="descclassname">views.CustomViewBox.</tt><tt class="descname">CustomViewBox</tt><a class="reference internal" href="modules/views/CustomViewBox.html#CustomViewBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.CustomViewBox.CustomViewBox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pyqtgraph.graphicsItems.ViewBox.ViewBox.ViewBox</span></tt></p>
+<dl class="attribute">
+<dt id="views.CustomViewBox.CustomViewBox.autoHistogram">
+<tt class="descname">autoHistogram</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5CBDC0&gt;</em><a class="headerlink" href="#views.CustomViewBox.CustomViewBox.autoHistogram" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.CustomViewBox.CustomViewBox.export">
+<tt class="descname">export</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5CBE30&gt;</em><a class="headerlink" href="#views.CustomViewBox.CustomViewBox.export" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.CustomViewBox.CustomViewBox.histogramToggle">
+<tt class="descname">histogramToggle</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5CBDF8&gt;</em><a class="headerlink" href="#views.CustomViewBox.CustomViewBox.histogramToggle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.CustomViewBox.CustomViewBox.keyPressEvent">
+<tt class="descname">keyPressEvent</tt><big>(</big><em>ev</em><big>)</big><a class="reference internal" href="modules/views/CustomViewBox.html#CustomViewBox.keyPressEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.CustomViewBox.CustomViewBox.keyPressEvent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.CustomViewBox.CustomViewBox.mouseDragEvent">
+<tt class="descname">mouseDragEvent</tt><big>(</big><em>ev</em>, <em>axis=None</em><big>)</big><a class="reference internal" href="modules/views/CustomViewBox.html#CustomViewBox.mouseDragEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.CustomViewBox.CustomViewBox.mouseDragEvent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.CustomViewBox.CustomViewBox.raiseContextMenu">
+<tt class="descname">raiseContextMenu</tt><big>(</big><em>ev</em><big>)</big><a class="reference internal" href="modules/views/CustomViewBox.html#CustomViewBox.raiseContextMenu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.CustomViewBox.CustomViewBox.raiseContextMenu" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.CustomViewBox.CustomViewBox.resetView">
+<tt class="descname">resetView</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5CBD88&gt;</em><a class="headerlink" href="#views.CustomViewBox.CustomViewBox.resetView" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.CustomViewBox.CustomViewBox.setMenu">
+<tt class="descname">setMenu</tt><big>(</big><em>menu</em><big>)</big><a class="reference internal" href="modules/views/CustomViewBox.html#CustomViewBox.setMenu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.CustomViewBox.CustomViewBox.setMenu" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.CustomViewBox.CustomViewBox.staticMetaObject">
+<tt class="descname">staticMetaObject</tt><em class="property"> = &lt;PySide.QtCore.QMetaObject object at 0x000000001C5D0108&gt;</em><a class="headerlink" href="#views.CustomViewBox.CustomViewBox.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-views.DataView">
+<span id="views-dataview"></span><h2>views.DataView<a class="headerlink" href="#module-views.DataView" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="views.DataView.DataView">
+<em class="property">class </em><tt class="descclassname">views.DataView.</tt><tt class="descname">DataView</tt><big>(</big><em>dataEngine</em>, <em>dataFormat</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="modules/views/DataView.html#DataView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView.DataView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PySide.QtGui.QWidget</span></tt></p>
+<dl class="attribute">
+<dt id="views.DataView.DataView.LinkedViewBoxes">
+<tt class="descname">LinkedViewBoxes</tt><em class="property"> = {}</em><a class="headerlink" href="#views.DataView.DataView.LinkedViewBoxes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataView.DataView.cleanup">
+<tt class="descname">cleanup</tt><big>(</big><big>)</big><a class="reference internal" href="modules/views/DataView.html#DataView.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView.DataView.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.DataView.DataView.communicator">
+<tt class="descname">communicator</tt><em class="property"> = &lt;views.DataView.DataViewCommunicator object at 0x000000001C5C0AC8&gt;</em><a class="headerlink" href="#views.DataView.DataView.communicator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.DataView.DataView.dataEnqueued">
+<tt class="descname">dataEnqueued</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5CB1F0&gt;</em><a class="headerlink" href="#views.DataView.DataView.dataEnqueued" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataView.DataView.disconnectData">
+<tt class="descname">disconnectData</tt><big>(</big><big>)</big><a class="reference internal" href="modules/views/DataView.html#DataView.disconnectData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView.DataView.disconnectData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataView.DataView.displayData">
+<tt class="descname">displayData</tt><big>(</big><big>)</big><a class="reference internal" href="modules/views/DataView.html#DataView.displayData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView.DataView.displayData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="views.DataView.DataView.getDataView">
+<em class="property">static </em><tt class="descname">getDataView</tt><big>(</big><em>dataFormat</em>, <em>dataEngine</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="modules/views/DataView.html#DataView.getDataView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView.DataView.getDataView" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataView.DataView.keyPressEvent">
+<tt class="descname">keyPressEvent</tt><big>(</big><em>ev</em><big>)</big><a class="reference internal" href="modules/views/DataView.html#DataView.keyPressEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView.DataView.keyPressEvent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataView.DataView.link">
+<tt class="descname">link</tt><big>(</big><em>viewBox</em><big>)</big><a class="reference internal" href="modules/views/DataView.html#DataView.link"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView.DataView.link" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataView.DataView.queueData">
+<tt class="descname">queueData</tt><big>(</big><em>id</em>, <em>timestamp</em>, <em>frame</em><big>)</big><a class="reference internal" href="modules/views/DataView.html#DataView.queueData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView.DataView.queueData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataView.DataView.setDataFormat">
+<tt class="descname">setDataFormat</tt><big>(</big><em>dataFormat</em><big>)</big><a class="reference internal" href="modules/views/DataView.html#DataView.setDataFormat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView.DataView.setDataFormat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataView.DataView.setSpanKeyModifier">
+<tt class="descname">setSpanKeyModifier</tt><big>(</big><em>m</em><big>)</big><a class="reference internal" href="modules/views/DataView.html#DataView.setSpanKeyModifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView.DataView.setSpanKeyModifier" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataView.DataView.setStatusBar">
+<tt class="descname">setStatusBar</tt><big>(</big><em>statusBar</em><big>)</big><a class="reference internal" href="modules/views/DataView.html#DataView.setStatusBar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView.DataView.setStatusBar" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.DataView.DataView.staticMetaObject">
+<tt class="descname">staticMetaObject</tt><em class="property"> = &lt;PySide.QtCore.QMetaObject object at 0x000000001C5C0B88&gt;</em><a class="headerlink" href="#views.DataView.DataView.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataView.DataView.unlink">
+<tt class="descname">unlink</tt><big>(</big><big>)</big><a class="reference internal" href="modules/views/DataView.html#DataView.unlink"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView.DataView.unlink" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="views.DataView.DataView.updateViewBoxLinks">
+<em class="property">static </em><tt class="descname">updateViewBoxLinks</tt><big>(</big><big>)</big><a class="reference internal" href="modules/views/DataView.html#DataView.updateViewBoxLinks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView.DataView.updateViewBoxLinks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="views.DataView.DataViewCommunicator">
+<em class="property">class </em><tt class="descclassname">views.DataView.</tt><tt class="descname">DataViewCommunicator</tt><big>(</big><em>parent=None</em><big>)</big><a class="reference internal" href="modules/views/DataView.html#DataViewCommunicator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView.DataViewCommunicator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PySide.QtCore.QObject</span></tt></p>
+<dl class="attribute">
+<dt id="views.DataView.DataViewCommunicator.setCurrentPoint2D">
+<tt class="descname">setCurrentPoint2D</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5CB0D8&gt;</em><a class="headerlink" href="#views.DataView.DataViewCommunicator.setCurrentPoint2D" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.DataView.DataViewCommunicator.setShiftClickPoint2D">
+<tt class="descname">setShiftClickPoint2D</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5CB110&gt;</em><a class="headerlink" href="#views.DataView.DataViewCommunicator.setShiftClickPoint2D" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.DataView.DataViewCommunicator.staticMetaObject">
+<tt class="descname">staticMetaObject</tt><em class="property"> = &lt;PySide.QtCore.QMetaObject object at 0x000000001C5C0A88&gt;</em><a class="headerlink" href="#views.DataView.DataViewCommunicator.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.DataView.DataViewCommunicator.thresholdsChanged">
+<tt class="descname">thresholdsChanged</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5CB180&gt;</em><a class="headerlink" href="#views.DataView.DataViewCommunicator.thresholdsChanged" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.DataView.DataViewCommunicator.viewRangeChanged">
+<tt class="descname">viewRangeChanged</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5CB148&gt;</em><a class="headerlink" href="#views.DataView.DataViewCommunicator.viewRangeChanged" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-views.DataView2D">
+<span id="views-dataview2d"></span><h2>views.DataView2D<a class="headerlink" href="#module-views.DataView2D" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="views.DataView2D.DataView2D">
+<em class="property">class </em><tt class="descclassname">views.DataView2D.</tt><tt class="descname">DataView2D</tt><big>(</big><em>dataEngine</em>, <em>dataFormat</em>, <em>sizeRect=None</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="modules/views/DataView2D.html#DataView2D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView2D.DataView2D" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#views.DataView.DataView" title="views.DataView.DataView"><tt class="xref py py-class docutils literal"><span class="pre">views.DataView.DataView</span></tt></a></p>
+<dl class="attribute">
+<dt id="views.DataView2D.DataView2D.HISTOGRAM_THRESHOLD">
+<tt class="descname">HISTOGRAM_THRESHOLD</tt><em class="property"> = 10</em><a class="headerlink" href="#views.DataView2D.DataView2D.HISTOGRAM_THRESHOLD" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataView2D.DataView2D.autoLevels">
+<tt class="descname">autoLevels</tt><big>(</big><big>)</big><a class="reference internal" href="modules/views/DataView2D.html#DataView2D.autoLevels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView2D.DataView2D.autoLevels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataView2D.DataView2D.computeChangedRange">
+<tt class="descname">computeChangedRange</tt><big>(</big><big>)</big><a class="reference internal" href="modules/views/DataView2D.html#DataView2D.computeChangedRange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView2D.DataView2D.computeChangedRange" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.DataView2D.DataView2D.dataAvailable">
+<tt class="descname">dataAvailable</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5D3228&gt;</em><a class="headerlink" href="#views.DataView2D.DataView2D.dataAvailable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataView2D.DataView2D.displayData">
+<tt class="descname">displayData</tt><big>(</big><big>)</big><a class="reference internal" href="modules/views/DataView2D.html#DataView2D.displayData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView2D.DataView2D.displayData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataView2D.DataView2D.exportImage">
+<tt class="descname">exportImage</tt><big>(</big><big>)</big><a class="reference internal" href="modules/views/DataView2D.html#DataView2D.exportImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView2D.DataView2D.exportImage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataView2D.DataView2D.getLevels">
+<tt class="descname">getLevels</tt><big>(</big><big>)</big><a class="reference internal" href="modules/views/DataView2D.html#DataView2D.getLevels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView2D.DataView2D.getLevels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataView2D.DataView2D.getMousePosition">
+<tt class="descname">getMousePosition</tt><big>(</big><em>pos</em><big>)</big><a class="reference internal" href="modules/views/DataView2D.html#DataView2D.getMousePosition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView2D.DataView2D.getMousePosition" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataView2D.DataView2D.linkViewBox">
+<tt class="descname">linkViewBox</tt><big>(</big><big>)</big><a class="reference internal" href="modules/views/DataView2D.html#DataView2D.linkViewBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView2D.DataView2D.linkViewBox" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataView2D.DataView2D.resetView">
+<tt class="descname">resetView</tt><big>(</big><big>)</big><a class="reference internal" href="modules/views/DataView2D.html#DataView2D.resetView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView2D.DataView2D.resetView" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataView2D.DataView2D.sendClickPosition">
+<tt class="descname">sendClickPosition</tt><big>(</big><em>ev</em><big>)</big><a class="reference internal" href="modules/views/DataView2D.html#DataView2D.sendClickPosition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView2D.DataView2D.sendClickPosition" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataView2D.DataView2D.setDataFormat">
+<tt class="descname">setDataFormat</tt><big>(</big><em>dataFormat</em><big>)</big><a class="reference internal" href="modules/views/DataView2D.html#DataView2D.setDataFormat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView2D.DataView2D.setDataFormat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.DataView2D.DataView2D.staticMetaObject">
+<tt class="descname">staticMetaObject</tt><em class="property"> = &lt;PySide.QtCore.QMetaObject object at 0x000000001C5D0808&gt;</em><a class="headerlink" href="#views.DataView2D.DataView2D.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataView2D.DataView2D.streamStarted">
+<tt class="descname">streamStarted</tt><big>(</big><big>)</big><a class="reference internal" href="modules/views/DataView2D.html#DataView2D.streamStarted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView2D.DataView2D.streamStarted" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataView2D.DataView2D.toggleHistogramView">
+<tt class="descname">toggleHistogramView</tt><big>(</big><big>)</big><a class="reference internal" href="modules/views/DataView2D.html#DataView2D.toggleHistogramView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView2D.DataView2D.toggleHistogramView" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataView2D.DataView2D.unlink">
+<tt class="descname">unlink</tt><big>(</big><big>)</big><a class="reference internal" href="modules/views/DataView2D.html#DataView2D.unlink"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView2D.DataView2D.unlink" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataView2D.DataView2D.updateImageLevels">
+<tt class="descname">updateImageLevels</tt><big>(</big><em>lower</em>, <em>upper</em><big>)</big><a class="reference internal" href="modules/views/DataView2D.html#DataView2D.updateImageLevels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView2D.DataView2D.updateImageLevels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataView2D.DataView2D.updateLowerLevel">
+<tt class="descname">updateLowerLevel</tt><big>(</big><em>lower</em><big>)</big><a class="reference internal" href="modules/views/DataView2D.html#DataView2D.updateLowerLevel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView2D.DataView2D.updateLowerLevel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataView2D.DataView2D.updateUpperLevel">
+<tt class="descname">updateUpperLevel</tt><big>(</big><em>upper</em><big>)</big><a class="reference internal" href="modules/views/DataView2D.html#DataView2D.updateUpperLevel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView2D.DataView2D.updateUpperLevel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="views.DataView2D.DataView2DMenu">
+<em class="property">class </em><tt class="descclassname">views.DataView2D.</tt><tt class="descname">DataView2DMenu</tt><big>(</big><em>parent</em><big>)</big><a class="reference internal" href="modules/views/DataView2D.html#DataView2DMenu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataView2D.DataView2DMenu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PySide.QtGui.QMenu</span></tt></p>
+<dl class="attribute">
+<dt id="views.DataView2D.DataView2DMenu.staticMetaObject">
+<tt class="descname">staticMetaObject</tt><em class="property"> = &lt;PySide.QtCore.QMetaObject object at 0x000000001C5D0688&gt;</em><a class="headerlink" href="#views.DataView2D.DataView2DMenu.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-views.DataViewContainer">
+<span id="views-dataviewcontainer"></span><h2>views.DataViewContainer<a class="headerlink" href="#module-views.DataViewContainer" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="views.DataViewContainer.DataViewContainer">
+<em class="property">class </em><tt class="descclassname">views.DataViewContainer.</tt><tt class="descname">DataViewContainer</tt><big>(</big><em>dataEngine</em>, <em>dataFormatName</em>, <em>shouldLinkViewBox=False</em>, <em>showFormatMenu=True</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="modules/views/DataViewContainer.html#DataViewContainer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataViewContainer.DataViewContainer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PySide.QtGui.QGroupBox</span></tt></p>
+<dl class="method">
+<dt id="views.DataViewContainer.DataViewContainer.removeAllActions">
+<tt class="descname">removeAllActions</tt><big>(</big><big>)</big><a class="reference internal" href="modules/views/DataViewContainer.html#DataViewContainer.removeAllActions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataViewContainer.DataViewContainer.removeAllActions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataViewContainer.DataViewContainer.setContextMenu">
+<tt class="descname">setContextMenu</tt><big>(</big><big>)</big><a class="reference internal" href="modules/views/DataViewContainer.html#DataViewContainer.setContextMenu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataViewContainer.DataViewContainer.setContextMenu" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataViewContainer.DataViewContainer.setDataFormat">
+<tt class="descname">setDataFormat</tt><big>(</big><em>dataFormatName</em><big>)</big><a class="reference internal" href="modules/views/DataViewContainer.html#DataViewContainer.setDataFormat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataViewContainer.DataViewContainer.setDataFormat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.DataViewContainer.DataViewContainer.setStatusBar">
+<tt class="descname">setStatusBar</tt><big>(</big><em>statusBar</em><big>)</big><a class="reference internal" href="modules/views/DataViewContainer.html#DataViewContainer.setStatusBar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.DataViewContainer.DataViewContainer.setStatusBar" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.DataViewContainer.DataViewContainer.staticMetaObject">
+<tt class="descname">staticMetaObject</tt><em class="property"> = &lt;PySide.QtCore.QMetaObject object at 0x000000001C5D08C8&gt;</em><a class="headerlink" href="#views.DataViewContainer.DataViewContainer.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-views.QxtSpanSlider">
+<span id="views-qxtspanslider"></span><h2>views.QxtSpanSlider<a class="headerlink" href="#module-views.QxtSpanSlider" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="views.QxtSpanSlider.QxtSpanSlider">
+<em class="property">class </em><tt class="descclassname">views.QxtSpanSlider.</tt><tt class="descname">QxtSpanSlider</tt><big>(</big><em>parent=None</em><big>)</big><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PySide.QtGui.QSlider</span></tt></p>
+<dl class="attribute">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.FreeMovement">
+<tt class="descname">FreeMovement</tt><em class="property"> = None</em><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.FreeMovement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.LowerHandle">
+<tt class="descname">LowerHandle</tt><em class="property"> = 1</em><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.LowerHandle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.NoCrossing">
+<tt class="descname">NoCrossing</tt><em class="property"> = 1</em><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.NoCrossing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.NoHandle">
+<tt class="descname">NoHandle</tt><em class="property"> = None</em><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.NoHandle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.NoOverlapping">
+<tt class="descname">NoOverlapping</tt><em class="property"> = 2</em><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.NoOverlapping" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.UpperHandle">
+<tt class="descname">UpperHandle</tt><em class="property"> = 2</em><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.UpperHandle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.drawHandle">
+<tt class="descname">drawHandle</tt><big>(</big><em>painter</em>, <em>handle</em><big>)</big><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.drawHandle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.drawHandle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.drawSpan">
+<tt class="descname">drawSpan</tt><big>(</big><em>painter</em>, <em>rect</em><big>)</big><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.drawSpan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.drawSpan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.floatLowerPositionChanged">
+<tt class="descname">floatLowerPositionChanged</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5C4DF8&gt;</em><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.floatLowerPositionChanged" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.floatUpperPositionChanged">
+<tt class="descname">floatUpperPositionChanged</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5C4E30&gt;</em><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.floatUpperPositionChanged" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.gradientLeftColor">
+<tt class="descname">gradientLeftColor</tt><em class="property"> = &lt;Property object at 0x000000001C5C1B88&gt;</em><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.gradientLeftColor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.gradientLeftColor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.gradientRightColor">
+<tt class="descname">gradientRightColor</tt><em class="property"> = &lt;Property object at 0x000000001C5C1BB8&gt;</em><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.gradientRightColor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.gradientRightColor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.handleMousePress">
+<tt class="descname">handleMousePress</tt><big>(</big><em>pos</em>, <em>control</em>, <em>value</em>, <em>handle</em><big>)</big><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.handleMousePress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.handleMousePress" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.handleMovementMode">
+<tt class="descname">handleMovementMode</tt><em class="property"> = &lt;Property object at 0x000000001C5C1B58&gt;</em><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.handleMovementMode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.handleMovementMode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.lowerPosition">
+<tt class="descname">lowerPosition</tt><em class="property"> = &lt;Property object at 0x000000001C5C1B28&gt;</em><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.lowerPosition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.lowerPosition" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.lowerPositionChanged">
+<tt class="descname">lowerPositionChanged</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5C4D88&gt;</em><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.lowerPositionChanged" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.lowerValue">
+<tt class="descname">lowerValue</tt><em class="property"> = &lt;Property object at 0x000000001C5C1A98&gt;</em><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.lowerValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.lowerValue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.lowerValueChanged">
+<tt class="descname">lowerValueChanged</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5C4D18&gt;</em><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.lowerValueChanged" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.mouseMoveEvent">
+<tt class="descname">mouseMoveEvent</tt><big>(</big><em>event</em><big>)</big><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.mouseMoveEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.mouseMoveEvent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.mousePressEvent">
+<tt class="descname">mousePressEvent</tt><big>(</big><em>event</em><big>)</big><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.mousePressEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.mousePressEvent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.mouseReleaseEvent">
+<tt class="descname">mouseReleaseEvent</tt><big>(</big><em>event</em><big>)</big><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.mouseReleaseEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.mouseReleaseEvent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.movePressedHandle">
+<tt class="descname">movePressedHandle</tt><big>(</big><big>)</big><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.movePressedHandle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.movePressedHandle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.paintEvent">
+<tt class="descname">paintEvent</tt><big>(</big><em>event</em><big>)</big><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.paintEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.paintEvent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.pick">
+<tt class="descname">pick</tt><big>(</big><em>p</em><big>)</big><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.pick"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.pick" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.pixelPosToRangeValue">
+<tt class="descname">pixelPosToRangeValue</tt><big>(</big><em>pos</em><big>)</big><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.pixelPosToRangeValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.pixelPosToRangeValue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.setFloatRange">
+<tt class="descname">setFloatRange</tt><big>(</big><em>min</em>, <em>max</em>, <em>step</em><big>)</big><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.setFloatRange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.setFloatRange" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.setGradientLeftColor">
+<tt class="descname">setGradientLeftColor</tt><big>(</big><em>color</em><big>)</big><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.setGradientLeftColor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.setGradientLeftColor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.setGradientRightColor">
+<tt class="descname">setGradientRightColor</tt><big>(</big><em>color</em><big>)</big><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.setGradientRightColor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.setGradientRightColor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.setHandleMovementMode">
+<tt class="descname">setHandleMovementMode</tt><big>(</big><em>mode</em><big>)</big><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.setHandleMovementMode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.setHandleMovementMode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.setLowerPosition">
+<tt class="descname">setLowerPosition</tt><big>(</big><em>lower</em><big>)</big><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.setLowerPosition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.setLowerPosition" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.setLowerValue">
+<tt class="descname">setLowerValue</tt><big>(</big><em>lower</em><big>)</big><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.setLowerValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.setLowerValue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.setSpan">
+<tt class="descname">setSpan</tt><big>(</big><em>lower</em>, <em>upper</em><big>)</big><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.setSpan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.setSpan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.setUpperPosition">
+<tt class="descname">setUpperPosition</tt><big>(</big><em>upper</em><big>)</big><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.setUpperPosition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.setUpperPosition" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.setUpperValue">
+<tt class="descname">setUpperValue</tt><big>(</big><em>upper</em><big>)</big><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.setUpperValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.setUpperValue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.setupPainter">
+<tt class="descname">setupPainter</tt><big>(</big><em>painter</em>, <em>orientation</em>, <em>x1</em>, <em>y1</em>, <em>x2</em>, <em>y2</em><big>)</big><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.setupPainter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.setupPainter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.sliderPressed">
+<tt class="descname">sliderPressed</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5C4E68&gt;</em><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.sliderPressed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.spanChanged">
+<tt class="descname">spanChanged</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5C4CA8&gt;</em><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.spanChanged" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.staticMetaObject">
+<tt class="descname">staticMetaObject</tt><em class="property"> = &lt;PySide.QtCore.QMetaObject object at 0x000000001C5C0A08&gt;</em><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.swapControls">
+<tt class="descname">swapControls</tt><big>(</big><big>)</big><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.swapControls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.swapControls" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.triggerAction">
+<tt class="descname">triggerAction</tt><big>(</big><em>action</em>, <em>main</em><big>)</big><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.triggerAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.triggerAction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.updateRange">
+<tt class="descname">updateRange</tt><big>(</big><em>min</em>, <em>max</em><big>)</big><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.updateRange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.updateRange" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.updateToolTip">
+<tt class="descname">updateToolTip</tt><big>(</big><big>)</big><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.updateToolTip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.updateToolTip" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.upperPosition">
+<tt class="descname">upperPosition</tt><em class="property"> = &lt;Property object at 0x000000001C5C1AF8&gt;</em><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.upperPosition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.upperPosition" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.upperPositionChanged">
+<tt class="descname">upperPositionChanged</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5C4DC0&gt;</em><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.upperPositionChanged" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.upperValue">
+<tt class="descname">upperValue</tt><em class="property"> = &lt;Property object at 0x000000001C5C1AC8&gt;</em><a class="reference internal" href="modules/views/QxtSpanSlider.html#QxtSpanSlider.upperValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.upperValue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="views.QxtSpanSlider.QxtSpanSlider.upperValueChanged">
+<tt class="descname">upperValueChanged</tt><em class="property"> = &lt;PySide.QtCore.Signal object at 0x000000001C5C4D50&gt;</em><a class="headerlink" href="#views.QxtSpanSlider.QxtSpanSlider.upperValueChanged" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="views.QxtSpanSlider.clamp">
+<tt class="descclassname">views.QxtSpanSlider.</tt><tt class="descname">clamp</tt><big>(</big><em>v</em>, <em>lower</em>, <em>upper</em><big>)</big><a class="reference internal" href="modules/views/QxtSpanSlider.html#clamp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#views.QxtSpanSlider.clamp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="views-selectdepthcameradialog">
+<h2>views.SelectDepthCameraDialog<a class="headerlink" href="#views-selectdepthcameradialog" title="Permalink to this headline">¶</a></h2>
+<hr class="docutils" />
+<span class="target" id="module-views"></span></div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="wizard.html" title="wizard package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="models.html" title="models package"
+             >previous</a> |</li>
+        <li><a href="index.html">home</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+ 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, &#39;Suramya&#39;.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+    </div>
+  </body>
+</html>

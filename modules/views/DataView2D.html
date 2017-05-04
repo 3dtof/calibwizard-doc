@@ -1,0 +1,416 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>views.DataView2D &mdash; SCAW &#39;0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '&#39;0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SCAW &#39;0.1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><h1 style="font-size: 3em;">Voxel Calibration Wizard</h1></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for views.DataView2D</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">PySide</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span>
+<span class="kn">import</span> <span class="nn">pyqtgraph</span>
+
+<span class="kn">import</span> <span class="nn">Voxel</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
+
+<span class="kn">from</span> <span class="nn">models.DataQueue</span> <span class="kn">import</span> <span class="n">DataQueue</span>
+
+<span class="kn">from</span> <span class="nn">models.DataEngine</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">from</span> <span class="nn">DataView</span> <span class="kn">import</span> <span class="n">DataView</span>
+
+<span class="kn">from</span> <span class="nn">CustomViewBox</span> <span class="kn">import</span> <span class="n">CustomViewBox</span>
+<span class="kn">from</span> <span class="nn">CustomHistogramLUTWidget</span> <span class="kn">import</span> <span class="n">CustomHistogramLUTWidget</span>
+
+<span class="kn">from</span> <span class="nn">QxtSpanSlider</span> <span class="kn">import</span> <span class="n">QxtSpanSlider</span>
+
+<span class="kn">import</span> <span class="nn">weakref</span>
+
+<div class="viewcode-block" id="DataView2DMenu"><a class="viewcode-back" href="../../views.html#views.DataView2D.DataView2DMenu">[docs]</a><span class="k">class</span> <span class="nc">DataView2DMenu</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QMenu</span><span class="p">):</span>
+  
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">DataView2DMenu</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">resetAction</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QAction</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QIcon</span><span class="o">.</span><span class="n">fromTheme</span><span class="p">(</span><span class="s1">&#39;reset&#39;</span><span class="p">),</span> <span class="s1">&#39;&amp;Reset view&#39;</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">resetAction</span><span class="o">.</span><span class="n">setShortcut</span><span class="p">(</span><span class="s1">&#39;R&#39;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">resetAction</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">resetView</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resetAction</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">autoLevelsAction</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QAction</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QIcon</span><span class="o">.</span><span class="n">fromTheme</span><span class="p">(</span><span class="s1">&#39;auto&#39;</span><span class="p">),</span> <span class="s1">&#39;Upd&amp;ate Thresholds&#39;</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">autoLevelsAction</span><span class="o">.</span><span class="n">setShortcut</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">autoLevelsAction</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">autoLevels</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">autoLevelsAction</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">histogramAction</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QAction</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QIcon</span><span class="o">.</span><span class="n">fromTheme</span><span class="p">(</span><span class="s1">&#39;statistics&#39;</span><span class="p">),</span> <span class="s1">&#39;&amp;Histogram&#39;</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">histogramAction</span><span class="o">.</span><span class="n">setCheckable</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">histogramAction</span><span class="o">.</span><span class="n">setShortcut</span><span class="p">(</span><span class="s1">&#39;H&#39;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">histogramAction</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">histogramVisible</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">histogramAction</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">toggleHistogramView</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">histogramAction</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">addSeparator</span><span class="p">()</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">exportAction</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QAction</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QIcon</span><span class="p">()</span><span class="o">.</span><span class="n">fromTheme</span><span class="p">(</span><span class="s1">&#39;export&#39;</span><span class="p">),</span> <span class="s1">&#39;&amp;Export Image&#39;</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">exportAction</span><span class="o">.</span><span class="n">setShortcut</span><span class="p">(</span><span class="s1">&#39;E&#39;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">exportAction</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">exportImage</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exportAction</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="DataView2D"><a class="viewcode-back" href="../../views.html#views.DataView2D.DataView2D">[docs]</a><span class="k">class</span> <span class="nc">DataView2D</span><span class="p">(</span><span class="n">DataView</span><span class="p">):</span>
+  
+  <span class="n">dataAvailable</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Signal</span><span class="p">()</span>
+  
+  <span class="n">HISTOGRAM_THRESHOLD</span> <span class="o">=</span> <span class="mi">10</span>
+  
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataEngine</span><span class="p">,</span> <span class="n">dataFormat</span><span class="p">,</span> <span class="n">sizeRect</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">parent</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+    <span class="n">DataView</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataEngine</span><span class="p">,</span> <span class="n">dataFormat</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">updateCount</span> <span class="o">=</span> <span class="mi">0</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">graphicsWidget</span> <span class="o">=</span> <span class="n">pyqtgraph</span><span class="o">.</span><span class="n">GraphicsLayoutWidget</span><span class="p">()</span>
+    
+    <span class="n">hlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">viewBox</span> <span class="o">=</span> <span class="n">CustomViewBox</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">graphicsWidget</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">viewBox</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">viewBox</span><span class="o">.</span><span class="n">sigRangeChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">computeChangedRange</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">imageItem</span> <span class="o">=</span> <span class="n">pyqtgraph</span><span class="o">.</span><span class="n">ImageItem</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">viewBox</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">imageItem</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">sizeRect</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">viewBox</span><span class="o">.</span><span class="n">setRange</span><span class="p">(</span><span class="n">sizeRect</span><span class="p">)</span>
+      
+    <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graphicsWidget</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">histogramLUTWidget</span> <span class="o">=</span> <span class="n">CustomHistogramLUTWidget</span><span class="p">()</span>
+    <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">histogramLUTWidget</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">histogramLUTWidget</span><span class="o">.</span><span class="n">setImageItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">imageItem</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">viewBox</span><span class="o">.</span><span class="n">resetView</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resetView</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">histogramLUTWidget</span><span class="o">.</span><span class="n">resetView</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resetView</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">viewBox</span><span class="o">.</span><span class="n">autoHistogram</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">autoLevels</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">histogramLUTWidget</span><span class="o">.</span><span class="n">autoHistogram</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">autoLevels</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">viewBox</span><span class="o">.</span><span class="n">histogramToggle</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toggleHistogramView</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">histogramLUTWidget</span><span class="o">.</span><span class="n">histogramToggle</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toggleHistogramView</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">viewBox</span><span class="o">.</span><span class="n">export</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exportImage</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">histogramLUTWidget</span><span class="o">.</span><span class="n">export</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exportImage</span><span class="p">)</span>
+      
+    <span class="bp">self</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">hlayout</span><span class="p">)</span>
+    
+    <span class="n">hlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">spanLabel</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Threshold:&#39;</span><span class="p">)</span>
+    <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spanLabel</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span> <span class="o">=</span> <span class="n">QxtSpanSlider</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">lowerPositionChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">updateLowerLevel</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">upperPositionChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">updateUpperLevel</span><span class="p">)</span>
+    <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">hlayout</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">setFocusProxy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graphicsWidget</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">setDataFormat</span><span class="p">(</span><span class="n">dataFormat</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">graphicsWidget</span><span class="o">.</span><span class="n">scene</span><span class="p">()</span><span class="o">.</span><span class="n">sigMouseMoved</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getMousePosition</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">graphicsWidget</span><span class="o">.</span><span class="n">scene</span><span class="p">()</span><span class="o">.</span><span class="n">sigMouseClicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sendClickPosition</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">depthCameraController</span> <span class="o">=</span> <span class="n">dataEngine</span><span class="o">.</span><span class="n">getDepthCameraController</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">depthCameraController</span><span class="o">.</span><span class="n">started</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">streamStarted</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">histogramVisible</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">toggleHistogramView</span><span class="p">()</span>
+    
+    <span class="n">m1</span> <span class="o">=</span> <span class="n">DataView2DMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="n">m2</span> <span class="o">=</span> <span class="n">DataView2DMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">viewBox</span><span class="o">.</span><span class="n">setMenu</span><span class="p">(</span><span class="n">m1</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">histogramLUTWidget</span><span class="o">.</span><span class="n">setMenu</span><span class="p">(</span><span class="n">m2</span><span class="p">)</span>
+    <span class="n">m1</span><span class="o">.</span><span class="n">histogramAction</span><span class="o">.</span><span class="n">toggled</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">m2</span><span class="o">.</span><span class="n">histogramAction</span><span class="o">.</span><span class="n">setChecked</span><span class="p">)</span>
+    <span class="n">m2</span><span class="o">.</span><span class="n">histogramAction</span><span class="o">.</span><span class="n">toggled</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">m1</span><span class="o">.</span><span class="n">histogramAction</span><span class="o">.</span><span class="n">setChecked</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">setContextMenuPolicy</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">CustomContextMenu</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="DataView2D.computeChangedRange"><a class="viewcode-back" href="../../views.html#views.DataView2D.DataView2D.computeChangedRange">[docs]</a>  <span class="k">def</span> <span class="nf">computeChangedRange</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="nb">range</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewBox</span><span class="o">.</span><span class="n">viewRect</span><span class="p">()</span>
+    <span class="n">isec</span> <span class="o">=</span> <span class="nb">range</span><span class="o">.</span><span class="n">intersected</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">imageItem</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">());</span>
+    <span class="c1">#print isec.x(), isec.y(), isec.x() + isec.width() - 1, isec.y() + isec.height() - 1</span>
+    <span class="n">DataView</span><span class="o">.</span><span class="n">communicator</span><span class="o">.</span><span class="n">viewRangeChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">isec</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">isec</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span> <span class="n">isec</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">+</span> <span class="n">isec</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">isec</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">+</span> <span class="n">isec</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    </div>
+  <span class="nd">@QtCore.Slot</span><span class="p">()</span>
+<div class="viewcode-block" id="DataView2D.resetView"><a class="viewcode-back" href="../../views.html#views.DataView2D.DataView2D.resetView">[docs]</a>  <span class="k">def</span> <span class="nf">resetView</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">viewBox</span><span class="o">.</span><span class="n">autoRange</span><span class="p">()</span>
+    
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">return</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">_setDataFormat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">autoLevels</span><span class="p">()</span>
+    
+    <span class="c1"># Reset all linked views</span>
+    <span class="k">if</span> <span class="bp">self</span> <span class="ow">in</span> <span class="n">DataView</span><span class="o">.</span><span class="n">LinkedViewBoxes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">DataView</span><span class="o">.</span><span class="n">LinkedViewBoxes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="bp">self</span><span class="p">:</span>
+          <span class="n">i</span><span class="o">.</span><span class="n">autoLevels</span><span class="p">()</span>
+          </div>
+<div class="viewcode-block" id="DataView2D.exportImage"><a class="viewcode-back" href="../../views.html#views.DataView2D.DataView2D.exportImage">[docs]</a>  <span class="k">def</span> <span class="nf">exportImage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">imageItem</span><span class="o">.</span><span class="n">getPixmap</span><span class="p">()</span>
+    
+    <span class="k">if</span> <span class="n">image</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Blank Image&#39;</span><span class="p">,</span> <span class="s1">&#39;There is no image to export.&#39;</span><span class="p">)</span>
+      <span class="k">return</span>
+    
+    <span class="c1">#filter = [&quot;*.&quot; + str(f) for f in QtGui.QImageWriter.supportedImageFormats()]</span>
+    
+    <span class="nb">filter</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;*.png&#39;</span><span class="p">,</span> <span class="s1">&#39;*.jpg&#39;</span><span class="p">]</span>
+    
+    <span class="n">filename</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getSaveFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Save Image Snapshot&#39;</span><span class="p">,</span> <span class="nb">filter</span> <span class="o">=</span> <span class="s2">&quot;Image files (&quot;</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">filter</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="n">image</span><span class="o">.</span><span class="n">toImage</span><span class="p">()</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+        <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Save Image Failed&#39;</span><span class="p">,</span> <span class="s1">&#39;Failed to save image to &quot;&#39;</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s1">&#39;&quot;.&#39;</span><span class="p">)</span>
+        <span class="k">return</span>
+    </div>
+<div class="viewcode-block" id="DataView2D.autoLevels"><a class="viewcode-back" href="../../views.html#views.DataView2D.DataView2D.autoLevels">[docs]</a>  <span class="k">def</span> <span class="nf">autoLevels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    
+    <span class="n">b</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">imageItem</span><span class="o">.</span><span class="n">getHistogram</span><span class="p">(</span><span class="n">bins</span> <span class="o">=</span> <span class="mi">100</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">h</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">b</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">return</span>
+    
+    <span class="n">h</span> <span class="o">=</span> <span class="p">(</span><span class="n">h</span> <span class="o">-</span> <span class="n">DataView2D</span><span class="o">.</span><span class="n">HISTOGRAM_THRESHOLD</span><span class="p">)</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    
+    <span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">updateImageLevels</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]],</span> <span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+    </div>
+<div class="viewcode-block" id="DataView2D.setDataFormat"><a class="viewcode-back" href="../../views.html#views.DataView2D.DataView2D.setDataFormat">[docs]</a>  <span class="k">def</span> <span class="nf">setDataFormat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataFormat</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_setDataFormat</span><span class="p">(</span><span class="n">dataFormat</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">updateCount</span> <span class="o">=</span> <span class="mi">0</span>
+    </div>
+  <span class="k">def</span> <span class="nf">_setDataFormat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataFormat</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">DataView2D</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setDataFormat</span><span class="p">(</span><span class="n">dataFormat</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span><span class="o">.</span><span class="n">isDepthType</span><span class="p">:</span>
+      <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataEngine</span><span class="o">.</span><span class="n">depthCameraController</span><span class="o">.</span><span class="n">getCurrentSource</span><span class="p">()</span>
+    
+      <span class="k">if</span> <span class="n">s</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">getDepthScalingFactor</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span><span class="o">.</span><span class="n">setScalingFactor</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">levels</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span><span class="o">.</span><span class="n">scalingFactor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span><span class="o">.</span><span class="n">scalingFactor</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">histogramLUTWidget</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">setColorMap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span><span class="o">.</span><span class="n">cmap</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">imageItem</span><span class="o">.</span><span class="n">setLookupTable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span><span class="o">.</span><span class="n">colorMap</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">histogramLUTWidget</span><span class="o">.</span><span class="n">setHistogramRange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">histogramLUTWidget</span><span class="o">.</span><span class="n">setLevels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span><span class="o">.</span><span class="n">scalingFactor</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">setRange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">setSpan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">setFloatRange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span><span class="o">.</span><span class="n">scalingFactor</span><span class="p">)</span>
+    
+    
+<div class="viewcode-block" id="DataView2D.sendClickPosition"><a class="viewcode-back" href="../../views.html#views.DataView2D.DataView2D.sendClickPosition">[docs]</a>  <span class="k">def</span> <span class="nf">sendClickPosition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ev</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">ev</span><span class="o">.</span><span class="n">button</span><span class="p">()</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">LeftButton</span> <span class="ow">and</span> <span class="n">ev</span><span class="o">.</span><span class="n">modifiers</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ControlModifier</span><span class="p">:</span> <span class="c1"># Alt + Left click?</span>
+      <span class="n">DataView</span><span class="o">.</span><span class="n">communicator</span><span class="o">.</span><span class="n">setCurrentPoint2D</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">imageItem</span><span class="o">.</span><span class="n">mapFromScene</span><span class="p">(</span><span class="n">ev</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()))</span>
+    <span class="k">elif</span> <span class="n">ev</span><span class="o">.</span><span class="n">button</span><span class="p">()</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">LeftButton</span> <span class="ow">and</span> <span class="n">ev</span><span class="o">.</span><span class="n">modifiers</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ShiftModifier</span><span class="p">:</span> <span class="c1"># Alt + Left click?</span>
+      <span class="n">DataView</span><span class="o">.</span><span class="n">communicator</span><span class="o">.</span><span class="n">setShiftClickPoint2D</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">imageItem</span><span class="o">.</span><span class="n">mapFromScene</span><span class="p">(</span><span class="n">ev</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()))</span>
+    </div>
+<div class="viewcode-block" id="DataView2D.linkViewBox"><a class="viewcode-back" href="../../views.html#views.DataView2D.DataView2D.linkViewBox">[docs]</a>  <span class="k">def</span> <span class="nf">linkViewBox</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">viewBox</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="DataView2D.unlink"><a class="viewcode-back" href="../../views.html#views.DataView2D.DataView2D.unlink">[docs]</a>  <span class="k">def</span> <span class="nf">unlink</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">viewBox</span><span class="o">.</span><span class="n">unregister</span><span class="p">()</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">DataView2D</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+    </div>
+<div class="viewcode-block" id="DataView2D.getMousePosition"><a class="viewcode-back" href="../../views.html#views.DataView2D.DataView2D.getMousePosition">[docs]</a>  <span class="k">def</span> <span class="nf">getMousePosition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">):</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">imageItem</span><span class="o">.</span><span class="n">mapFromScene</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+    
+    <span class="n">frameSize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataEngine</span><span class="o">.</span><span class="n">frameSize</span>
+    
+    <span class="k">if</span> <span class="n">frameSize</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="n">frameSize</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="n">frameSize</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="k">return</span>
+      
+      <span class="n">point</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="p">()),</span> <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">y</span><span class="p">())]</span>
+    
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">statusBar</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statusBar</span><span class="o">.</span><span class="n">setPoint</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+  </div>
+  <span class="nd">@QtCore.Slot</span><span class="p">()</span>
+<div class="viewcode-block" id="DataView2D.streamStarted"><a class="viewcode-back" href="../../views.html#views.DataView2D.DataView2D.streamStarted">[docs]</a>  <span class="k">def</span> <span class="nf">streamStarted</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">updateCount</span> <span class="o">=</span> <span class="mi">0</span>
+      </div>
+<div class="viewcode-block" id="DataView2D.getLevels"><a class="viewcode-back" href="../../views.html#views.DataView2D.DataView2D.getLevels">[docs]</a>  <span class="k">def</span> <span class="nf">getLevels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">histogramVisible</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">histogramLUTWidget</span><span class="o">.</span><span class="n">getLevels</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">levels</span>
+    </div>
+<div class="viewcode-block" id="DataView2D.toggleHistogramView"><a class="viewcode-back" href="../../views.html#views.DataView2D.DataView2D.toggleHistogramView">[docs]</a>  <span class="k">def</span> <span class="nf">toggleHistogramView</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">histogramVisible</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">spanLabel</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">levels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">histogramLUTWidget</span><span class="o">.</span><span class="n">getLevels</span><span class="p">())</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">histogramLUTWidget</span><span class="o">.</span><span class="n">setImageItem</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">histogramLUTWidget</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+      
+      <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span><span class="o">.</span><span class="n">scalingFactor</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">setSpan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">setSpan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span><span class="o">.</span><span class="n">scalingFactor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span><span class="o">.</span><span class="n">scalingFactor</span><span class="p">)</span>
+      
+      <span class="bp">self</span><span class="o">.</span><span class="n">histogramVisible</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">histogramLUTWidget</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">histogramLUTWidget</span><span class="o">.</span><span class="n">setImageItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">imageItem</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">spanLabel</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">histogramLUTWidget</span><span class="o">.</span><span class="n">setLevels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">histogramVisible</span> <span class="o">=</span> <span class="bp">True</span>
+      
+    <span class="bp">self</span><span class="o">.</span><span class="n">resetView</span><span class="p">()</span>
+    </div>
+  <span class="nd">@QtCore.Slot</span><span class="p">()</span>
+<div class="viewcode-block" id="DataView2D.displayData"><a class="viewcode-back" href="../../views.html#views.DataView2D.DataView2D.displayData">[docs]</a>  <span class="k">def</span> <span class="nf">displayData</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">updateCount</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">updateCount</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataQueue</span><span class="o">.</span><span class="n">tryGet</span><span class="p">()</span>
+    
+    <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">imageItem</span><span class="o">.</span><span class="n">setImage</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">levels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getLevels</span><span class="p">())</span>
+      
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">updateCount</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resetView</span><span class="p">()</span>
+    </div>
+  <span class="nd">@QtCore.Slot</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<div class="viewcode-block" id="DataView2D.updateLowerLevel"><a class="viewcode-back" href="../../views.html#views.DataView2D.DataView2D.updateLowerLevel">[docs]</a>  <span class="k">def</span> <span class="nf">updateLowerLevel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span><span class="o">.</span><span class="n">scalingFactor</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lower</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">lower</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span><span class="o">.</span><span class="n">scalingFactor</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">imageItem</span><span class="o">.</span><span class="n">setLevels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">histogramLUTWidget</span><span class="o">.</span><span class="n">setLevels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">DataView</span><span class="o">.</span><span class="n">communicator</span><span class="o">.</span><span class="n">thresholdsChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    </div>
+  <span class="nd">@QtCore.Slot</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<div class="viewcode-block" id="DataView2D.updateUpperLevel"><a class="viewcode-back" href="../../views.html#views.DataView2D.DataView2D.updateUpperLevel">[docs]</a>  <span class="k">def</span> <span class="nf">updateUpperLevel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">upper</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span><span class="o">.</span><span class="n">scalingFactor</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">upper</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">upper</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span><span class="o">.</span><span class="n">scalingFactor</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">imageItem</span><span class="o">.</span><span class="n">setLevels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">histogramLUTWidget</span><span class="o">.</span><span class="n">setLevels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">DataView</span><span class="o">.</span><span class="n">communicator</span><span class="o">.</span><span class="n">thresholdsChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    </div>
+<div class="viewcode-block" id="DataView2D.updateImageLevels"><a class="viewcode-back" href="../../views.html#views.DataView2D.DataView2D.updateImageLevels">[docs]</a>  <span class="k">def</span> <span class="nf">updateImageLevels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lower</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">upper</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span><span class="o">.</span><span class="n">scalingFactor</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">setSpan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">setSpan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span><span class="o">.</span><span class="n">scalingFactor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span><span class="o">.</span><span class="n">scalingFactor</span><span class="p">)</span>
+        
+    <span class="bp">self</span><span class="o">.</span><span class="n">histogramLUTWidget</span><span class="o">.</span><span class="n">setLevels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">imageItem</span><span class="o">.</span><span class="n">setLevels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span>
+    <span class="n">DataView</span><span class="o">.</span><span class="n">communicator</span><span class="o">.</span><span class="n">thresholdsChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, &#39;Suramya&#39;.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+    </div>
+  </body>
+</html>

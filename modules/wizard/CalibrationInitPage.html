@@ -1,0 +1,448 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>wizard.CalibrationInitPage &mdash; SCAW &#39;0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '&#39;0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SCAW &#39;0.1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><h1 style="font-size: 3em;">Voxel Calibration Wizard</h1></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for wizard.CalibrationInitPage</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># TI Voxel Viewer component.</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2014 Texas Instruments Inc.</span>
+<span class="c1">#</span>
+
+<span class="kn">from</span> <span class="nn">PySide</span> <span class="kn">import</span> <span class="n">QtCore</span><span class="p">,</span> <span class="n">QtGui</span>
+
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">Calibrations</span> <span class="kn">import</span> <span class="n">CALIB_SHOW</span><span class="p">,</span> <span class="n">CALIB_DICT</span><span class="p">,</span> <span class="n">CHIPSETS</span><span class="p">,</span> <span class="n">CALIB_NAME</span>
+<span class="kn">from</span> <span class="nn">PySide.QtGui</span> <span class="kn">import</span> <span class="n">QHBoxLayout</span><span class="p">,</span> <span class="n">QLabel</span>
+<span class="kn">from</span> <span class="nn">views.SelectDepthCameraDialog</span> <span class="kn">import</span> <span class="n">SelectDepthCameraDialog</span>
+<span class="kn">import</span> <span class="nn">Voxel</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+
+
+<div class="viewcode-block" id="CalibrationInitPage"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationInitPage.CalibrationInitPage">[docs]</a><span class="k">class</span> <span class="nc">CalibrationInitPage</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QWizardPage</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Initial Calibration Wizard Page. Here you can select the calibrations to perform&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">calibrationWizard</span><span class="p">,</span> <span class="n">editIndex</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">parent</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrations</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">complete</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">CALIB_DICT</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>  
+      
+        <span class="nb">super</span><span class="p">(</span><span class="n">CalibrationInitPage</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span> <span class="o">=</span> <span class="n">calibrationWizard</span>
+<span class="c1">#         self.depthCamera = self.calibrationWizard.depthCamera</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">editIndex</span> <span class="o">=</span> <span class="n">editIndex</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">setTitle</span><span class="p">(</span><span class="s1">&#39;Calibration Wizard for Depth Camera&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setSubTitle</span><span class="p">(</span><span class="s1">&#39;Choose types of calibrations to perform&#39;</span><span class="p">)</span>
+    
+    
+        <span class="bp">self</span><span class="o">.</span><span class="n">vlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="c1"># Adding profiles</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">groupbox</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QGroupBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">groupbox</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">groupbox</span><span class="o">.</span><span class="n">setTitle</span><span class="p">(</span><span class="s1">&#39;Calibrations to perform&#39;</span><span class="p">)</span>
+        <span class="n">vglayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">groupbox</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">vglayout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">newProfileName</span> <span class="o">=</span> <span class="bp">None</span>
+        
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrations</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QCheckBox</span><span class="p">()</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">CALIB_NAME</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; Calibration&quot;</span><span class="p">)</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">stateChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">addCalibs</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
+            <span class="n">vglayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        
+        <span class="c1">#Data Capture Method - Using files or using Camera</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">captureDataGroupBox</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QGroupBox</span><span class="p">(</span><span class="s2">&quot;Select Data Capture Method&quot;</span><span class="p">)</span>
+        <span class="n">hlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">captureDataGroupBox</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">hlayout</span><span class="p">)</span>
+        <span class="n">radioCapture</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QRadioButton</span><span class="p">(</span><span class="s2">&quot;Capture From Camera&quot;</span><span class="p">)</span>
+        <span class="n">radioSelect</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QRadioButton</span><span class="p">(</span><span class="s2">&quot;Select Files From PC&quot;</span><span class="p">)</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">radioCapture</span><span class="p">)</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">radioSelect</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">captureDataGroupBox</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">radioGroup</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QButtonGroup</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">radioGroup</span><span class="o">.</span><span class="n">addButton</span><span class="p">(</span><span class="n">radioCapture</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">radioGroup</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="n">radioCapture</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">radioGroup</span><span class="o">.</span><span class="n">addButton</span><span class="p">(</span><span class="n">radioSelect</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">radioGroup</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="n">radioSelect</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">radioSelect</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        
+        
+        <span class="c1">#If files, select the chipset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chipsetGroupBox</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QGroupBox</span><span class="p">(</span><span class="s2">&quot;Select Chipset&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selectChipset</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QComboBox</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">camera</span> <span class="ow">in</span> <span class="n">CHIPSETS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">selectChipset</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">CHIPSETS</span><span class="p">[</span><span class="n">camera</span><span class="p">])</span>
+        <span class="n">hlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;Select Chipset Type&quot;</span><span class="p">)</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selectChipset</span><span class="p">)</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chipsetGroupBox</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">hlayout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chipsetGroupBox</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">chipsetGroupBox</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+
+        <span class="c1">#Camera Profile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">profileGroupBox</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QGroupBox</span><span class="p">(</span><span class="s2">&quot;Camera Profile&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">profileGroupBox</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">profileGroupBox</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+        <span class="n">vglayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">profileGroupBox</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">vglayout</span><span class="p">)</span>
+        <span class="n">hlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;Select Camera Profile&quot;</span><span class="p">)</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">profiles</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QComboBox</span><span class="p">()</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">profiles</span><span class="p">)</span>    
+        <span class="n">vglayout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">hlayout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">newProfileName</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="p">()</span>
+            
+        <span class="n">vlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="n">hlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;New Camera Profile Name:&#39;</span><span class="p">))</span>
+        
+        <span class="n">newProfileNameEdit</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLineEdit</span><span class="p">()</span>
+        <span class="n">newProfileNameEdit</span><span class="o">.</span><span class="n">setValidator</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QRegExpValidator</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QRegExp</span><span class="p">(</span><span class="s1">&#39;[A-Za-z0-9 ]*&#39;</span><span class="p">)))</span>           
+        <span class="n">newProfileNameEdit</span><span class="o">.</span><span class="n">setToolTip</span><span class="p">(</span><span class="s1">&#39;Only alphanumeric characters are allowed&#39;</span><span class="p">)</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">newProfileNameEdit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">newProfileNameEdit</span> <span class="o">=</span> <span class="n">newProfileNameEdit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">newProfileNameEdit</span><span class="o">.</span><span class="n">textChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setProfileName</span><span class="p">)</span>
+        <span class="n">vlayout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">hlayout</span><span class="p">)</span>
+        
+        <span class="n">hlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Parent Camera Profile:&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parentProfiles</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QComboBox</span><span class="p">()</span>        
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parentProfiles</span><span class="p">)</span>
+        <span class="n">vlayout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">hlayout</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">newProfileName</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">vlayout</span><span class="p">)</span>
+        <span class="n">vglayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newProfileName</span><span class="p">)</span>
+        
+        <span class="c1">#Local Profile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">localGroupBox</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QGroupBox</span><span class="p">(</span><span class="s2">&quot;Select Local Conf File&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">localGroupBox</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">localGroupBox</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+        <span class="n">vlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">profileSelectButtons</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QButtonGroup</span><span class="p">()</span>
+        <span class="n">newProfileButton</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QRadioButton</span><span class="p">(</span><span class="s2">&quot;Create New Profile&quot;</span><span class="p">)</span>
+        <span class="n">editProfileButton</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QRadioButton</span><span class="p">(</span><span class="s2">&quot;Edit Existing Profile&quot;</span><span class="p">)</span>
+        <span class="n">hlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">newProfileButton</span><span class="p">)</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">editProfileButton</span><span class="p">)</span>
+        <span class="n">vlayout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">hlayout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">profileSelectButtons</span><span class="o">.</span><span class="n">addButton</span><span class="p">(</span><span class="n">newProfileButton</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">profileSelectButtons</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="n">newProfileButton</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">profileSelectButtons</span><span class="o">.</span><span class="n">addButton</span><span class="p">(</span><span class="n">editProfileButton</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">profileSelectButtons</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="n">editProfileButton</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">profileSelectButtons</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">newProfileNameOffline</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="p">()</span>   
+        <span class="n">label</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;Profile Name:&quot;</span><span class="p">)</span>
+        <span class="n">hlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">newProfileNameEditLocal</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLineEdit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">newProfileNameEditLocal</span><span class="o">.</span><span class="n">setValidator</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QRegExpValidator</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QRegExp</span><span class="p">(</span><span class="s1">&#39;[A-Za-z0-9 ]*&#39;</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">newProfileNameEditLocal</span><span class="o">.</span><span class="n">setToolTip</span><span class="p">(</span><span class="s1">&#39;Only alphanumeric characters are allowed&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">newProfileNameEditLocal</span><span class="o">.</span><span class="n">textChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setProfileNameLocal</span><span class="p">)</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newProfileNameEditLocal</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">newProfileNameOffline</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">hlayout</span><span class="p">)</span>
+        <span class="n">vlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newProfileNameOffline</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">localGroupBox</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">vlayout</span><span class="p">)</span>  
+        <span class="n">hlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>          
+        <span class="n">label</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">()</span>
+        <span class="n">label</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;Select Conf file&quot;</span><span class="p">)</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">confButton</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;Pick Conf File&quot;</span><span class="p">)</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">confButton</span><span class="p">)</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">confLine</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLineEdit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">confLine</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">confLine</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+        <span class="n">vlayout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">hlayout</span><span class="p">)</span>
+        <span class="n">lhlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">lhlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">confLine</span><span class="p">)</span>
+        <span class="n">lhlayout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+        <span class="n">vlayout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">lhlayout</span><span class="p">)</span>
+    
+        <span class="bp">self</span><span class="o">.</span><span class="n">makeConnections</span><span class="p">()</span>
+        
+    <span class="c1">#initialize connections so that all components are up to date    </span>
+<div class="viewcode-block" id="CalibrationInitPage.makeConnections"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationInitPage.CalibrationInitPage.makeConnections">[docs]</a>    <span class="k">def</span> <span class="nf">makeConnections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">showNewProfileName</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setDepthCamera</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">radioGroup</span><span class="o">.</span><span class="n">buttonClicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setDepthCamera</span><span class="p">)</span>    
+        <span class="bp">self</span><span class="o">.</span><span class="n">selectChipset</span><span class="o">.</span><span class="n">currentIndexChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selectChipsetType</span><span class="p">)</span></div>
+<div class="viewcode-block" id="CalibrationInitPage.addCalibs"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationInitPage.CalibrationInitPage.addCalibs">[docs]</a>    <span class="k">def</span> <span class="nf">addCalibs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>      
+        
+        <span class="k">if</span> <span class="p">(</span><span class="n">state</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Checked</span><span class="p">):</span>
+            <span class="n">CALIB_SHOW</span><span class="p">[</span><span class="n">title</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">pages</span><span class="p">[</span><span class="n">title</span><span class="p">]</span><span class="o">.</span><span class="n">doShow</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">CALIB_SHOW</span><span class="p">[</span><span class="n">title</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">pages</span><span class="p">[</span><span class="n">title</span><span class="p">]</span><span class="o">.</span><span class="n">doShow</span> <span class="o">=</span> <span class="bp">False</span>
+                        </div>
+<div class="viewcode-block" id="CalibrationInitPage.setProfileName"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationInitPage.CalibrationInitPage.setProfileName">[docs]</a>    <span class="k">def</span> <span class="nf">setProfileName</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">newProfileNameEdit</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">profileName</span> <span class="o">=</span> <span class="n">text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">complete</span> <span class="o">=</span> <span class="bp">True</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">completeChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>  
+        </div>
+<div class="viewcode-block" id="CalibrationInitPage.setProfileNameLocal"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationInitPage.CalibrationInitPage.setProfileNameLocal">[docs]</a>    <span class="k">def</span> <span class="nf">setProfileNameLocal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">newProfileNameEditLocal</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">text</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">profileName</span> <span class="o">=</span> <span class="n">text</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">confButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">confButton</span><span class="o">.</span><span class="n">setDisabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        </div>
+<div class="viewcode-block" id="CalibrationInitPage.selectChipsetType"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationInitPage.CalibrationInitPage.selectChipsetType">[docs]</a>    <span class="k">def</span> <span class="nf">selectChipsetType</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">camera</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selectChipset</span><span class="o">.</span><span class="n">currentText</span><span class="p">()</span>
+        </div>
+<div class="viewcode-block" id="CalibrationInitPage.setDepthCamera"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationInitPage.CalibrationInitPage.setDepthCamera">[docs]</a>    <span class="k">def</span> <span class="nf">setDepthCamera</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">radioGroup</span><span class="o">.</span><span class="n">checkedId</span><span class="p">()</span> <span class="o">==</span><span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">devices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">depthCamera</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">cameraSystem</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">devices</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>     
+            <span class="bp">self</span><span class="o">.</span><span class="n">chipsetGroupBox</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setCameraProfileGroupBox</span><span class="p">()</span>
+        
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">radioGroup</span><span class="o">.</span><span class="n">checkedId</span><span class="p">()</span> <span class="o">==</span><span class="mi">1</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chipsetGroupBox</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">depthCamera</span> <span class="o">=</span> <span class="n">SelectDepthCameraDialog</span><span class="o">.</span><span class="n">showDialog</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">cameraSystem</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">depthCamera</span><span class="p">:</span>    
+                <span class="bp">self</span><span class="o">.</span><span class="n">radioGroup</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">setDepthCamera</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setCameraProfileGroupBox</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">radioGroup</span><span class="o">.</span><span class="n">checkedId</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">depthCamera</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chipsetGroupBox</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">selectChipsetType</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selectChipset</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setCameraProfileGroupBox</span><span class="p">()</span>
+        </div>
+<div class="viewcode-block" id="CalibrationInitPage.showHideNewProfileName"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationInitPage.CalibrationInitPage.showHideNewProfileName">[docs]</a>    <span class="k">def</span> <span class="nf">showHideNewProfileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">newProfileName</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">newProfileName</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">setCameraProfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">profileIDs</span><span class="p">[</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">setPreviousConfiguration</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">getCurrentCameraProfileID</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">profileName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">profileNamesAndID</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">getCurrentCameraProfileID</span><span class="p">()]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">complete</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">completeChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>        
+    </div>
+<div class="viewcode-block" id="CalibrationInitPage.setParentProfile"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationInitPage.CalibrationInitPage.setParentProfile">[docs]</a>    <span class="k">def</span> <span class="nf">setParentProfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">parentProfile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parentProfiles</span><span class="o">.</span><span class="n">itemText</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">setCameraProfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">profileIDs</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">setPreviousConfiguration</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">profileIDs</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+    </div>
+<div class="viewcode-block" id="CalibrationInitPage.showNewProfileName"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationInitPage.CalibrationInitPage.showNewProfileName">[docs]</a>    <span class="k">def</span> <span class="nf">showNewProfileName</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">profileSelectButtons</span><span class="o">.</span><span class="n">checkedId</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">newProfileNameOffline</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">newProfileNameEditLocal</span><span class="o">.</span><span class="n">text</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">confButton</span><span class="o">.</span><span class="n">setDisabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+            
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">newProfileNameOffline</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">confButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">completeChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+        </div>
+<div class="viewcode-block" id="CalibrationInitPage.setCameraProfileGroupBox"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationInitPage.CalibrationInitPage.setCameraProfileGroupBox">[docs]</a>    <span class="k">def</span> <span class="nf">setCameraProfileGroupBox</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">depthCamera</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">depthCamera</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">profileNamesAndID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">getCameraProfileNames</span><span class="p">()</span>
+        
+            <span class="n">currentProfileID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">getCurrentCameraProfileID</span><span class="p">()</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">profileNames</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">profileIDs</span> <span class="o">=</span> <span class="p">[]</span>
+            
+            <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">editIndex</span> <span class="o">=</span> <span class="mi">0</span>
+            
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">profileNamesAndID</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">profile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">configFile</span><span class="o">.</span><span class="n">getCameraProfile</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+              
+                <span class="k">if</span> <span class="n">profile</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">profile</span><span class="o">.</span><span class="n">getLocation</span><span class="p">()</span> <span class="o">==</span> <span class="n">Voxel</span><span class="o">.</span><span class="n">ConfigurationFile</span><span class="o">.</span><span class="n">IN_CAMERA</span><span class="p">:</span>
+                        <span class="n">v</span> <span class="o">+=</span> <span class="s2">&quot; (HW)&quot;</span><span class="p">;</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">profileIDs</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">profileIDs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">profileNames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+              
+                <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="n">currentProfileID</span><span class="p">:</span>
+                    <span class="n">index</span> <span class="o">=</span> <span class="n">i</span>
+                
+                <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">editIndex</span><span class="p">:</span>
+                    <span class="n">editIndex</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+              
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            
+            <span class="n">profileNames</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">profileNames</span><span class="p">)</span>
+            <span class="n">profileNames</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Add New&#39;</span><span class="p">)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">profiles</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parentProfiles</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">profiles</span><span class="o">.</span><span class="n">addItems</span><span class="p">(</span><span class="n">profileNames</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parentProfiles</span><span class="o">.</span><span class="n">addItems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">profileNames</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parentProfiles</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parentProfiles</span><span class="o">.</span><span class="n">currentIndexChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setParentProfile</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">profiles</span><span class="o">.</span><span class="n">currentIndexChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">showHideNewProfileName</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">localGroupBox</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">profileGroupBox</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            
+            
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">profileGroupBox</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">localGroupBox</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">confLine</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">confButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selectConfFile</span><span class="p">)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">profileSelectButtons</span><span class="o">.</span><span class="n">buttonClicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">showNewProfileName</span><span class="p">)</span>
+            </div>
+<div class="viewcode-block" id="CalibrationInitPage.selectConfFile"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationInitPage.CalibrationInitPage.selectConfFile">[docs]</a>    <span class="k">def</span> <span class="nf">selectConfFile</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">confFile</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Select Conf File&quot;</span><span class="p">,</span> <span class="nb">filter</span> <span class="o">=</span> <span class="s1">&#39;Conf files (*.conf)&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">confFile</span><span class="p">:</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">Voxel</span><span class="o">.</span><span class="n">ConfigurationFile</span><span class="p">()</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">confFile</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">previousConfiguration</span> <span class="o">=</span> <span class="n">config</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">complete</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">completeChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+        </div>
+<div class="viewcode-block" id="CalibrationInitPage.isComplete"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationInitPage.CalibrationInitPage.isComplete">[docs]</a>    <span class="k">def</span> <span class="nf">isComplete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">complete</span>
+        </div>
+<div class="viewcode-block" id="CalibrationInitPage.validatePage"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationInitPage.CalibrationInitPage.validatePage">[docs]</a>    <span class="k">def</span> <span class="nf">validatePage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">createNew</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">depthCamera</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">profiles</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">createNew</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">profileName</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">profileName</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">createNew</span><span class="p">:</span>
+                <span class="k">print</span> <span class="n">profileName</span>
+                <span class="nb">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">addCameraProfile</span><span class="p">(</span><span class="n">profileName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">getCurrentCameraProfileID</span><span class="p">())</span>
+                
+                <span class="k">if</span> <span class="nb">id</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;Failed to create a new profile &quot;&#39;</span> <span class="o">+</span> <span class="n">profileName</span> <span class="o">+</span> <span class="s1">&#39;&quot;. See logs for more details.&#39;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="bp">False</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">currentProfileID</span> <span class="o">=</span> <span class="nb">id</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">currentConfiguration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">configFile</span><span class="o">.</span><span class="n">getCameraProfile</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">currentProfileName</span> <span class="o">=</span> <span class="n">profileName</span>
+            
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">currentConfiguration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">previousConfiguration</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">currentProfileName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">profileNames</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">profiles</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">currentProfileID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">getCurrentCameraProfileID</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">profileSelectButtons</span><span class="o">.</span><span class="n">checkedId</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">currentConfiguration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">previousConfiguration</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">profileName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">currentConfiguration</span><span class="o">.</span><span class="n">getProfileName</span><span class="p">()</span>
+                
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">currentConfiguration</span> <span class="o">=</span> <span class="n">Voxel</span><span class="o">.</span><span class="n">ConfigurationFile</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">currentConfiguration</span><span class="o">.</span><span class="n">setParentID</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">previousConfiguration</span><span class="o">.</span><span class="n">getID</span><span class="p">())</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">profileName</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">profileName</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">currentConfiguration</span><span class="o">.</span><span class="n">setProfileName</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">profileName</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">currentConfiguration</span><span class="o">.</span><span class="n">setID</span><span class="p">(</span><span class="mi">150</span><span class="p">)</span> <span class="c1">#change this id in the actual conf file</span>
+            <span class="k">return</span> <span class="bp">True</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, &#39;Suramya&#39;.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+    </div>
+  </body>
+</html>

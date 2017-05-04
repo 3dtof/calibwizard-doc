@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>views.CustomHistogramLUTWidget &mdash; SCAW &#39;0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '&#39;0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SCAW &#39;0.1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><h1 style="font-size: 3em;">Voxel Calibration Wizard</h1></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for views.CustomHistogramLUTWidget</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># TI Voxel Viewer component.</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2014 Texas Instruments Inc.</span>
+<span class="c1">#</span>
+
+<span class="kn">from</span> <span class="nn">PySide</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span>
+
+<span class="kn">import</span> <span class="nn">pyqtgraph</span>
+
+<span class="kn">from</span> <span class="nn">pyqtgraph.graphicsItems.PlotDataItem</span> <span class="kn">import</span> <span class="n">dataType</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">weakref</span>
+
+<div class="viewcode-block" id="CustomHistogramLUTWidget"><a class="viewcode-back" href="../../views.html#views.CustomHistogramLUTWidget.CustomHistogramLUTWidget">[docs]</a><span class="k">class</span> <span class="nc">CustomHistogramLUTWidget</span><span class="p">(</span><span class="n">pyqtgraph</span><span class="o">.</span><span class="n">HistogramLUTWidget</span><span class="p">):</span>
+  
+  <span class="n">resetView</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Signal</span><span class="p">()</span>
+  <span class="n">autoHistogram</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Signal</span><span class="p">()</span>
+  <span class="n">histogramToggle</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Signal</span><span class="p">()</span>
+  <span class="n">export</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Signal</span><span class="p">()</span>
+  
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">fillHistogram</span> <span class="o">=</span> <span class="bp">True</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">CustomHistogramLUTWidget</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span><span class="p">,</span> <span class="n">fillHistogram</span> <span class="o">=</span> <span class="n">fillHistogram</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">vb</span><span class="o">.</span><span class="n">setMouseEnabled</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="c1"># Disable zoom in viewbox</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">gradientChanged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradientChanged</span>
+    
+    <span class="c1"># Disable right click and other mouse events on gradient</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="o">.</span><span class="n">mouseClickEvent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradientMouseClickEvent</span> 
+    <span class="c1">#self.plot.setData = self.setData</span>
+    
+<div class="viewcode-block" id="CustomHistogramLUTWidget.keyPressEvent"><a class="viewcode-back" href="../../views.html#views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.keyPressEvent">[docs]</a>  <span class="k">def</span> <span class="nf">keyPressEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ev</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">ev</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_R</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">resetView</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+      <span class="n">ev</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">ev</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_A</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">autoHistogram</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+      <span class="n">ev</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">ev</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_H</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">histogramToggle</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+      <span class="n">ev</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">ev</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_E</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">export</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+      <span class="n">ev</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="nb">super</span><span class="p">(</span><span class="n">CustomHistogramLUTWidget</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">keyPressEvent</span><span class="p">(</span><span class="n">ev</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="CustomHistogramLUTWidget.gradientMouseClickEvent"><a class="viewcode-back" href="../../views.html#views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.gradientMouseClickEvent">[docs]</a>  <span class="k">def</span> <span class="nf">gradientMouseClickEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ev</span><span class="p">):</span>
+    <span class="k">pass</span>
+  </div>
+<div class="viewcode-block" id="CustomHistogramLUTWidget.setImageItem"><a class="viewcode-back" href="../../views.html#views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.setImageItem">[docs]</a>  <span class="k">def</span> <span class="nf">setImageItem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">imageItem</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">imageItem</span><span class="p">()</span><span class="o">.</span><span class="n">sigImageChanged</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">imageChanged</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">img</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">imageItem</span> <span class="o">=</span> <span class="n">weakref</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+      <span class="n">img</span><span class="o">.</span><span class="n">sigImageChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">imageChanged</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">imageItem</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="bp">None</span>
+      </div>
+<div class="viewcode-block" id="CustomHistogramLUTWidget.setMenu"><a class="viewcode-back" href="../../views.html#views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.setMenu">[docs]</a>  <span class="k">def</span> <span class="nf">setMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">menu</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">vb</span><span class="o">.</span><span class="n">menu</span> <span class="o">=</span> <span class="n">menu</span>
+    </div>
+<div class="viewcode-block" id="CustomHistogramLUTWidget.gradientChanged"><a class="viewcode-back" href="../../views.html#views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.gradientChanged">[docs]</a>  <span class="k">def</span> <span class="nf">gradientChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">pass</span>
+    </div>
+  <span class="nd">@QtCore.Slot</span><span class="p">()</span>
+<div class="viewcode-block" id="CustomHistogramLUTWidget.imageChanged"><a class="viewcode-back" href="../../views.html#views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.imageChanged">[docs]</a>  <span class="k">def</span> <span class="nf">imageChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">autoLevel</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">autoRange</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">imageItem</span><span class="p">()</span><span class="o">.</span><span class="n">getHistogram</span><span class="p">(</span><span class="n">bins</span> <span class="o">=</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">h</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="o">*</span><span class="n">h</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="CustomHistogramLUTWidget.setData"><a class="viewcode-back" href="../../views.html#views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.setData">[docs]</a>  <span class="k">def</span> <span class="nf">setData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">updateItems</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">informViewBoundsChanged</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">sigPlotChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plot</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="CustomHistogramLUTWidget.updateItems"><a class="viewcode-back" href="../../views.html#views.CustomHistogramLUTWidget.CustomHistogramLUTWidget.updateItems">[docs]</a>  <span class="k">def</span> <span class="nf">updateItems</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="n">curveArgs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="p">[(</span><span class="s1">&#39;pen&#39;</span><span class="p">,</span><span class="s1">&#39;pen&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;shadowPen&#39;</span><span class="p">,</span><span class="s1">&#39;shadowPen&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;fillLevel&#39;</span><span class="p">,</span><span class="s1">&#39;fillLevel&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;fillBrush&#39;</span><span class="p">,</span> <span class="s1">&#39;brush&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;antialias&#39;</span><span class="p">,</span> <span class="s1">&#39;antialias&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;connect&#39;</span><span class="p">,</span> <span class="s1">&#39;connect&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;stepMode&#39;</span><span class="p">,</span> <span class="s1">&#39;stepMode&#39;</span><span class="p">)]:</span>
+        <span class="n">curveArgs</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+    
+    <span class="k">if</span> <span class="n">curveArgs</span><span class="p">[</span><span class="s1">&#39;pen&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">or</span> <span class="p">(</span><span class="n">curveArgs</span><span class="p">[</span><span class="s1">&#39;brush&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">curveArgs</span><span class="p">[</span><span class="s1">&#39;fillLevel&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">curve</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">curveArgs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">curve</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">curve</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, &#39;Suramya&#39;.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+    </div>
+  </body>
+</html>

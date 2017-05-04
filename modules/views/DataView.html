@@ -1,0 +1,267 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>views.DataView &mdash; SCAW &#39;0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '&#39;0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SCAW &#39;0.1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><h1 style="font-size: 3em;">Voxel Calibration Wizard</h1></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for views.DataView</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># TI Voxel Viewer component.</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2014 Texas Instruments Inc.</span>
+<span class="c1">#</span>
+
+<span class="kn">from</span> <span class="nn">PySide</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span>
+<span class="kn">import</span> <span class="nn">pyqtgraph</span>
+
+<span class="kn">import</span> <span class="nn">Voxel</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">models.DataQueue</span> <span class="kn">import</span> <span class="n">DataQueue</span>
+
+<span class="kn">from</span> <span class="nn">QxtSpanSlider</span> <span class="kn">import</span> <span class="n">QxtSpanSlider</span>
+
+<span class="kn">from</span> <span class="nn">models.DataEngine</span> <span class="kn">import</span> <span class="o">*</span>
+
+<div class="viewcode-block" id="DataViewCommunicator"><a class="viewcode-back" href="../../views.html#views.DataView.DataViewCommunicator">[docs]</a><span class="k">class</span> <span class="nc">DataViewCommunicator</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QObject</span><span class="p">):</span>
+  
+  <span class="n">setCurrentPoint2D</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Signal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+  
+  <span class="n">setShiftClickPoint2D</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Signal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+  
+  <span class="n">viewRangeChanged</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Signal</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span> <span class="c1"># x1, y1, x2, y2</span>
+  
+  <span class="n">thresholdsChanged</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Signal</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span>
+  
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">DataViewCommunicator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="DataView"><a class="viewcode-back" href="../../views.html#views.DataView.DataView">[docs]</a><span class="k">class</span> <span class="nc">DataView</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QWidget</span><span class="p">):</span>
+  
+  <span class="n">dataEnqueued</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Signal</span><span class="p">()</span>
+  
+  <span class="n">communicator</span> <span class="o">=</span> <span class="n">DataViewCommunicator</span><span class="p">()</span> <span class="c1"># Static object for communication from and to DataView instances</span>
+  
+  <span class="n">LinkedViewBoxes</span> <span class="o">=</span> <span class="p">{}</span>
+  
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataEngine</span><span class="p">,</span> <span class="n">dataFormat</span><span class="p">,</span> <span class="n">parent</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">DataView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">dataEngine</span> <span class="o">=</span> <span class="n">dataEngine</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">dataQueue</span> <span class="o">=</span> <span class="n">DataQueue</span><span class="p">()</span>
+    
+    <span class="n">DataView</span><span class="o">.</span><span class="n">setDataFormat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataFormat</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">dataEnqueued</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">displayData</span><span class="p">,</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">QueuedConnection</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">spanKeyModifier</span> <span class="o">=</span> <span class="bp">None</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">statusBar</span> <span class="o">=</span> <span class="bp">None</span>
+    
+  <span class="nd">@QtCore.Slot</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span>
+<div class="viewcode-block" id="DataView.queueData"><a class="viewcode-back" href="../../views.html#views.DataView.DataView.queueData">[docs]</a>  <span class="k">def</span> <span class="nf">queueData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">dataQueue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">dataEnqueued</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+      </div>
+<div class="viewcode-block" id="DataView.setDataFormat"><a class="viewcode-back" href="../../views.html#views.DataView.DataView.setDataFormat">[docs]</a>  <span class="k">def</span> <span class="nf">setDataFormat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataFormat</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">disconnectData</span><span class="p">()</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span> <span class="o">=</span> <span class="n">dataFormat</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">dataEngine</span><span class="o">.</span><span class="n">connectData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">queueData</span><span class="p">,</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">QueuedConnection</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="DataView.disconnectData"><a class="viewcode-back" href="../../views.html#views.DataView.DataView.disconnectData">[docs]</a>  <span class="k">def</span> <span class="nf">disconnectData</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">dataEngine</span><span class="o">.</span><span class="n">disconnectData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataFormat</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">queueData</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="DataView.cleanup"><a class="viewcode-back" href="../../views.html#views.DataView.DataView.cleanup">[docs]</a>  <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">disconnectData</span><span class="p">()</span>
+      </div>
+<div class="viewcode-block" id="DataView.setStatusBar"><a class="viewcode-back" href="../../views.html#views.DataView.DataView.setStatusBar">[docs]</a>  <span class="k">def</span> <span class="nf">setStatusBar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">statusBar</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">statusBar</span> <span class="o">=</span> <span class="n">statusBar</span>
+    </div>
+  <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="DataView.updateViewBoxLinks"><a class="viewcode-back" href="../../views.html#views.DataView.DataView.updateViewBoxLinks">[docs]</a>  <span class="k">def</span> <span class="nf">updateViewBoxLinks</span><span class="p">():</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">DataView</span><span class="o">.</span><span class="n">LinkedViewBoxes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+      <span class="n">v</span> <span class="o">=</span> <span class="n">DataView</span><span class="o">.</span><span class="n">LinkedViewBoxes</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+      <span class="n">v</span><span class="o">.</span><span class="n">setXLink</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+      <span class="n">v</span><span class="o">.</span><span class="n">setYLink</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+      <span class="k">return</span>
+    
+    <span class="n">v</span> <span class="o">=</span> <span class="n">DataView</span><span class="o">.</span><span class="n">LinkedViewBoxes</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">DataView</span><span class="o">.</span><span class="n">LinkedViewBoxes</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+      <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">setXLink</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+      <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">setYLink</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+      
+  <span class="c1">## link() and unlink() are used to synchronize mouse/keyboard events between multiple viewboxes</span></div>
+<div class="viewcode-block" id="DataView.link"><a class="viewcode-back" href="../../views.html#views.DataView.DataView.link">[docs]</a>  <span class="k">def</span> <span class="nf">link</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">viewBox</span><span class="p">):</span>
+    <span class="n">DataView</span><span class="o">.</span><span class="n">LinkedViewBoxes</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="n">viewBox</span>
+    
+    <span class="c1">#print &quot;Number of viewboxes = &quot;, len(DataView.LinkedViewBoxes)    </span>
+    <span class="n">DataView</span><span class="o">.</span><span class="n">updateViewBoxLinks</span><span class="p">()</span>
+      </div>
+<div class="viewcode-block" id="DataView.unlink"><a class="viewcode-back" href="../../views.html#views.DataView.DataView.unlink">[docs]</a>  <span class="k">def</span> <span class="nf">unlink</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span> <span class="ow">in</span> <span class="n">DataView</span><span class="o">.</span><span class="n">LinkedViewBoxes</span><span class="p">:</span>
+      <span class="k">del</span> <span class="n">DataView</span><span class="o">.</span><span class="n">LinkedViewBoxes</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span>
+      <span class="k">print</span> <span class="s2">&quot;Number of viewboxes = &quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">DataView</span><span class="o">.</span><span class="n">LinkedViewBoxes</span><span class="p">)</span>
+      <span class="n">DataView</span><span class="o">.</span><span class="n">updateViewBoxLinks</span><span class="p">()</span>
+    
+  <span class="c1"># Implement in derived class</span></div>
+  <span class="nd">@QtCore.Slot</span><span class="p">()</span>
+<div class="viewcode-block" id="DataView.displayData"><a class="viewcode-back" href="../../views.html#views.DataView.DataView.displayData">[docs]</a>  <span class="k">def</span> <span class="nf">displayData</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">pass</span>
+    </div>
+  <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="DataView.getDataView"><a class="viewcode-back" href="../../views.html#views.DataView.DataView.getDataView">[docs]</a>  <span class="k">def</span> <span class="nf">getDataView</span><span class="p">(</span><span class="n">dataFormat</span><span class="p">,</span> <span class="n">dataEngine</span><span class="p">,</span> <span class="n">parent</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">dataFormat</span><span class="o">.</span><span class="n">dataType</span> <span class="o">==</span> <span class="n">DataFormat</span><span class="o">.</span><span class="n">DATA_2D</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">DataView2D</span><span class="p">(</span><span class="n">dataEngine</span><span class="p">,</span> <span class="n">dataFormat</span><span class="p">,</span> <span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span><span class="p">)</span>
+<span class="c1">#     else:</span>
+<span class="c1">#       return DataView3D(dataEngine, dataFormat, parent = parent)</span>
+    </div>
+<div class="viewcode-block" id="DataView.setSpanKeyModifier"><a class="viewcode-back" href="../../views.html#views.DataView.DataView.setSpanKeyModifier">[docs]</a>  <span class="k">def</span> <span class="nf">setSpanKeyModifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">spanKeyModifier</span> <span class="o">=</span> <span class="n">m</span>
+    </div>
+<div class="viewcode-block" id="DataView.keyPressEvent"><a class="viewcode-back" href="../../views.html#views.DataView.DataView.keyPressEvent">[docs]</a>  <span class="k">def</span> <span class="nf">keyPressEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ev</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spanKeyModifier</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">ev</span><span class="o">.</span><span class="n">modifiers</span><span class="p">()</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">spanKeyModifier</span><span class="p">:</span>
+      <span class="n">ev</span><span class="o">.</span><span class="n">ignore</span><span class="p">()</span>
+      <span class="k">return</span>
+    
+    <span class="k">if</span> <span class="n">ev</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_Left</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">setSliderDown</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">ev</span><span class="o">.</span><span class="n">modifiers</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ShiftModifier</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">setUpperPosition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">upperPosition</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">singleStep</span><span class="p">())</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">setLowerPosition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">lowerPosition</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">singleStep</span><span class="p">())</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">setSliderDown</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+      <span class="n">ev</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">ev</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_Right</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">setSliderDown</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">ev</span><span class="o">.</span><span class="n">modifiers</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ShiftModifier</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">setUpperPosition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">upperPosition</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">singleStep</span><span class="p">())</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">setLowerPosition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">lowerPosition</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">singleStep</span><span class="p">())</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">setSliderDown</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+      <span class="n">ev</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">ev</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_Down</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">setSliderDown</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">ev</span><span class="o">.</span><span class="n">modifiers</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ShiftModifier</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">setUpperPosition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">upperPosition</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">pageStep</span><span class="p">())</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">setLowerPosition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">lowerPosition</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">pageStep</span><span class="p">())</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">setSliderDown</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+      <span class="n">ev</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">ev</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_Up</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">setSliderDown</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">ev</span><span class="o">.</span><span class="n">modifiers</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ShiftModifier</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">setUpperPosition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">upperPosition</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">pageStep</span><span class="p">())</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">setLowerPosition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">lowerPosition</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">pageStep</span><span class="p">())</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">spanSlider</span><span class="o">.</span><span class="n">setSliderDown</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+      <span class="n">ev</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="nb">super</span><span class="p">(</span><span class="n">DataView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">keyPressEvent</span><span class="p">(</span><span class="n">ev</span><span class="p">)</span>
+
+</div></div>
+<span class="kn">from</span> <span class="nn">DataView2D</span> <span class="kn">import</span> <span class="n">DataView2D</span>
+<span class="c1"># from DataView3D import DataView3D</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, &#39;Suramya&#39;.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>calibration.CheckerboardLensCalibration &mdash; SCAW &#39;0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '&#39;0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SCAW &#39;0.1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><h1 style="font-size: 3em;">Voxel Calibration Wizard</h1></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for calibration.CheckerboardLensCalibration</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Checkerboard Lens Calibration - uses the open cv algorithm to compute calibration </span>
+<span class="sd">    parameters for a lens. Takes PNGs or VXLs as input. Also converts the vxls into pngs.</span>
+<span class="sd">    Rows and columns of the checkerboard need to be provided.</span>
+<span class="sd">    Usage:</span>
+<span class="sd">    python CheckerBoardLensCalibration.py --file filePath --rows rows --cols cols</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">VxlToPng</span> <span class="kn">import</span> <span class="n">vxltoPng</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<div class="viewcode-block" id="CheckerBoardLensCalibration"><a class="viewcode-back" href="../../calibration.html#calibration.CheckerboardLensCalibration.CheckerBoardLensCalibration">[docs]</a><span class="k">def</span> <span class="nf">CheckerBoardLensCalibration</span><span class="p">(</span><span class="n">filePath</span><span class="p">,</span> <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
+    
+    <span class="sd">&quot;&quot;&quot;Returns Lens Parameters and distortion coefficients using images or vxl files of a checkerboard taken in different orientations.</span>
+<span class="sd">    </span>
+<span class="sd">    Checkerboard Lens Calibration - uses the open cv algorithm to compute calibration </span>
+<span class="sd">    parameters for a lens. Takes PNGs or VXLs as input. Also converts the vxls into pngs.</span>
+<span class="sd">    Rows and columns of the checkerboard need to be provided.</span>
+
+<span class="sd"> - **Parameters** required::</span>
+
+<span class="sd">          :param filePath: Takes the path of the file with checkerboard images / vxl files</span>
+<span class="sd">          :param rows: Rows present in the checkerboard</span>
+<span class="sd">          :param cols: Columns present in the checkerboard</span>
+<span class="sd">          </span>
+<span class="sd">   .. note:: Use at least ten images of the checkerboard in different orientations to get the correct result  </span>
+<span class="sd">&quot;&quot;&quot;</span>
+          
+    <span class="n">objp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">rows</span><span class="o">*</span><span class="n">cols</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">criteria</span> <span class="o">=</span> <span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">TERM_CRITERIA_EPS</span> <span class="o">+</span> <span class="n">cv2</span><span class="o">.</span><span class="n">TERM_CRITERIA_MAX_ITER</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">)</span>
+    <span class="n">objp</span><span class="p">[:,:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">rows</span><span class="p">,</span><span class="mi">0</span><span class="p">:</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">objpoints</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">imgpoints</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">images</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">filePath</span><span class="o">+</span> <span class="s1">&#39;/*.png&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">images</span><span class="p">:</span>
+        <span class="n">vxls</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">filePath</span> <span class="o">+</span> <span class="s1">&#39;/*.vxl&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">vxl</span> <span class="ow">in</span> <span class="n">vxls</span><span class="p">:</span>
+            <span class="n">vxltoPng</span><span class="p">(</span><span class="n">vxl</span><span class="p">)</span>
+    <span class="n">images</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">filePath</span><span class="o">+</span> <span class="s1">&#39;/*.png&#39;</span><span class="p">)</span>        
+    <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="n">images</span><span class="p">:</span> 
+        <span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+        <span class="n">gray</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2GRAY</span><span class="p">)</span><span class="c1"># images are converted to grayscale</span>
+        <span class="n">ret</span><span class="p">,</span> <span class="n">corners</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">findChessboardCorners</span><span class="p">(</span><span class="n">gray</span><span class="p">,</span> <span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">),</span><span class="bp">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
+            <span class="n">objpoints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">objp</span><span class="p">)</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">cornerSubPix</span><span class="p">(</span><span class="n">gray</span><span class="p">,</span><span class="n">corners</span><span class="p">,(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">),(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span><span class="n">criteria</span><span class="p">)</span>
+            <span class="n">imgpoints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">corners</span><span class="p">)</span>
+    <span class="n">ret</span><span class="p">,</span> <span class="n">mtx</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">rvecs</span><span class="p">,</span> <span class="n">tvecs</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">calibrateCamera</span><span class="p">(</span><span class="n">objpoints</span><span class="p">,</span> <span class="n">imgpoints</span><span class="p">,</span> <span class="n">gray</span><span class="o">.</span><span class="n">shape</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="bp">None</span><span class="p">,</span><span class="bp">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ret</span><span class="p">,</span> <span class="n">mtx</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">rvecs</span><span class="p">,</span> <span class="n">tvecs</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s2">&quot;Cannot calibrate the camera.&quot;</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    </div>
+<div class="viewcode-block" id="parseArgs"><a class="viewcode-back" href="../../calibration.html#calibration.CheckerboardLensCalibration.parseArgs">[docs]</a><span class="k">def</span> <span class="nf">parseArgs</span> <span class="p">(</span><span class="n">args</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Parsing the arguments in the command line - this is used to get the parameters using this script&quot;&quot;&quot;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Calculate Common Phase Offsets&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-f&#39;</span><span class="p">,</span> <span class="s1">&#39;--file&#39;</span><span class="p">,</span> <span class="n">help</span> <span class="o">=</span> <span class="s1">&#39;FilePath&#39;</span><span class="p">,</span> <span class="n">required</span> <span class="o">=</span> <span class="s1">&#39;True&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span> <span class="bp">None</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="s1">&#39;--rows&#39;</span><span class="p">,</span> <span class="nb">type</span> <span class="o">=</span> <span class="nb">int</span><span class="p">,</span> <span class="n">help</span> <span class="o">=</span> <span class="s1">&#39;Number of Rows&#39;</span><span class="p">,</span> <span class="n">required</span> <span class="o">=</span> <span class="s1">&#39;True&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="s1">&#39;--cols&#39;</span><span class="p">,</span> <span class="n">help</span> <span class="o">=</span> <span class="s1">&#39;Number of Columns&#39;</span><span class="p">,</span> <span class="nb">type</span> <span class="o">=</span> <span class="nb">int</span><span class="p">,</span>  <span class="n">required</span> <span class="o">=</span> <span class="s1">&#39;True&#39;</span><span class="p">,</span> <span class="n">default</span> <span class="o">=</span> <span class="mi">15</span><span class="p">)</span>     
+    <span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    </div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>    
+    
+    <span class="n">val</span> <span class="o">=</span> <span class="n">parseArgs</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">CheckerBoardLensCalibration</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">file</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">rows</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">cols</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s2">&quot;Cannot perform lens calibration&quot;</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+    
+    <span class="n">boo</span><span class="p">,</span> <span class="n">mtx</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">rvecs</span><span class="p">,</span> <span class="n">tvecs</span> <span class="o">=</span> <span class="n">ret</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">dist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">cx</span> <span class="o">=</span> <span class="n">mtx</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">cy</span> <span class="o">=</span> <span class="n">mtx</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">fx</span> <span class="o">=</span> <span class="n">mtx</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">fy</span> <span class="o">=</span> <span class="n">mtx</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">k1</span> <span class="o">=</span> <span class="n">dist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">k2</span> <span class="o">=</span> <span class="n">dist</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">p1</span> <span class="o">=</span> <span class="n">dist</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">p2</span> <span class="o">=</span> <span class="n">dist</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">k3</span> <span class="o">=</span> <span class="n">dist</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+    
+    <span class="k">print</span> <span class="s2">&quot;cx = </span><span class="si">%f</span><span class="se">\n</span><span class="s2">cy = </span><span class="si">%f</span><span class="se">\n</span><span class="s2">fx = </span><span class="si">%f</span><span class="se">\n</span><span class="s2">fy = </span><span class="si">%f</span><span class="se">\n</span><span class="s2">k1 = </span><span class="si">%f</span><span class="se">\n</span><span class="s2">k2 = </span><span class="si">%f</span><span class="se">\n</span><span class="s2">k3=</span><span class="si">%f</span><span class="se">\n</span><span class="s2">p1=</span><span class="si">%f</span><span class="se">\n</span><span class="s2">p2=</span><span class="si">%f</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">fx</span><span class="p">,</span> <span class="n">fy</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k3</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, &#39;Suramya&#39;.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+    </div>
+  </body>
+</html>

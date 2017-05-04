@@ -1,0 +1,891 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>wizard package &mdash; SCAW &#39;0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="static/default.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '&#39;0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/underscore.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SCAW &#39;0.1.0 documentation" href="index.html" />
+    <link rel="prev" title="views package" href="views.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="index.html"><h1 style="font-size: 3em;">Voxel Calibration Wizard</h1></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="views.html" title="views package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">home</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+ 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">wizard package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-wizard.CalibrationCaptureData">wizard.CalibrationCaptureData</a></li>
+<li><a class="reference internal" href="#module-wizard.CalibrationCommonPhase">wizard.CalibrationCommonPhase</a></li>
+<li><a class="reference internal" href="#module-wizard.CalibrationConclusionsPage">wizard.CalibrationConclusionsPage</a></li>
+<li><a class="reference internal" href="#module-wizard.CalibrationHDRCommonPhaseOffset">wizard.CalibrationHDRCommonPhaseOffset</a></li>
+<li><a class="reference internal" href="#module-wizard.CalibrationInitPage">wizard.CalibrationInitPage</a></li>
+<li><a class="reference internal" href="#module-wizard.CalibrationLensPage">wizard.CalibrationLensPage</a></li>
+<li><a class="reference internal" href="#module-wizard.CalibrationNonLinearityPage">wizard.CalibrationNonLinearityPage</a></li>
+<li><a class="reference internal" href="#module-wizard.CalibrationPage">wizard.CalibrationPage</a></li>
+<li><a class="reference internal" href="#module-wizard.CalibrationPerPixelOffsetPage">wizard.CalibrationPerPixelOffsetPage</a></li>
+<li><a class="reference internal" href="#module-wizard.CalibrationSelectPage">wizard.CalibrationSelectPage</a></li>
+<li><a class="reference internal" href="#module-wizard.CalibrationTemperaturePage">wizard.CalibrationTemperaturePage</a></li>
+<li><a class="reference internal" href="#module-wizard">contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="views.html"
+                        title="previous chapter">views package</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="sources/wizard.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="wizard-package">
+<h1>wizard package<a class="headerlink" href="#wizard-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-wizard.CalibrationCaptureData">
+<span id="wizard-calibrationcapturedata"></span><h2>wizard.CalibrationCaptureData<a class="headerlink" href="#module-wizard.CalibrationCaptureData" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="wizard.CalibrationCaptureData.CalibrationDataCapturePage">
+<em class="property">class </em><tt class="descclassname">wizard.CalibrationCaptureData.</tt><tt class="descname">CalibrationDataCapturePage</tt><big>(</big><em>calibrationWizard</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationCaptureData.html#CalibrationDataCapturePage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationCaptureData.CalibrationDataCapturePage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#wizard.CalibrationPage.CalibrationPage" title="wizard.CalibrationPage.CalibrationPage"><tt class="xref py py-class docutils literal"><span class="pre">wizard.CalibrationPage.CalibrationPage</span></tt></a></p>
+<p>This code is used for live capture</p>
+<p>This code  captures data and calibrates, saving files into the profile path. Profile path = /path/to/.Voxel/profiles.</p>
+<dl class="attribute">
+<dt id="wizard.CalibrationCaptureData.CalibrationDataCapturePage.BUTTON_TEXTS">
+<tt class="descname">BUTTON_TEXTS</tt><em class="property"> = {'lens': ['Capture Far View', 'Capture Near View', 'Capture Common Phase OFfset Data', 'Capture Per Pixel Data', 'Calibrate'], 'perPixel': ['Capture Pixel Data', 'Calibrate'], 'commonPhase': ['Capture Phase Data', 'Capture Phase Data for Second Modulation Frequency', 'Capture Per Pixel Offset Data', 'Calibrate']}</em><a class="headerlink" href="#wizard.CalibrationCaptureData.CalibrationDataCapturePage.BUTTON_TEXTS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="wizard.CalibrationCaptureData.CalibrationDataCapturePage.MESSAGE_TEXTS">
+<tt class="descname">MESSAGE_TEXTS</tt><em class="property"> = {'lens': [&quot;Point the depth camera flat to a wall. Make sure you only see the flat wall in the camera view below and nothing else. This will be for far view capture. Later you'll need to capture near view. Now, for far view click on the capture button.&quot;, 'Maintain the depth camera orientation to the flat wall but move it closer. Make sure you only see the flat wall in the camera view below and nothing else. Now, click on the capture button to the right.', 'Capture Data for Common Phase and Per Pixel Offset Calculation. ', 'Capture Data for Per Pixel Offset Calculation', &quot;Great! You've got all views captured. Now, click on the calibrate button to compute the calibration coefficents.&quot;], 'perPixel': ['Point the camera to a flat wall and capture data for calculating per pixel offsets.', 'Great! you have all the data captured. CLick on calibrate. '], 'commonPhase': ['Point the depth camera flat to a wall. Make sure you only see the flat wall in the camera view below and nothing else.', 'dealias_en is turned on. Please click on capture to record data with the second modulation frequency.', 'Capture Data for Per Pixel Offset Calculation', 'All views captured. Click on calibrate to calibrate']}</em><a class="headerlink" href="#wizard.CalibrationCaptureData.CalibrationDataCapturePage.MESSAGE_TEXTS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="wizard.CalibrationCaptureData.CalibrationDataCapturePage.STATE_COMMON_PHASE_CAPTURED">
+<tt class="descname">STATE_COMMON_PHASE_CAPTURED</tt><em class="property"> = 3</em><a class="headerlink" href="#wizard.CalibrationCaptureData.CalibrationDataCapturePage.STATE_COMMON_PHASE_CAPTURED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="wizard.CalibrationCaptureData.CalibrationDataCapturePage.STATE_FAR_CAPTURED">
+<tt class="descname">STATE_FAR_CAPTURED</tt><em class="property"> = 2</em><a class="headerlink" href="#wizard.CalibrationCaptureData.CalibrationDataCapturePage.STATE_FAR_CAPTURED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="wizard.CalibrationCaptureData.CalibrationDataCapturePage.STATE_NEAR_CAPTURED">
+<tt class="descname">STATE_NEAR_CAPTURED</tt><em class="property"> = 1</em><a class="headerlink" href="#wizard.CalibrationCaptureData.CalibrationDataCapturePage.STATE_NEAR_CAPTURED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="wizard.CalibrationCaptureData.CalibrationDataCapturePage.STATE_PER_PIXEL_CAPTURED">
+<tt class="descname">STATE_PER_PIXEL_CAPTURED</tt><em class="property"> = 4</em><a class="headerlink" href="#wizard.CalibrationCaptureData.CalibrationDataCapturePage.STATE_PER_PIXEL_CAPTURED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="wizard.CalibrationCaptureData.CalibrationDataCapturePage.STATE_START">
+<tt class="descname">STATE_START</tt><em class="property"> = 0</em><a class="headerlink" href="#wizard.CalibrationCaptureData.CalibrationDataCapturePage.STATE_START" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="wizard.CalibrationCaptureData.CalibrationDataCapturePage.STRATEGY">
+<tt class="descname">STRATEGY</tt><em class="property"> = 'FlatWall'</em><a class="headerlink" href="#wizard.CalibrationCaptureData.CalibrationDataCapturePage.STRATEGY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationCaptureData.CalibrationDataCapturePage.calibrate">
+<tt class="descname">calibrate</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationCaptureData.html#CalibrationDataCapturePage.calibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationCaptureData.CalibrationDataCapturePage.calibrate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationCaptureData.CalibrationDataCapturePage.captureData">
+<tt class="descname">captureData</tt><big>(</big><em>value</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationCaptureData.html#CalibrationDataCapturePage.captureData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationCaptureData.CalibrationDataCapturePage.captureData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationCaptureData.CalibrationDataCapturePage.captureDataAndCalibrate">
+<tt class="descname">captureDataAndCalibrate</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationCaptureData.html#CalibrationDataCapturePage.captureDataAndCalibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationCaptureData.CalibrationDataCapturePage.captureDataAndCalibrate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationCaptureData.CalibrationDataCapturePage.cleanupPage">
+<tt class="descname">cleanupPage</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationCaptureData.html#CalibrationDataCapturePage.cleanupPage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationCaptureData.CalibrationDataCapturePage.cleanupPage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationCaptureData.CalibrationDataCapturePage.closeEvent">
+<tt class="descname">closeEvent</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationCaptureData.html#CalibrationDataCapturePage.closeEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationCaptureData.CalibrationDataCapturePage.closeEvent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationCaptureData.CalibrationDataCapturePage.initializePage">
+<tt class="descname">initializePage</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationCaptureData.html#CalibrationDataCapturePage.initializePage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationCaptureData.CalibrationDataCapturePage.initializePage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationCaptureData.CalibrationDataCapturePage.isComplete">
+<tt class="descname">isComplete</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationCaptureData.html#CalibrationDataCapturePage.isComplete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationCaptureData.CalibrationDataCapturePage.isComplete" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationCaptureData.CalibrationDataCapturePage.setDistance">
+<tt class="descname">setDistance</tt><big>(</big><em>value</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationCaptureData.html#CalibrationDataCapturePage.setDistance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationCaptureData.CalibrationDataCapturePage.setDistance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationCaptureData.CalibrationDataCapturePage.setNumberOfFrames">
+<tt class="descname">setNumberOfFrames</tt><big>(</big><em>value</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationCaptureData.html#CalibrationDataCapturePage.setNumberOfFrames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationCaptureData.CalibrationDataCapturePage.setNumberOfFrames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationCaptureData.CalibrationDataCapturePage.startCapture">
+<tt class="descname">startCapture</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationCaptureData.html#CalibrationDataCapturePage.startCapture"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationCaptureData.CalibrationDataCapturePage.startCapture" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="wizard.CalibrationCaptureData.CalibrationDataCapturePage.staticMetaObject">
+<tt class="descname">staticMetaObject</tt><em class="property"> = &lt;PySide.QtCore.QMetaObject object at 0x000000001C62C048&gt;</em><a class="headerlink" href="#wizard.CalibrationCaptureData.CalibrationDataCapturePage.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationCaptureData.CalibrationDataCapturePage.stopCapture">
+<tt class="descname">stopCapture</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationCaptureData.html#CalibrationDataCapturePage.stopCapture"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationCaptureData.CalibrationDataCapturePage.stopCapture" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-wizard.CalibrationCommonPhase">
+<span id="wizard-calibrationcommonphase"></span><h2>wizard.CalibrationCommonPhase<a class="headerlink" href="#module-wizard.CalibrationCommonPhase" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="wizard.CalibrationCommonPhase.CalibrationCommonPhasePage">
+<em class="property">class </em><tt class="descclassname">wizard.CalibrationCommonPhase.</tt><tt class="descname">CalibrationCommonPhasePage</tt><big>(</big><em>calibrationWizard</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationCommonPhase.html#CalibrationCommonPhasePage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationCommonPhase.CalibrationCommonPhasePage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#wizard.CalibrationPage.CalibrationPage" title="wizard.CalibrationPage.CalibrationPage"><tt class="xref py py-class docutils literal"><span class="pre">wizard.CalibrationPage.CalibrationPage</span></tt></a></p>
+<p>Returns the common phase offsets for a particular chipset</p>
+<p>Uses a vxl file of a flat wall and returns the common phase offset. The file can be recorded using Voxel Viewer.</p>
+<dl class="docutils">
+<dt><strong>Parameters</strong>:</dt>
+<dd>-dealias_en: If the parameter dealias_en is true or false
+-fileName1: VXL file pointing to the flat wall, captured using voxel viewer
+-modFreq1: Modulation Frequency 1, corresponding to the frequency used in fileName1
+-distance: Distance of the camera from the flat wall
+-fileName2: VXL file pointing to the flat wall, captured using voxel viewer
+-modFreq2: Modulation Frequency 2, corresponding to the frequency used in fileName2</dd>
+</dl>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<dl class="docutils">
+<dt>If dealias_en is true, capture the first vxl using the following method for saving vxl files:</dt>
+<dd><ul class="first last simple">
+<li>Open Voxel Viewer</li>
+<li>Set ind_freq_data_en True</li>
+<li>Set ind_freq_data_sel as False</li>
+<li>Capture data (at least 200 frames)</li>
+</ul>
+</dd>
+</dl>
+<p class="last">For second modulation frequency, turn ind_freq_data_sel to True and capture data again.</p>
+</div>
+<ul class="simple">
+<li>Make sure that the distance of the camera does <strong>not</strong> change while capturing data</li>
+</ul>
+<dl class="method">
+<dt id="wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.FlatWall">
+<tt class="descname">FlatWall</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationCommonPhase.html#CalibrationCommonPhasePage.FlatWall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.FlatWall" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.FlatWallCalib">
+<tt class="descname">FlatWallCalib</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationCommonPhase.html#CalibrationCommonPhasePage.FlatWallCalib"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.FlatWallCalib" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.calibrate">
+<tt class="descname">calibrate</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationCommonPhase.html#CalibrationCommonPhasePage.calibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.calibrate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.cleanupPage">
+<tt class="descname">cleanupPage</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationCommonPhase.html#CalibrationCommonPhasePage.cleanupPage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.cleanupPage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.getValues">
+<tt class="descname">getValues</tt><big>(</big><em>value</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationCommonPhase.html#CalibrationCommonPhasePage.getValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.getValues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.initializePage">
+<tt class="descname">initializePage</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationCommonPhase.html#CalibrationCommonPhasePage.initializePage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.initializePage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.isComplete">
+<tt class="descname">isComplete</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationCommonPhase.html#CalibrationCommonPhasePage.isComplete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.isComplete" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.selectFileDialog">
+<tt class="descname">selectFileDialog</tt><big>(</big><em>key</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationCommonPhase.html#CalibrationCommonPhasePage.selectFileDialog"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.selectFileDialog" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.showSecondFrequency">
+<tt class="descname">showSecondFrequency</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationCommonPhase.html#CalibrationCommonPhasePage.showSecondFrequency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.showSecondFrequency" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.staticMetaObject">
+<tt class="descname">staticMetaObject</tt><em class="property"> = &lt;PySide.QtCore.QMetaObject object at 0x000000001C5E8148&gt;</em><a class="headerlink" href="#wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-wizard.CalibrationConclusionsPage">
+<span id="wizard-calibrationconclusionspage"></span><h2>wizard.CalibrationConclusionsPage<a class="headerlink" href="#module-wizard.CalibrationConclusionsPage" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="wizard.CalibrationConclusionsPage.CalibrationConclusionPage">
+<em class="property">class </em><tt class="descclassname">wizard.CalibrationConclusionsPage.</tt><tt class="descname">CalibrationConclusionPage</tt><big>(</big><em>calibrationWizard</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationConclusionsPage.html#CalibrationConclusionPage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationConclusionsPage.CalibrationConclusionPage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PySide.QtGui.QWizardPage</span></tt></p>
+<p>This is the final page of the wizard. The collected data is saved as a conf file in this page</p>
+<dl class="method">
+<dt id="wizard.CalibrationConclusionsPage.CalibrationConclusionPage.initializePage">
+<tt class="descname">initializePage</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationConclusionsPage.html#CalibrationConclusionPage.initializePage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationConclusionsPage.CalibrationConclusionPage.initializePage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationConclusionsPage.CalibrationConclusionPage.setParam">
+<tt class="descname">setParam</tt><big>(</big><em>section</em>, <em>name</em>, <em>value</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationConclusionsPage.html#CalibrationConclusionPage.setParam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationConclusionsPage.CalibrationConclusionPage.setParam" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="wizard.CalibrationConclusionsPage.CalibrationConclusionPage.staticMetaObject">
+<tt class="descname">staticMetaObject</tt><em class="property"> = &lt;PySide.QtCore.QMetaObject object at 0x000000001C5D0AC8&gt;</em><a class="headerlink" href="#wizard.CalibrationConclusionsPage.CalibrationConclusionPage.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-wizard.CalibrationHDRCommonPhaseOffset">
+<span id="wizard-calibrationhdrcommonphaseoffset"></span><h2>wizard.CalibrationHDRCommonPhaseOffset<a class="headerlink" href="#module-wizard.CalibrationHDRCommonPhaseOffset" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="wizard.CalibrationHDRCommonPhaseOffset.CalibrationHDRCommonPhasePage">
+<em class="property">class </em><tt class="descclassname">wizard.CalibrationHDRCommonPhaseOffset.</tt><tt class="descname">CalibrationHDRCommonPhasePage</tt><big>(</big><em>calibrationWizard</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationHDRCommonPhaseOffset.html#CalibrationHDRCommonPhasePage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationHDRCommonPhaseOffset.CalibrationHDRCommonPhasePage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#wizard.CalibrationCommonPhase.CalibrationCommonPhasePage" title="wizard.CalibrationCommonPhase.CalibrationCommonPhasePage"><tt class="xref py py-class docutils literal"><span class="pre">wizard.CalibrationCommonPhase.CalibrationCommonPhasePage</span></tt></a></p>
+<p>CalibrationHDRCommonPhasePage: This page is similar to CalibrationCommonPhasePage. HDR coefficients are required when HDR is enabled.</p>
+<dl class="method">
+<dt id="wizard.CalibrationHDRCommonPhaseOffset.CalibrationHDRCommonPhasePage.calibrate">
+<tt class="descname">calibrate</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationHDRCommonPhaseOffset.html#CalibrationHDRCommonPhasePage.calibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationHDRCommonPhaseOffset.CalibrationHDRCommonPhasePage.calibrate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationHDRCommonPhaseOffset.CalibrationHDRCommonPhasePage.initializePage">
+<tt class="descname">initializePage</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationHDRCommonPhaseOffset.html#CalibrationHDRCommonPhasePage.initializePage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationHDRCommonPhaseOffset.CalibrationHDRCommonPhasePage.initializePage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="wizard.CalibrationHDRCommonPhaseOffset.CalibrationHDRCommonPhasePage.staticMetaObject">
+<tt class="descname">staticMetaObject</tt><em class="property"> = &lt;PySide.QtCore.QMetaObject object at 0x000000001C5E8808&gt;</em><a class="headerlink" href="#wizard.CalibrationHDRCommonPhaseOffset.CalibrationHDRCommonPhasePage.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-wizard.CalibrationInitPage">
+<span id="wizard-calibrationinitpage"></span><h2>wizard.CalibrationInitPage<a class="headerlink" href="#module-wizard.CalibrationInitPage" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="wizard.CalibrationInitPage.CalibrationInitPage">
+<em class="property">class </em><tt class="descclassname">wizard.CalibrationInitPage.</tt><tt class="descname">CalibrationInitPage</tt><big>(</big><em>calibrationWizard</em>, <em>editIndex=-1</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationInitPage.html#CalibrationInitPage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationInitPage.CalibrationInitPage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PySide.QtGui.QWizardPage</span></tt></p>
+<p>Initial Calibration Wizard Page. Here you can select the calibrations to perform</p>
+<dl class="method">
+<dt id="wizard.CalibrationInitPage.CalibrationInitPage.addCalibs">
+<tt class="descname">addCalibs</tt><big>(</big><em>title</em>, <em>state</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationInitPage.html#CalibrationInitPage.addCalibs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationInitPage.CalibrationInitPage.addCalibs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationInitPage.CalibrationInitPage.isComplete">
+<tt class="descname">isComplete</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationInitPage.html#CalibrationInitPage.isComplete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationInitPage.CalibrationInitPage.isComplete" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationInitPage.CalibrationInitPage.makeConnections">
+<tt class="descname">makeConnections</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationInitPage.html#CalibrationInitPage.makeConnections"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationInitPage.CalibrationInitPage.makeConnections" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationInitPage.CalibrationInitPage.selectChipsetType">
+<tt class="descname">selectChipsetType</tt><big>(</big><em>i</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationInitPage.html#CalibrationInitPage.selectChipsetType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationInitPage.CalibrationInitPage.selectChipsetType" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationInitPage.CalibrationInitPage.selectConfFile">
+<tt class="descname">selectConfFile</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationInitPage.html#CalibrationInitPage.selectConfFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationInitPage.CalibrationInitPage.selectConfFile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationInitPage.CalibrationInitPage.setCameraProfileGroupBox">
+<tt class="descname">setCameraProfileGroupBox</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationInitPage.html#CalibrationInitPage.setCameraProfileGroupBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationInitPage.CalibrationInitPage.setCameraProfileGroupBox" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationInitPage.CalibrationInitPage.setDepthCamera">
+<tt class="descname">setDepthCamera</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationInitPage.html#CalibrationInitPage.setDepthCamera"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationInitPage.CalibrationInitPage.setDepthCamera" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationInitPage.CalibrationInitPage.setParentProfile">
+<tt class="descname">setParentProfile</tt><big>(</big><em>index</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationInitPage.html#CalibrationInitPage.setParentProfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationInitPage.CalibrationInitPage.setParentProfile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationInitPage.CalibrationInitPage.setProfileName">
+<tt class="descname">setProfileName</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationInitPage.html#CalibrationInitPage.setProfileName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationInitPage.CalibrationInitPage.setProfileName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationInitPage.CalibrationInitPage.setProfileNameLocal">
+<tt class="descname">setProfileNameLocal</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationInitPage.html#CalibrationInitPage.setProfileNameLocal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationInitPage.CalibrationInitPage.setProfileNameLocal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationInitPage.CalibrationInitPage.showHideNewProfileName">
+<tt class="descname">showHideNewProfileName</tt><big>(</big><em>index</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationInitPage.html#CalibrationInitPage.showHideNewProfileName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationInitPage.CalibrationInitPage.showHideNewProfileName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationInitPage.CalibrationInitPage.showNewProfileName">
+<tt class="descname">showNewProfileName</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationInitPage.html#CalibrationInitPage.showNewProfileName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationInitPage.CalibrationInitPage.showNewProfileName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="wizard.CalibrationInitPage.CalibrationInitPage.staticMetaObject">
+<tt class="descname">staticMetaObject</tt><em class="property"> = &lt;PySide.QtCore.QMetaObject object at 0x0000000006127E08&gt;</em><a class="headerlink" href="#wizard.CalibrationInitPage.CalibrationInitPage.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationInitPage.CalibrationInitPage.validatePage">
+<tt class="descname">validatePage</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationInitPage.html#CalibrationInitPage.validatePage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationInitPage.CalibrationInitPage.validatePage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-wizard.CalibrationLensPage">
+<span id="wizard-calibrationlenspage"></span><h2>wizard.CalibrationLensPage<a class="headerlink" href="#module-wizard.CalibrationLensPage" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="wizard.CalibrationLensPage.CalibrationImage">
+<em class="property">class </em><tt class="descclassname">wizard.CalibrationLensPage.</tt><tt class="descname">CalibrationImage</tt><big>(</big><em>imageFile</em>, <em>calibrationLensPage</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationLensPage.html#CalibrationImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationLensPage.CalibrationImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PySide.QtGui.QListWidgetItem</span></tt></p>
+<dl class="method">
+<dt id="wizard.CalibrationLensPage.CalibrationImage.computeCorners">
+<tt class="descname">computeCorners</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationLensPage.html#CalibrationImage.computeCorners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationLensPage.CalibrationImage.computeCorners" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationLensPage.CalibrationImage.showCorners">
+<tt class="descname">showCorners</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationLensPage.html#CalibrationImage.showCorners"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationLensPage.CalibrationImage.showCorners" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="wizard.CalibrationLensPage.CalibrationLensPage">
+<em class="property">class </em><tt class="descclassname">wizard.CalibrationLensPage.</tt><tt class="descname">CalibrationLensPage</tt><big>(</big><em>calibrationWizard</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationLensPage.html#CalibrationLensPage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationLensPage.CalibrationLensPage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#wizard.CalibrationPage.CalibrationPage" title="wizard.CalibrationPage.CalibrationPage"><tt class="xref py py-class docutils literal"><span class="pre">wizard.CalibrationPage.CalibrationPage</span></tt></a></p>
+<p>Calibration Lens page for computation of the lens parameters</p>
+<dl class="method">
+<dt id="wizard.CalibrationLensPage.CalibrationLensPage.CheckerBoard">
+<tt class="descname">CheckerBoard</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationLensPage.html#CalibrationLensPage.CheckerBoard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationLensPage.CalibrationLensPage.CheckerBoard" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationLensPage.CalibrationLensPage.CheckerBoardCalib">
+<tt class="descname">CheckerBoardCalib</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationLensPage.html#CalibrationLensPage.CheckerBoardCalib"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationLensPage.CalibrationLensPage.CheckerBoardCalib" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationLensPage.CalibrationLensPage.FlatWall">
+<tt class="descname">FlatWall</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationLensPage.html#CalibrationLensPage.FlatWall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationLensPage.CalibrationLensPage.FlatWall" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationLensPage.CalibrationLensPage.FlatWallCalib">
+<tt class="descname">FlatWallCalib</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationLensPage.html#CalibrationLensPage.FlatWallCalib"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationLensPage.CalibrationLensPage.FlatWallCalib" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationLensPage.CalibrationLensPage.addImage">
+<tt class="descname">addImage</tt><big>(</big><em>image</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationLensPage.html#CalibrationLensPage.addImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationLensPage.CalibrationLensPage.addImage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationLensPage.CalibrationLensPage.calibrate">
+<tt class="descname">calibrate</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationLensPage.html#CalibrationLensPage.calibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationLensPage.CalibrationLensPage.calibrate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationLensPage.CalibrationLensPage.calibratedImagesKeyPressEvent">
+<tt class="descname">calibratedImagesKeyPressEvent</tt><big>(</big><em>event</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationLensPage.html#CalibrationLensPage.calibratedImagesKeyPressEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationLensPage.CalibrationLensPage.calibratedImagesKeyPressEvent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationLensPage.CalibrationLensPage.cleanupPage">
+<tt class="descname">cleanupPage</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationLensPage.html#CalibrationLensPage.cleanupPage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationLensPage.CalibrationLensPage.cleanupPage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationLensPage.CalibrationLensPage.deleteImage">
+<tt class="descname">deleteImage</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationLensPage.html#CalibrationLensPage.deleteImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationLensPage.CalibrationLensPage.deleteImage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationLensPage.CalibrationLensPage.getValues">
+<tt class="descname">getValues</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationLensPage.html#CalibrationLensPage.getValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationLensPage.CalibrationLensPage.getValues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationLensPage.CalibrationLensPage.initializePage">
+<tt class="descname">initializePage</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationLensPage.html#CalibrationLensPage.initializePage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationLensPage.CalibrationLensPage.initializePage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationLensPage.CalibrationLensPage.populateImages">
+<tt class="descname">populateImages</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationLensPage.html#CalibrationLensPage.populateImages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationLensPage.CalibrationLensPage.populateImages" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationLensPage.CalibrationLensPage.selectFileDialog">
+<tt class="descname">selectFileDialog</tt><big>(</big><em>key</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationLensPage.html#CalibrationLensPage.selectFileDialog"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationLensPage.CalibrationLensPage.selectFileDialog" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationLensPage.CalibrationLensPage.setCalibParams">
+<tt class="descname">setCalibParams</tt><big>(</big><em>mtx</em>, <em>dist</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationLensPage.html#CalibrationLensPage.setCalibParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationLensPage.CalibrationLensPage.setCalibParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationLensPage.CalibrationLensPage.setCalibrateButton">
+<tt class="descname">setCalibrateButton</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationLensPage.html#CalibrationLensPage.setCalibrateButton"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationLensPage.CalibrationLensPage.setCalibrateButton" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationLensPage.CalibrationLensPage.setDirectory">
+<tt class="descname">setDirectory</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationLensPage.html#CalibrationLensPage.setDirectory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationLensPage.CalibrationLensPage.setDirectory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationLensPage.CalibrationLensPage.setDistanceValues">
+<tt class="descname">setDistanceValues</tt><big>(</big><em>value</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationLensPage.html#CalibrationLensPage.setDistanceValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationLensPage.CalibrationLensPage.setDistanceValues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationLensPage.CalibrationLensPage.setLayout">
+<tt class="descname">setLayout</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationLensPage.html#CalibrationLensPage.setLayout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationLensPage.CalibrationLensPage.setLayout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationLensPage.CalibrationLensPage.setValues">
+<tt class="descname">setValues</tt><big>(</big><em>value</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationLensPage.html#CalibrationLensPage.setValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationLensPage.CalibrationLensPage.setValues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationLensPage.CalibrationLensPage.showContextMenu">
+<tt class="descname">showContextMenu</tt><big>(</big><em>point</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationLensPage.html#CalibrationLensPage.showContextMenu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationLensPage.CalibrationLensPage.showContextMenu" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationLensPage.CalibrationLensPage.showImage">
+<tt class="descname">showImage</tt><big>(</big><em>item=None</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationLensPage.html#CalibrationLensPage.showImage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationLensPage.CalibrationLensPage.showImage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="wizard.CalibrationLensPage.CalibrationLensPage.staticMetaObject">
+<tt class="descname">staticMetaObject</tt><em class="property"> = &lt;PySide.QtCore.QMetaObject object at 0x000000001C5D0A88&gt;</em><a class="headerlink" href="#wizard.CalibrationLensPage.CalibrationLensPage.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-wizard.CalibrationNonLinearityPage">
+<span id="wizard-calibrationnonlinearitypage"></span><h2>wizard.CalibrationNonLinearityPage<a class="headerlink" href="#module-wizard.CalibrationNonLinearityPage" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage">
+<em class="property">class </em><tt class="descclassname">wizard.CalibrationNonLinearityPage.</tt><tt class="descname">CalibrationNonLinearityPage</tt><big>(</big><em>calibrationWizard</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationNonLinearityPage.html#CalibrationNonLinearityPage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#wizard.CalibrationPage.CalibrationPage" title="wizard.CalibrationPage.CalibrationPage"><tt class="xref py py-class docutils literal"><span class="pre">wizard.CalibrationPage.CalibrationPage</span></tt></a></p>
+<p>Wizard page for non linearity calibration</p>
+<p>Takes CSV file as input and gives non linearity coefficients as output</p>
+<dl class="attribute">
+<dt id="wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.CSV_FILE_NAME">
+<tt class="descname">CSV_FILE_NAME</tt><em class="property"> = 'non-linearity.csv'</em><a class="headerlink" href="#wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.CSV_FILE_NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.calibrate">
+<tt class="descname">calibrate</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationNonLinearityPage.html#CalibrationNonLinearityPage.calibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.calibrate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.cleanupPage">
+<tt class="descname">cleanupPage</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationNonLinearityPage.html#CalibrationNonLinearityPage.cleanupPage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.cleanupPage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.getData">
+<tt class="descname">getData</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationNonLinearityPage.html#CalibrationNonLinearityPage.getData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.getData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.importCSV">
+<tt class="descname">importCSV</tt><big>(</big><em>csvFile=None</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationNonLinearityPage.html#CalibrationNonLinearityPage.importCSV"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.importCSV" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.initializePage">
+<tt class="descname">initializePage</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationNonLinearityPage.html#CalibrationNonLinearityPage.initializePage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.initializePage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.insertRow">
+<tt class="descname">insertRow</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationNonLinearityPage.html#CalibrationNonLinearityPage.insertRow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.insertRow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.isComplete">
+<tt class="descname">isComplete</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationNonLinearityPage.html#CalibrationNonLinearityPage.isComplete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.isComplete" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.removeAllRows">
+<tt class="descname">removeAllRows</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationNonLinearityPage.html#CalibrationNonLinearityPage.removeAllRows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.removeAllRows" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.removeRow">
+<tt class="descname">removeRow</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationNonLinearityPage.html#CalibrationNonLinearityPage.removeRow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.removeRow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.setChipsetParams">
+<tt class="descname">setChipsetParams</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationNonLinearityPage.html#CalibrationNonLinearityPage.setChipsetParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.setChipsetParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.setModFrequency">
+<tt class="descname">setModFrequency</tt><big>(</big><em>value</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationNonLinearityPage.html#CalibrationNonLinearityPage.setModFrequency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.setModFrequency" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.setModFrequency2">
+<tt class="descname">setModFrequency2</tt><big>(</big><em>value</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationNonLinearityPage.html#CalibrationNonLinearityPage.setModFrequency2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.setModFrequency2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.staticMetaObject">
+<tt class="descname">staticMetaObject</tt><em class="property"> = &lt;PySide.QtCore.QMetaObject object at 0x000000001C5E8708&gt;</em><a class="headerlink" href="#wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.writeCSV">
+<tt class="descname">writeCSV</tt><big>(</big><em>data</em>, <em>csvFile</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationNonLinearityPage.html#CalibrationNonLinearityPage.writeCSV"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationNonLinearityPage.CalibrationNonLinearityPage.writeCSV" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="wizard.CalibrationNonLinearityPage.CalibrationNonLinearityTableDelegate">
+<em class="property">class </em><tt class="descclassname">wizard.CalibrationNonLinearityPage.</tt><tt class="descname">CalibrationNonLinearityTableDelegate</tt><big>(</big><em>parent=None</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationNonLinearityPage.html#CalibrationNonLinearityTableDelegate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationNonLinearityPage.CalibrationNonLinearityTableDelegate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PySide.QtGui.QItemDelegate</span></tt></p>
+<dl class="attribute">
+<dt id="wizard.CalibrationNonLinearityPage.CalibrationNonLinearityTableDelegate.staticMetaObject">
+<tt class="descname">staticMetaObject</tt><em class="property"> = &lt;PySide.QtCore.QMetaObject object at 0x000000001C5E86C8&gt;</em><a class="headerlink" href="#wizard.CalibrationNonLinearityPage.CalibrationNonLinearityTableDelegate.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-wizard.CalibrationPage">
+<span id="wizard-calibrationpage"></span><h2>wizard.CalibrationPage<a class="headerlink" href="#module-wizard.CalibrationPage" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="wizard.CalibrationPage.CalibrationPage">
+<em class="property">class </em><tt class="descclassname">wizard.CalibrationPage.</tt><tt class="descname">CalibrationPage</tt><a class="reference internal" href="modules/wizard/CalibrationPage.html#CalibrationPage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationPage.CalibrationPage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PySide.QtGui.QWizardPage</span></tt></p>
+<dl class="method">
+<dt id="wizard.CalibrationPage.CalibrationPage.clearLayout">
+<tt class="descname">clearLayout</tt><big>(</big><em>layout</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationPage.html#CalibrationPage.clearLayout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationPage.CalibrationPage.clearLayout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationPage.CalibrationPage.isComplete">
+<tt class="descname">isComplete</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationPage.html#CalibrationPage.isComplete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationPage.CalibrationPage.isComplete" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="wizard.CalibrationPage.CalibrationPage.staticMetaObject">
+<tt class="descname">staticMetaObject</tt><em class="property"> = &lt;PySide.QtCore.QMetaObject object at 0x00000000065E4A88&gt;</em><a class="headerlink" href="#wizard.CalibrationPage.CalibrationPage.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-wizard.CalibrationPerPixelOffsetPage">
+<span id="wizard-calibrationperpixeloffsetpage"></span><h2>wizard.CalibrationPerPixelOffsetPage<a class="headerlink" href="#module-wizard.CalibrationPerPixelOffsetPage" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="wizard.CalibrationPerPixelOffsetPage.CalibrationPerPixelOffsetPage">
+<em class="property">class </em><tt class="descclassname">wizard.CalibrationPerPixelOffsetPage.</tt><tt class="descname">CalibrationPerPixelOffsetPage</tt><big>(</big><em>calibrationWizard</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationPerPixelOffsetPage.html#CalibrationPerPixelOffsetPage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationPerPixelOffsetPage.CalibrationPerPixelOffsetPage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#wizard.CalibrationPage.CalibrationPage" title="wizard.CalibrationPage.CalibrationPage"><tt class="xref py py-class docutils literal"><span class="pre">wizard.CalibrationPage.CalibrationPage</span></tt></a></p>
+<dl class="method">
+<dt id="wizard.CalibrationPerPixelOffsetPage.CalibrationPerPixelOffsetPage.calibrate">
+<tt class="descname">calibrate</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationPerPixelOffsetPage.html#CalibrationPerPixelOffsetPage.calibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationPerPixelOffsetPage.CalibrationPerPixelOffsetPage.calibrate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationPerPixelOffsetPage.CalibrationPerPixelOffsetPage.cleanupPage">
+<tt class="descname">cleanupPage</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationPerPixelOffsetPage.html#CalibrationPerPixelOffsetPage.cleanupPage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationPerPixelOffsetPage.CalibrationPerPixelOffsetPage.cleanupPage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationPerPixelOffsetPage.CalibrationPerPixelOffsetPage.initializePage">
+<tt class="descname">initializePage</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationPerPixelOffsetPage.html#CalibrationPerPixelOffsetPage.initializePage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationPerPixelOffsetPage.CalibrationPerPixelOffsetPage.initializePage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationPerPixelOffsetPage.CalibrationPerPixelOffsetPage.selectFileDialog">
+<tt class="descname">selectFileDialog</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationPerPixelOffsetPage.html#CalibrationPerPixelOffsetPage.selectFileDialog"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationPerPixelOffsetPage.CalibrationPerPixelOffsetPage.selectFileDialog" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="wizard.CalibrationPerPixelOffsetPage.CalibrationPerPixelOffsetPage.staticMetaObject">
+<tt class="descname">staticMetaObject</tt><em class="property"> = &lt;PySide.QtCore.QMetaObject object at 0x000000001C5DCCC8&gt;</em><a class="headerlink" href="#wizard.CalibrationPerPixelOffsetPage.CalibrationPerPixelOffsetPage.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-wizard.CalibrationSelectPage">
+<span id="wizard-calibrationselectpage"></span><h2>wizard.CalibrationSelectPage<a class="headerlink" href="#module-wizard.CalibrationSelectPage" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="wizard.CalibrationSelectPage.CalibrationSelectPage">
+<em class="property">class </em><tt class="descclassname">wizard.CalibrationSelectPage.</tt><tt class="descname">CalibrationSelectPage</tt><big>(</big><em>calibrationWizard</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationSelectPage.html#CalibrationSelectPage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationSelectPage.CalibrationSelectPage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PySide.QtGui.QWizardPage</span></tt></p>
+<dl class="method">
+<dt id="wizard.CalibrationSelectPage.CalibrationSelectPage.buttonClicked">
+<tt class="descname">buttonClicked</tt><big>(</big><em>key</em>, <em>id</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationSelectPage.html#CalibrationSelectPage.buttonClicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationSelectPage.CalibrationSelectPage.buttonClicked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationSelectPage.CalibrationSelectPage.cleanupPage">
+<tt class="descname">cleanupPage</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationSelectPage.html#CalibrationSelectPage.cleanupPage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationSelectPage.CalibrationSelectPage.cleanupPage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationSelectPage.CalibrationSelectPage.clearLayout">
+<tt class="descname">clearLayout</tt><big>(</big><em>layout</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationSelectPage.html#CalibrationSelectPage.clearLayout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationSelectPage.CalibrationSelectPage.clearLayout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationSelectPage.CalibrationSelectPage.initializePage">
+<tt class="descname">initializePage</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationSelectPage.html#CalibrationSelectPage.initializePage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationSelectPage.CalibrationSelectPage.initializePage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationSelectPage.CalibrationSelectPage.setDataLabelText">
+<tt class="descname">setDataLabelText</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationSelectPage.html#CalibrationSelectPage.setDataLabelText"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationSelectPage.CalibrationSelectPage.setDataLabelText" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="wizard.CalibrationSelectPage.CalibrationSelectPage.staticMetaObject">
+<tt class="descname">staticMetaObject</tt><em class="property"> = &lt;PySide.QtCore.QMetaObject object at 0x0000000006127EC8&gt;</em><a class="headerlink" href="#wizard.CalibrationSelectPage.CalibrationSelectPage.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-wizard.CalibrationTemperaturePage">
+<span id="wizard-calibrationtemperaturepage"></span><h2>wizard.CalibrationTemperaturePage<a class="headerlink" href="#module-wizard.CalibrationTemperaturePage" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="wizard.CalibrationTemperaturePage.CalibratePhaseTableDelegate">
+<em class="property">class </em><tt class="descclassname">wizard.CalibrationTemperaturePage.</tt><tt class="descname">CalibratePhaseTableDelegate</tt><big>(</big><em>parent=None</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationTemperaturePage.html#CalibratePhaseTableDelegate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationTemperaturePage.CalibratePhaseTableDelegate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">PySide.QtGui.QItemDelegate</span></tt></p>
+<dl class="method">
+<dt id="wizard.CalibrationTemperaturePage.CalibratePhaseTableDelegate.createEditor">
+<tt class="descname">createEditor</tt><big>(</big><em>parent</em>, <em>option</em>, <em>index</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationTemperaturePage.html#CalibratePhaseTableDelegate.createEditor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationTemperaturePage.CalibratePhaseTableDelegate.createEditor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="wizard.CalibrationTemperaturePage.CalibratePhaseTableDelegate.staticMetaObject">
+<tt class="descname">staticMetaObject</tt><em class="property"> = &lt;PySide.QtCore.QMetaObject object at 0x000000001C5DCAC8&gt;</em><a class="headerlink" href="#wizard.CalibrationTemperaturePage.CalibratePhaseTableDelegate.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="wizard.CalibrationTemperaturePage.CalibrationTemperaturePage">
+<em class="property">class </em><tt class="descclassname">wizard.CalibrationTemperaturePage.</tt><tt class="descname">CalibrationTemperaturePage</tt><big>(</big><em>calibrationWizard</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationTemperaturePage.html#CalibrationTemperaturePage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationTemperaturePage.CalibrationTemperaturePage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#wizard.CalibrationPage.CalibrationPage" title="wizard.CalibrationPage.CalibrationPage"><tt class="xref py py-class docutils literal"><span class="pre">wizard.CalibrationPage.CalibrationPage</span></tt></a></p>
+<dl class="attribute">
+<dt id="wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.CSV_FILE_NAME">
+<tt class="descname">CSV_FILE_NAME</tt><em class="property"> = 'temperature-phase-offset.csv'</em><a class="headerlink" href="#wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.CSV_FILE_NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.MAX_PHASE_VALUE">
+<tt class="descname">MAX_PHASE_VALUE</tt><em class="property"> = 4096</em><a class="headerlink" href="#wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.MAX_PHASE_VALUE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.calibrate">
+<tt class="descname">calibrate</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationTemperaturePage.html#CalibrationTemperaturePage.calibrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.calibrate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.getData">
+<tt class="descname">getData</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationTemperaturePage.html#CalibrationTemperaturePage.getData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.getData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.importCSV">
+<tt class="descname">importCSV</tt><big>(</big><em>csvFile=None</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationTemperaturePage.html#CalibrationTemperaturePage.importCSV"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.importCSV" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.initializePage">
+<tt class="descname">initializePage</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationTemperaturePage.html#CalibrationTemperaturePage.initializePage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.initializePage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.insertRow">
+<tt class="descname">insertRow</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationTemperaturePage.html#CalibrationTemperaturePage.insertRow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.insertRow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.isComplete">
+<tt class="descname">isComplete</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationTemperaturePage.html#CalibrationTemperaturePage.isComplete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.isComplete" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.removeAllRows">
+<tt class="descname">removeAllRows</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationTemperaturePage.html#CalibrationTemperaturePage.removeAllRows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.removeAllRows" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.removeRow">
+<tt class="descname">removeRow</tt><big>(</big><big>)</big><a class="reference internal" href="modules/wizard/CalibrationTemperaturePage.html#CalibrationTemperaturePage.removeRow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.removeRow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.staticMetaObject">
+<tt class="descname">staticMetaObject</tt><em class="property"> = &lt;PySide.QtCore.QMetaObject object at 0x000000001C5DCB48&gt;</em><a class="headerlink" href="#wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.staticMetaObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.wrapPhaseToSignedInteger">
+<tt class="descname">wrapPhaseToSignedInteger</tt><big>(</big><em>phase</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationTemperaturePage.html#CalibrationTemperaturePage.wrapPhaseToSignedInteger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.wrapPhaseToSignedInteger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.writeCSV">
+<tt class="descname">writeCSV</tt><big>(</big><em>data</em>, <em>csvFile</em><big>)</big><a class="reference internal" href="modules/wizard/CalibrationTemperaturePage.html#CalibrationTemperaturePage.writeCSV"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wizard.CalibrationTemperaturePage.CalibrationTemperaturePage.writeCSV" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-wizard">
+<span id="contents"></span><h2>contents<a class="headerlink" href="#module-wizard" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="views.html" title="views package"
+             >previous</a> |</li>
+        <li><a href="index.html">home</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+ 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, &#39;Suramya&#39;.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+    </div>
+  </body>
+</html>

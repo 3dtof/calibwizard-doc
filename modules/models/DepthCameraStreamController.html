@@ -1,0 +1,635 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>models.DepthCameraStreamController &mdash; SCAW &#39;0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '&#39;0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SCAW &#39;0.1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><h1 style="font-size: 3em;">Voxel Calibration Wizard</h1></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for models.DepthCameraStreamController</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># TI Voxel Viewer component.</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2015 Texas Instruments Inc.</span>
+<span class="c1">#</span>
+
+<span class="kn">from</span> <span class="nn">PySide</span> <span class="kn">import</span> <span class="n">QtCore</span>
+
+<span class="kn">import</span> <span class="nn">Voxel</span>
+
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">threading</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="c1"># from PyVoxelViewer.common.Logger import Logger</span>
+
+<div class="viewcode-block" id="StreamSource"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.StreamSource">[docs]</a><span class="k">class</span> <span class="nc">StreamSource</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QObject</span><span class="p">):</span>
+  
+  <span class="n">paused</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Signal</span><span class="p">()</span>
+  <span class="n">resumed</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Signal</span><span class="p">()</span>
+  <span class="n">stopped</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Signal</span><span class="p">()</span>
+  <span class="n">beforestart</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Signal</span><span class="p">()</span>
+  <span class="n">started</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Signal</span><span class="p">()</span>
+  
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">parent</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">StreamSource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">callback</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">pos</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">paus</span> <span class="o">=</span> <span class="bp">False</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">frameStreamHandler</span> <span class="o">=</span> <span class="bp">None</span>
+    
+<div class="viewcode-block" id="StreamSource.isInitialized"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.StreamSource.isInitialized">[docs]</a>  <span class="k">def</span> <span class="nf">isInitialized</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">pass</span>
+    </div>
+<div class="viewcode-block" id="StreamSource.getName"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.StreamSource.getName">[docs]</a>  <span class="k">def</span> <span class="nf">getName</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+    </div>
+<div class="viewcode-block" id="StreamSource.setCallback"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.StreamSource.setCallback">[docs]</a>  <span class="k">def</span> <span class="nf">setCallback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">callback</span> <span class="o">=</span> <span class="n">callback</span>
+    </div>
+<div class="viewcode-block" id="StreamSource.removeCallback"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.StreamSource.removeCallback">[docs]</a>  <span class="k">def</span> <span class="nf">removeCallback</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">callback</span> <span class="o">=</span> <span class="bp">None</span>
+    </div>
+<div class="viewcode-block" id="StreamSource.start"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.StreamSource.start">[docs]</a>  <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">False</span>
+  </div>
+<div class="viewcode-block" id="StreamSource.pause"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.StreamSource.pause">[docs]</a>  <span class="k">def</span> <span class="nf">pause</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isRunning</span><span class="p">():</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">paus</span> <span class="o">=</span> <span class="bp">True</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">paused</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+      <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">False</span>
+    </div>
+<div class="viewcode-block" id="StreamSource.resume"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.StreamSource.resume">[docs]</a>  <span class="k">def</span> <span class="nf">resume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isRunning</span><span class="p">():</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isPaused</span><span class="p">():</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paus</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resumed</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">True</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">paus</span> <span class="o">=</span> <span class="bp">False</span>
+      <span class="k">return</span> <span class="bp">False</span>
+  </div>
+<div class="viewcode-block" id="StreamSource.stop"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.StreamSource.stop">[docs]</a>  <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">False</span>
+  </div>
+<div class="viewcode-block" id="StreamSource.isRunning"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.StreamSource.isRunning">[docs]</a>  <span class="k">def</span> <span class="nf">isRunning</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">False</span>
+  </div>
+<div class="viewcode-block" id="StreamSource.isPaused"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.StreamSource.isPaused">[docs]</a>  <span class="k">def</span> <span class="nf">isPaused</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">paus</span>
+  </div>
+<div class="viewcode-block" id="StreamSource.isSeekable"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.StreamSource.isSeekable">[docs]</a>  <span class="k">def</span> <span class="nf">isSeekable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">False</span>
+  </div>
+<div class="viewcode-block" id="StreamSource.isLiveStream"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.StreamSource.isLiveStream">[docs]</a>  <span class="k">def</span> <span class="nf">isLiveStream</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">False</span>
+  </div>
+<div class="viewcode-block" id="StreamSource.length"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.StreamSource.length">[docs]</a>  <span class="k">def</span> <span class="nf">length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mi">0</span>
+  </div>
+<div class="viewcode-block" id="StreamSource.currentPosition"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.StreamSource.currentPosition">[docs]</a>  <span class="k">def</span> <span class="nf">currentPosition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos</span>
+</div>
+<div class="viewcode-block" id="StreamSource.currentTimestamp"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.StreamSource.currentTimestamp">[docs]</a>  <span class="k">def</span> <span class="nf">currentTimestamp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span>
+</div>
+<div class="viewcode-block" id="StreamSource.seek"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.StreamSource.seek">[docs]</a>  <span class="k">def</span> <span class="nf">seek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">False</span>
+</div>
+<div class="viewcode-block" id="StreamSource.getROI"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.StreamSource.getROI">[docs]</a>  <span class="k">def</span> <span class="nf">getROI</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="StreamSource.getBinning"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.StreamSource.getBinning">[docs]</a>  <span class="k">def</span> <span class="nf">getBinning</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">None</span>
+  
+  </div>
+<div class="viewcode-block" id="StreamSource.getStreamParamf"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.StreamSource.getStreamParamf">[docs]</a>  <span class="k">def</span> <span class="nf">getStreamParamf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameStreamHandler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">r</span><span class="p">,</span> <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameStreamHandler</span><span class="o">.</span><span class="n">getStreamParamf</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">r</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">f</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="mi">0</span>
+  </div>
+<div class="viewcode-block" id="StreamSource.getDepthScalingFactor"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.StreamSource.getDepthScalingFactor">[docs]</a>  <span class="k">def</span> <span class="nf">getDepthScalingFactor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getStreamParamf</span><span class="p">(</span><span class="s2">&quot;depthScalingFactor&quot;</span><span class="p">)</span>
+  </div>
+<div class="viewcode-block" id="StreamSource.getAmplitudeScalingFactor"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.StreamSource.getAmplitudeScalingFactor">[docs]</a>  <span class="k">def</span> <span class="nf">getAmplitudeScalingFactor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getStreamParamf</span><span class="p">(</span><span class="s2">&quot;amplitudeScalingFactor&quot;</span><span class="p">)</span>
+  
+  
+  </div></div>
+<div class="viewcode-block" id="DepthCameraStreamSource"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamSource">[docs]</a><span class="k">class</span> <span class="nc">DepthCameraStreamSource</span><span class="p">(</span><span class="n">StreamSource</span><span class="p">):</span>
+  
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depthCamera</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">DepthCameraStreamSource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="s2">&quot;Live Capture&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">setDepthCamera</span><span class="p">(</span><span class="n">depthCamera</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="DepthCameraStreamSource.isInitialized"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamSource.isInitialized">[docs]</a>  <span class="k">def</span> <span class="nf">isInitialized</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="DepthCameraStreamSource.setDepthCamera"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamSource.setDepthCamera">[docs]</a>  <span class="k">def</span> <span class="nf">setDepthCamera</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depthCamera</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span> <span class="o">=</span> <span class="n">depthCamera</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">frameStreamHandler</span> <span class="o">=</span> <span class="n">depthCamera</span>
+
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">clearAllCallbacks</span><span class="p">()</span>
+    
+      <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">registerCallback</span><span class="p">(</span><span class="n">Voxel</span><span class="o">.</span><span class="n">DepthCamera</span><span class="o">.</span><span class="n">FRAME_RAW_FRAME_UNPROCESSED</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">callbackInternal</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">registerCallback</span><span class="p">(</span><span class="n">Voxel</span><span class="o">.</span><span class="n">DepthCamera</span><span class="o">.</span><span class="n">FRAME_RAW_FRAME_PROCESSED</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">callbackInternal</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">registerCallback</span><span class="p">(</span><span class="n">Voxel</span><span class="o">.</span><span class="n">DepthCamera</span><span class="o">.</span><span class="n">FRAME_DEPTH_FRAME</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">callbackInternal</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">registerCallback</span><span class="p">(</span><span class="n">Voxel</span><span class="o">.</span><span class="n">DepthCamera</span><span class="o">.</span><span class="n">FRAME_XYZI_POINT_CLOUD_FRAME</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">callbackInternal</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="DepthCameraStreamSource.start"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamSource.start">[docs]</a>  <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isPaused</span><span class="p">():</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resume</span><span class="p">()</span>
+    
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">isRunning</span><span class="p">():</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">beforestart</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">start</span><span class="p">():</span>
+        <span class="k">return</span> <span class="bp">False</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">started</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+      <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">False</span>
+    </div>
+<div class="viewcode-block" id="DepthCameraStreamSource.isPaused"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamSource.isPaused">[docs]</a>  <span class="k">def</span> <span class="nf">isPaused</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">isPaused</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">False</span>
+    </div>
+<div class="viewcode-block" id="DepthCameraStreamSource.pause"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamSource.pause">[docs]</a>  <span class="k">def</span> <span class="nf">pause</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="p">:</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">pause</span><span class="p">():</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paused</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">True</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">False</span>
+      </div>
+<div class="viewcode-block" id="DepthCameraStreamSource.resume"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamSource.resume">[docs]</a>  <span class="k">def</span> <span class="nf">resume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="p">:</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">resume</span><span class="p">():</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resumed</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">True</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">False</span>
+    </div>
+<div class="viewcode-block" id="DepthCameraStreamSource.stop"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamSource.stop">[docs]</a>  <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isPaused</span><span class="p">():</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">resume</span><span class="p">()</span>
+    
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="p">:</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">isRunning</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">stop</span><span class="p">():</span>
+          <span class="k">return</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stopped</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">True</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stopped</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">False</span>
+    
+    </div>
+<div class="viewcode-block" id="DepthCameraStreamSource.isLiveStream"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamSource.isLiveStream">[docs]</a>  <span class="k">def</span> <span class="nf">isLiveStream</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">True</span>
+  </div>
+<div class="viewcode-block" id="DepthCameraStreamSource.isRunning"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamSource.isRunning">[docs]</a>  <span class="k">def</span> <span class="nf">isRunning</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="o">.</span><span class="n">isRunning</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">False</span>
+    </div>
+<div class="viewcode-block" id="DepthCameraStreamSource.callbackInternal"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamSource.callbackInternal">[docs]</a>  <span class="k">def</span> <span class="nf">callbackInternal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depthCamera</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">pos</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">id</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">timestamp</span>
+    
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isPaused</span><span class="p">():</span>
+      <span class="k">return</span>
+    
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span><span class="n">depthCamera</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span>
+      
+      </div>
+  <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isRunning</span><span class="p">():</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+      
+    <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span>
+      </div>
+<div class="viewcode-block" id="FileStreamSource"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.FileStreamSource">[docs]</a><span class="k">class</span> <span class="nc">FileStreamSource</span><span class="p">(</span><span class="n">StreamSource</span><span class="p">):</span>
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">cameraSystem</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">FileStreamSource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">runThread</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">running</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">cameraSystem</span> <span class="o">=</span> <span class="n">cameraSystem</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">frameStream</span> <span class="o">=</span> <span class="n">Voxel</span><span class="o">.</span><span class="n">FrameStreamReader</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">filename</span><span class="p">),</span> <span class="n">cameraSystem</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">frameStreamHandler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameStream</span>
+    
+<div class="viewcode-block" id="FileStreamSource.isInitialized"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.FileStreamSource.isInitialized">[docs]</a>  <span class="k">def</span> <span class="nf">isInitialized</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameStream</span><span class="o">.</span><span class="n">isStreamGood</span><span class="p">()</span>
+    </div>
+<div class="viewcode-block" id="FileStreamSource.isLiveStream"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.FileStreamSource.isLiveStream">[docs]</a>  <span class="k">def</span> <span class="nf">isLiveStream</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">False</span>
+  </div>
+<div class="viewcode-block" id="FileStreamSource.isRunning"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.FileStreamSource.isRunning">[docs]</a>  <span class="k">def</span> <span class="nf">isRunning</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">running</span>
+  </div>
+<div class="viewcode-block" id="FileStreamSource.isSeekable"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.FileStreamSource.isSeekable">[docs]</a>  <span class="k">def</span> <span class="nf">isSeekable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">True</span>
+  </div>
+<div class="viewcode-block" id="FileStreamSource.currentPosition"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.FileStreamSource.currentPosition">[docs]</a>  <span class="k">def</span> <span class="nf">currentPosition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameStream</span><span class="o">.</span><span class="n">currentPosition</span><span class="p">()</span>
+  </div>
+<div class="viewcode-block" id="FileStreamSource.currentTimestamp"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.FileStreamSource.currentTimestamp">[docs]</a>  <span class="k">def</span> <span class="nf">currentTimestamp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="mi">0</span>
+    </div>
+<div class="viewcode-block" id="FileStreamSource.length"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.FileStreamSource.length">[docs]</a>  <span class="k">def</span> <span class="nf">length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameStream</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+  </div>
+<div class="viewcode-block" id="FileStreamSource.seek"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.FileStreamSource.seek">[docs]</a>  <span class="k">def</span> <span class="nf">seek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">frameStream</span><span class="o">.</span><span class="n">seekTo</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isRunning</span><span class="p">():</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">processNext</span><span class="p">()</span>
+  </div>
+<div class="viewcode-block" id="FileStreamSource.processNext"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.FileStreamSource.processNext">[docs]</a>  <span class="k">def</span> <span class="nf">processNext</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameStream</span><span class="o">.</span><span class="n">readNext</span><span class="p">():</span>
+      <span class="k">return</span> <span class="bp">False</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameStream</span><span class="o">.</span><span class="n">frames</span><span class="p">[</span><span class="n">Voxel</span><span class="o">.</span><span class="n">DepthCamera</span><span class="o">.</span><span class="n">FRAME_RAW_FRAME_UNPROCESSED</span><span class="p">]</span><span class="o">.</span><span class="n">timestamp</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">frameID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameStream</span><span class="o">.</span><span class="n">frames</span><span class="p">[</span><span class="n">Voxel</span><span class="o">.</span><span class="n">DepthCamera</span><span class="o">.</span><span class="n">FRAME_RAW_FRAME_UNPROCESSED</span><span class="p">]</span><span class="o">.</span><span class="n">id</span>
+    
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameStream</span><span class="o">.</span><span class="n">frames</span><span class="p">[</span><span class="n">Voxel</span><span class="o">.</span><span class="n">DepthCamera</span><span class="o">.</span><span class="n">FRAME_RAW_FRAME_UNPROCESSED</span><span class="p">],</span> <span class="n">Voxel</span><span class="o">.</span><span class="n">DepthCamera</span><span class="o">.</span><span class="n">FRAME_RAW_FRAME_UNPROCESSED</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameStream</span><span class="o">.</span><span class="n">frames</span><span class="p">[</span><span class="n">Voxel</span><span class="o">.</span><span class="n">DepthCamera</span><span class="o">.</span><span class="n">FRAME_RAW_FRAME_PROCESSED</span><span class="p">],</span> <span class="n">Voxel</span><span class="o">.</span><span class="n">DepthCamera</span><span class="o">.</span><span class="n">FRAME_RAW_FRAME_PROCESSED</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameStream</span><span class="o">.</span><span class="n">frames</span><span class="p">[</span><span class="n">Voxel</span><span class="o">.</span><span class="n">DepthCamera</span><span class="o">.</span><span class="n">FRAME_DEPTH_FRAME</span><span class="p">],</span> <span class="n">Voxel</span><span class="o">.</span><span class="n">DepthCamera</span><span class="o">.</span><span class="n">FRAME_DEPTH_FRAME</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameStream</span><span class="o">.</span><span class="n">frames</span><span class="p">[</span><span class="n">Voxel</span><span class="o">.</span><span class="n">DepthCamera</span><span class="o">.</span><span class="n">FRAME_XYZI_POINT_CLOUD_FRAME</span><span class="p">],</span> <span class="n">Voxel</span><span class="o">.</span><span class="n">DepthCamera</span><span class="o">.</span><span class="n">FRAME_XYZI_POINT_CLOUD_FRAME</span><span class="p">)</span>
+      
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isPaused</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isRunning</span><span class="p">():</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">frameStream</span><span class="o">.</span><span class="n">seekTo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frameStream</span><span class="o">.</span><span class="n">currentPosition</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+      
+    <span class="k">return</span> <span class="bp">True</span>
+  </div>
+<div class="viewcode-block" id="FileStreamSource.runLoop"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.FileStreamSource.runLoop">[docs]</a>  <span class="k">def</span> <span class="nf">runLoop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">lastTimeStamp</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">lastFrameIndex</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">running</span><span class="p">:</span>
+      <span class="n">t</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">processNext</span><span class="p">():</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">running</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stopped</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+      
+      <span class="n">t2</span> <span class="o">=</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t</span><span class="p">)</span><span class="o">*</span><span class="mf">1E6</span>
+      <span class="k">if</span> <span class="n">lastTimeStamp</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">-</span> <span class="n">lastTimeStamp</span> <span class="o">-</span> <span class="n">t2</span><span class="p">)</span><span class="o">*</span><span class="mf">1E-6</span>
+        
+        <span class="k">if</span> <span class="n">lastFrameIndex</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameID</span> <span class="o">&gt;</span> <span class="n">lastFrameIndex</span><span class="p">:</span>
+          <span class="n">t</span> <span class="o">/=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frameID</span> <span class="o">-</span> <span class="n">lastFrameIndex</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+          <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+      
+      <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isPaused</span><span class="p">():</span>
+        <span class="n">lastTimeStamp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span>
+        <span class="n">lastFrameIndex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameID</span>
+  </div>
+<div class="viewcode-block" id="FileStreamSource.start"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.FileStreamSource.start">[docs]</a>  <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">frameStream</span><span class="o">.</span><span class="n">isStreamGood</span><span class="p">():</span>
+      <span class="k">return</span> <span class="bp">False</span>
+    
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isPaused</span><span class="p">():</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">resume</span><span class="p">()</span>
+    
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentPosition</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">beforestart</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">running</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">runThread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runLoop</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">runThread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">started</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+    <span class="k">return</span> <span class="bp">True</span>
+  </div>
+<div class="viewcode-block" id="FileStreamSource.pause"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.FileStreamSource.pause">[docs]</a>  <span class="k">def</span> <span class="nf">pause</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">super</span><span class="p">(</span><span class="n">FileStreamSource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">pause</span><span class="p">():</span>
+      <span class="k">return</span> <span class="bp">False</span>
+    
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isRunning</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">runThread</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">runThread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">running</span> <span class="o">=</span> <span class="bp">False</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">runThread</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">running</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">runThread</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">return</span> <span class="bp">True</span>
+      
+  </div>
+<div class="viewcode-block" id="FileStreamSource.stop"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.FileStreamSource.stop">[docs]</a>  <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isPaused</span><span class="p">():</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">pause</span><span class="p">():</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">resume</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">stopped</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">True</span>
+  </div>
+  <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+</div>
+<div class="viewcode-block" id="DepthCameraStreamController"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamController">[docs]</a><span class="k">class</span> <span class="nc">DepthCameraStreamController</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QObject</span><span class="p">):</span>
+  
+  <span class="n">started</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Signal</span><span class="p">()</span>
+  <span class="n">beforestart</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Signal</span><span class="p">()</span>
+  <span class="n">stopped</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Signal</span><span class="p">()</span>
+  <span class="n">paused</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Signal</span><span class="p">()</span>
+  <span class="n">resumed</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Signal</span><span class="p">()</span>
+  <span class="n">sourceListChanged</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Signal</span><span class="p">()</span>
+  <span class="n">sourceSelected</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Signal</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+  <span class="n">onDepthCameraSet</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Signal</span><span class="p">()</span>
+  
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cameraSystem</span><span class="p">,</span> <span class="n">depthCamera</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">DepthCameraStreamController</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span> <span class="o">=</span> <span class="n">depthCamera</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">cameraSystem</span> <span class="o">=</span> <span class="n">cameraSystem</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">depthCameraSourceIndex</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">callbacks</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sources</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Voxel</span><span class="o">.</span><span class="n">DepthCamera</span><span class="o">.</span><span class="n">FRAME_TYPE_COUNT</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
+      
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">addDepthCameraSource</span><span class="p">()</span>
+    
+<div class="viewcode-block" id="DepthCameraStreamController.addDepthCameraSource"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamController.addDepthCameraSource">[docs]</a>  <span class="k">def</span> <span class="nf">addDepthCameraSource</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">DepthCameraStreamSource</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">depthCameraSourceIndex</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sourceListChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">setCurrentSource</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">depthCameraSourceIndex</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="DepthCameraStreamController.getCameraSystem"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamController.getCameraSystem">[docs]</a>  <span class="k">def</span> <span class="nf">getCameraSystem</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cameraSystem</span>
+  </div>
+<div class="viewcode-block" id="DepthCameraStreamController.disconnectDepthCamera"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamController.disconnectDepthCamera">[docs]</a>  <span class="k">def</span> <span class="nf">disconnectDepthCamera</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">onlyFromUI</span> <span class="o">=</span> <span class="bp">False</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span><span class="p">:</span>
+      <span class="k">return</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+    
+<span class="c1">#     if not onlyFromUI:</span>
+<span class="c1">#       if not self.cameraSystem.disconnect(self.depthCamera):</span>
+<span class="c1">#         Logger.writeLog(Voxel.LOG_ERROR, &#39;Failed to disconnect depth camera&#39;)</span>
+<span class="c1">#       </span>
+    <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span> <span class="o">=</span> <span class="bp">None</span>
+    
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">depthCameraSourceIndex</span><span class="p">]:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span> <span class="o">=</span> <span class="bp">None</span>
+    
+    <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">depthCameraSourceIndex</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">depthCameraSourceIndex</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sourceListChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+    </div>
+<div class="viewcode-block" id="DepthCameraStreamController.setDepthCamera"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamController.setDepthCamera">[docs]</a>  <span class="k">def</span> <span class="nf">setDepthCamera</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depthCamera</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span> <span class="o">=</span> <span class="n">depthCamera</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">onDepthCameraSet</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+    
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCameraSourceIndex</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span><span class="o">.</span><span class="n">isRunning</span><span class="p">()</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">depthCameraSourceIndex</span><span class="p">]</span> <span class="ow">and</span> <span class="n">r</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+        
+      <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">depthCameraSourceIndex</span><span class="p">]</span><span class="o">.</span><span class="n">setDepthCamera</span><span class="p">(</span><span class="n">depthCamera</span><span class="p">)</span>
+      
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">depthCameraSourceIndex</span><span class="p">]</span> <span class="ow">and</span> <span class="n">r</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">addDepthCameraSource</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">depthCameraSourceIndex</span><span class="p">]</span><span class="o">.</span><span class="n">setDepthCamera</span><span class="p">(</span><span class="n">depthCamera</span><span class="p">)</span>
+      
+    <span class="bp">self</span><span class="o">.</span><span class="n">sourceSelected</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">currentSourceIndex</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="DepthCameraStreamController.getDepthCamera"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamController.getDepthCamera">[docs]</a>  <span class="k">def</span> <span class="nf">getDepthCamera</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">depthCamera</span>
+  </div>
+<div class="viewcode-block" id="DepthCameraStreamController.getCurrentSource"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamController.getCurrentSource">[docs]</a>  <span class="k">def</span> <span class="nf">getCurrentSource</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;currentSource&#39;</span><span class="p">):</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">None</span>
+    </div>
+<div class="viewcode-block" id="DepthCameraStreamController.setCurrentSource"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamController.setCurrentSource">[docs]</a>  <span class="k">def</span> <span class="nf">setCurrentSource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">pos</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">):</span>
+      <span class="k">print</span> <span class="s2">&quot;DepthCameraStreamController: Invalid source ID = &quot;</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="s2">&quot;, Valid = [0, &quot;</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+      <span class="k">return</span> <span class="bp">False</span>
+    
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;currentSource&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span><span class="o">.</span><span class="n">removeCallback</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span><span class="o">.</span><span class="n">started</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">started</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span><span class="o">.</span><span class="n">beforestart</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">beforestart</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span><span class="o">.</span><span class="n">stopped</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stopped</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span><span class="o">.</span><span class="n">paused</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paused</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span><span class="o">.</span><span class="n">resumed</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resumed</span><span class="p">)</span>
+      
+    <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">currentSourceIndex</span> <span class="o">=</span> <span class="n">pos</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span><span class="o">.</span><span class="n">setCallback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">callbackInternal</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span><span class="o">.</span><span class="n">started</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">started</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span><span class="o">.</span><span class="n">beforestart</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">beforestart</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span><span class="o">.</span><span class="n">stopped</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stopped</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span><span class="o">.</span><span class="n">paused</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paused</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span><span class="o">.</span><span class="n">resumed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resumed</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sourceSelected</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">True</span>
+    </div>
+<div class="viewcode-block" id="DepthCameraStreamController.registerCallback"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamController.registerCallback">[docs]</a>  <span class="k">def</span> <span class="nf">registerCallback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">callback</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">callbacks</span><span class="p">[</span><span class="nb">type</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">True</span>
+    </div>
+<div class="viewcode-block" id="DepthCameraStreamController.clearCallback"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamController.clearCallback">[docs]</a>  <span class="k">def</span> <span class="nf">clearCallback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">callback</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">callbacks</span><span class="p">[</span><span class="nb">type</span><span class="p">]:</span>
+      <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">callback</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">callbacks</span><span class="p">[</span><span class="nb">type</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">return</span> <span class="bp">False</span>
+    </div>
+<div class="viewcode-block" id="DepthCameraStreamController.getSources"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamController.getSources">[docs]</a>  <span class="k">def</span> <span class="nf">getSources</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span>
+  
+    </div>
+<div class="viewcode-block" id="DepthCameraStreamController.addFileStreamSource"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamController.addFileStreamSource">[docs]</a>  <span class="k">def</span> <span class="nf">addFileStreamSource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">:</span>
+      <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">FileStreamSource</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">filename</span> <span class="o">==</span> <span class="n">filename</span><span class="p">:</span>
+          <span class="k">return</span> <span class="n">i</span>
+      <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">FileStreamSource</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cameraSystem</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sourceListChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">i</span>
+  </div>
+<div class="viewcode-block" id="DepthCameraStreamController.removeStreamSource"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamController.removeStreamSource">[docs]</a>  <span class="k">def</span> <span class="nf">removeStreamSource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">index</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">):</span>
+      <span class="k">return</span> <span class="bp">False</span>
+    
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">index</span><span class="p">],</span> <span class="n">DepthCameraStreamSource</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">disconnectDepthCamera</span><span class="p">(</span><span class="n">onlyFromUI</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+    
+    <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sourceListChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+    <span class="k">return</span> <span class="bp">True</span>
+    </div>
+<div class="viewcode-block" id="DepthCameraStreamController.isRunning"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamController.isRunning">[docs]</a>  <span class="k">def</span> <span class="nf">isRunning</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;currentSource&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span><span class="o">.</span><span class="n">isRunning</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">False</span>
+    </div>
+<div class="viewcode-block" id="DepthCameraStreamController.isPaused"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamController.isPaused">[docs]</a>  <span class="k">def</span> <span class="nf">isPaused</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;currentSource&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span><span class="o">.</span><span class="n">isPaused</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">False</span>
+  </div>
+<div class="viewcode-block" id="DepthCameraStreamController.callbackInternal"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamController.callbackInternal">[docs]</a>  <span class="k">def</span> <span class="nf">callbackInternal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depthCamera</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">callbacks</span><span class="p">[</span><span class="nb">type</span><span class="p">]:</span>
+      <span class="n">f</span><span class="p">(</span><span class="n">depthCamera</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span>
+      </div>
+<div class="viewcode-block" id="DepthCameraStreamController.start"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamController.start">[docs]</a>  <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;currentSource&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">False</span>
+    </div>
+<div class="viewcode-block" id="DepthCameraStreamController.pause"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamController.pause">[docs]</a>  <span class="k">def</span> <span class="nf">pause</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;currentSource&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span><span class="o">.</span><span class="n">pause</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">False</span>
+  </div>
+<div class="viewcode-block" id="DepthCameraStreamController.stop"><a class="viewcode-back" href="../../models.html#models.DepthCameraStreamController.DepthCameraStreamController.stop">[docs]</a>  <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;currentSource&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentSource</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">False</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, &#39;Suramya&#39;.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,535 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>wizard.CalibrationLensPage &mdash; SCAW &#39;0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '&#39;0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SCAW &#39;0.1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><h1 style="font-size: 3em;">Voxel Calibration Wizard</h1></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for wizard.CalibrationLensPage</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">from</span> <span class="nn">PySide</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span>
+<span class="kn">from</span> <span class="nn">calibration.CheckerboardLensCalibration</span> <span class="kn">import</span> <span class="n">CheckerBoardLensCalibration</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">calibration.VxlToPng</span> <span class="kn">import</span> <span class="n">vxltoPng</span>
+<span class="kn">from</span> <span class="nn">CalibrationPage</span> <span class="kn">import</span> <span class="n">CalibrationPage</span>
+<span class="kn">from</span> <span class="nn">calibration.FlatWallLensCalib</span> <span class="kn">import</span> <span class="n">flatWallLensCalibration</span>
+<span class="kn">from</span> <span class="nn">capture.CalibrationDataCaptureDialog</span> <span class="kn">import</span> <span class="n">CalibrationDataCaptureDialog</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+
+<div class="viewcode-block" id="CalibrationImage"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationLensPage.CalibrationImage">[docs]</a><span class="k">class</span> <span class="nc">CalibrationImage</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">):</span>
+  
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imageFile</span><span class="p">,</span> <span class="n">calibrationLensPage</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">CalibrationImage</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QIcon</span><span class="p">(</span><span class="n">imageFile</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">imageFile</span><span class="p">))</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">imageFile</span> <span class="o">=</span> <span class="n">imageFile</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">calibrationLensPage</span> <span class="o">=</span> <span class="n">calibrationLensPage</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">criteria</span> <span class="o">=</span> <span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">TERM_CRITERIA_EPS</span> <span class="o">+</span> <span class="n">cv2</span><span class="o">.</span><span class="n">TERM_CRITERIA_MAX_ITER</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="CalibrationImage.computeCorners"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationLensPage.CalibrationImage.computeCorners">[docs]</a>  <span class="k">def</span> <span class="nf">computeCorners</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">rows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationLensPage</span><span class="o">.</span><span class="n">getValues</span><span class="p">()</span>
+
+    <span class="c1"># prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">objpoints</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">rows</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">objpoints</span><span class="p">[:,:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">rows</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+    
+    <span class="bp">self</span><span class="o">.</span><span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">imageFile</span><span class="p">)</span>
+    <span class="n">gray</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2GRAY</span><span class="p">)</span><span class="c1"># images are converted to grayscale</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">imageShape</span> <span class="o">=</span> <span class="n">gray</span><span class="o">.</span><span class="n">shape</span>
+    
+    <span class="c1"># Find the chess board corners</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">ret</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">corners</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">findChessboardCorners</span><span class="p">(</span><span class="n">gray</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rows</span><span class="p">),</span><span class="bp">None</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">corners</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">cv2</span><span class="o">.</span><span class="n">cornerSubPix</span><span class="p">(</span><span class="n">gray</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">corners</span><span class="p">,</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">),(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">criteria</span><span class="p">)</span>
+      </div>
+<div class="viewcode-block" id="CalibrationImage.showCorners"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationLensPage.CalibrationImage.showCorners">[docs]</a>  <span class="k">def</span> <span class="nf">showCorners</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">computeCorners</span><span class="p">()</span>
+    
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">corners</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrationLensPage</span><span class="p">,</span> <span class="s1">&#39;Corners not found&#39;</span><span class="p">,</span> <span class="s1">&#39;Necessary corners could not be computed&#39;</span><span class="p">)</span>
+      <span class="k">return</span>
+    
+    <span class="n">cv2</span><span class="o">.</span><span class="n">drawChessboardCorners</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rows</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">corners</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ret</span><span class="p">)</span>
+    <span class="n">cv2</span><span class="o">.</span><span class="n">namedWindow</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">imageFile</span><span class="p">),</span> <span class="n">cv2</span><span class="o">.</span><span class="n">WINDOW_NORMAL</span><span class="p">)</span>
+    <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">imageFile</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">)</span>
+    <span class="n">cv2</span><span class="o">.</span><span class="n">waitKey</span><span class="p">()</span>
+    <span class="n">cv2</span><span class="o">.</span><span class="n">destroyWindow</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">imageFile</span><span class="p">))</span>
+    
+    <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">img</span>
+
+
+</div></div>
+<div class="viewcode-block" id="CalibrationLensPage"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationLensPage.CalibrationLensPage">[docs]</a><span class="k">class</span> <span class="nc">CalibrationLensPage</span><span class="p">(</span><span class="n">CalibrationPage</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calibration Lens page for computation of the lens parameters&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">calibrationWizard</span><span class="p">):</span>
+        <span class="nb">super</span> <span class="p">(</span><span class="n">CalibrationLensPage</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span> <span class="o">=</span> <span class="n">calibrationWizard</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setTitle</span><span class="p">(</span><span class="s1">&#39;Lens Calibration&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setSubTitle</span><span class="p">(</span><span class="s1">&#39;Select files for calibration&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrated</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span> <span class="o">=</span> <span class="bp">None</span>
+        
+<div class="viewcode-block" id="CalibrationLensPage.initializePage"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationLensPage.CalibrationLensPage.initializePage">[docs]</a>    <span class="k">def</span> <span class="nf">initializePage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>    
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrateButton</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s1">&#39;Calibrate&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrateButton</span><span class="o">.</span><span class="n">setDisabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+
+        <span class="n">label</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Select Data Source&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibLayout</span> <span class="o">=</span> <span class="s1">&#39;self.&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibs</span><span class="p">[</span><span class="s1">&#39;lens&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;()&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrateType</span> <span class="o">=</span> <span class="s1">&#39;self.&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibs</span><span class="p">[</span><span class="s1">&#39;lens&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;Calib()&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lensPath</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">groupbox</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paramsGroupBox</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">depthCamera</span><span class="p">:</span>
+            <span class="n">depthCamera</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">depthCamera</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lensPath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">profilePath</span>\
+             <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="n">depthCamera</span><span class="o">.</span><span class="n">name</span><span class="p">()</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="n">depthCamera</span><span class="o">.</span><span class="n">id</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;)&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrateButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrate</span><span class="p">)</span>
+        </div>
+<div class="viewcode-block" id="CalibrationLensPage.cleanupPage"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationLensPage.CalibrationLensPage.cleanupPage">[docs]</a>    <span class="k">def</span> <span class="nf">cleanupPage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clearLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">)</span>
+        </div>
+<div class="viewcode-block" id="CalibrationLensPage.setLayout"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationLensPage.CalibrationLensPage.setLayout">[docs]</a>    <span class="k">def</span> <span class="nf">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">eval</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibLayout</span><span class="p">)</span>
+        </div>
+<div class="viewcode-block" id="CalibrationLensPage.CheckerBoard"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationLensPage.CalibrationLensPage.CheckerBoard">[docs]</a>    <span class="k">def</span> <span class="nf">CheckerBoard</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Select the directory for the images. Also, select the no of rows and colums&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lensPath</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> 
+            <span class="n">hlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+            <span class="n">hlayout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lensPathButton</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s1">&#39;Select Image Path&#39;</span><span class="p">)</span>
+            <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lensPathButton</span><span class="p">)</span>
+            <span class="n">hlayout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">hlayout</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lensPathButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setDirectory</span><span class="p">)</span>    
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rows</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSpinBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rows</span><span class="o">.</span><span class="n">setMaximum</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rows</span><span class="o">.</span><span class="n">setMinimum</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rows</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rowValue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rows</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        <span class="n">rowlabel</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;rows&#39;</span><span class="p">)</span>
+        <span class="n">collabel</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;cols&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cols</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSpinBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="o">.</span><span class="n">setMaximum</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="o">.</span><span class="n">setMinimum</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">colValue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rows</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setValues</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setValues</span><span class="p">)</span>
+        <span class="n">hlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">rowlabel</span><span class="p">)</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rows</span><span class="p">)</span>
+<span class="c1">#         hlayout.addStretch()</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">collabel</span><span class="p">)</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">hlayout</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lensPath</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lensPath</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lensPath</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">populateImages</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="CalibrationLensPage.setDirectory"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationLensPage.CalibrationLensPage.setDirectory">[docs]</a>    <span class="k">def</span> <span class="nf">setDirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>   
+        <span class="n">lensPath</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getExistingDirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Open the folder Containing Images&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lensPath</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">lensPath</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">paramsGroupBox</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">paramsGroupBox</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrated</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">completeChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lensPath</span> <span class="o">=</span> <span class="n">lensPath</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lensPathButton</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s1">&#39;Change Path&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">populateImages</span><span class="p">()</span>
+        </div>
+<div class="viewcode-block" id="CalibrationLensPage.populateImages"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationLensPage.CalibrationLensPage.populateImages">[docs]</a>    <span class="k">def</span> <span class="nf">populateImages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">groupbox</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">groupbox</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QGroupBox</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">groupbox</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">groupbox</span><span class="o">.</span><span class="n">setTitle</span><span class="p">(</span><span class="s1">&#39;Input Images showing Lens Distortion&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidget</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="o">.</span><span class="n">keyPressEvent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibratedImagesKeyPressEvent</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="o">.</span><span class="n">setResizeMode</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QListView</span><span class="o">.</span><span class="n">Adjust</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="o">.</span><span class="n">setWordWrap</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="o">.</span><span class="n">setTextElideMode</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">ElideNone</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="o">.</span><span class="n">itemDoubleClicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">showImage</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="o">.</span><span class="n">setContextMenuPolicy</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">CustomContextMenu</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="o">.</span><span class="n">customContextMenuRequested</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">showContextMenu</span><span class="p">)</span>
+        
+            <span class="bp">self</span><span class="o">.</span><span class="n">menu</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="p">)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">removeAction</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QAction</span><span class="p">(</span><span class="s1">&#39;Remove&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">removeAction</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deleteImage</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">removeAction</span><span class="o">.</span><span class="n">setShortcut</span><span class="p">(</span><span class="s1">&#39;Del&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">removeAction</span><span class="p">)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">showAction</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QAction</span><span class="p">(</span><span class="s1">&#39;Show Corners&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">showAction</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">showImage</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">showAction</span><span class="o">.</span><span class="n">setShortcut</span><span class="p">(</span><span class="s1">&#39;Return&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">showAction</span><span class="p">)</span>
+            
+            <span class="n">vglayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+            <span class="n">vglayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">groupbox</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">vglayout</span><span class="p">)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="o">.</span><span class="n">setViewMode</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QListView</span><span class="o">.</span><span class="n">IconMode</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="o">.</span><span class="n">setIconSize</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">QSize</span><span class="p">(</span><span class="mi">80</span><span class="p">,</span> <span class="mi">60</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="o">.</span><span class="n">setSpacing</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">depthCamera</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QIcon</span><span class="p">(</span><span class="s2">&quot;images/add.png&quot;</span><span class="p">),</span> <span class="s1">&#39;Add&#39;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidgetItem</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QIcon</span><span class="p">(</span><span class="s2">&quot;images/add.png&quot;</span><span class="p">),</span> <span class="s1">&#39;Add&#39;</span><span class="p">))</span>
+            
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lensPath</span><span class="p">):</span>
+          <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lensPath</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImageFiles</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lensPath</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="s1">&#39;*.png&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImageFiles</span><span class="p">:</span>
+            <span class="n">images</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lensPath</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="s1">&#39;*.vxl&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">images</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="n">images</span><span class="p">:</span>
+                    <span class="n">vxltoPng</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">image</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImageFiles</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lensPath</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="s1">&#39;*.png&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImageFiles</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">depthCamera</span><span class="p">:</span>
+                <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;No images found&quot;</span><span class="p">,</span> <span class="s2">&quot;Select a different Directory&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImageFiles</span><span class="p">:</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="o">.</span><span class="n">insertItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">CalibrationImage</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrateButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">setCalibrateButton</span><span class="p">()</span></div>
+<div class="viewcode-block" id="CalibrationLensPage.showContextMenu"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationLensPage.CalibrationLensPage.showContextMenu">[docs]</a>    <span class="k">def</span> <span class="nf">showContextMenu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="o">.</span><span class="n">itemAt</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">item</span><span class="p">:</span>
+          <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="o">.</span><span class="n">row</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+          
+          <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">menu</span><span class="o">.</span><span class="n">popup</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="o">.</span><span class="n">mapToGlobal</span><span class="p">(</span><span class="n">point</span><span class="p">))</span>
+            
+    </div>
+<div class="viewcode-block" id="CalibrationLensPage.calibratedImagesKeyPressEvent"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationLensPage.CalibrationLensPage.calibratedImagesKeyPressEvent">[docs]</a>    <span class="k">def</span> <span class="nf">calibratedImagesKeyPressEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_Return</span><span class="p">:</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">showImage</span><span class="p">()</span>
+          <span class="n">event</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key_Delete</span><span class="p">:</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">deleteImage</span><span class="p">()</span>
+          <span class="n">event</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="n">QtGui</span><span class="o">.</span><span class="n">QListWidget</span><span class="o">.</span><span class="n">keyPressEvent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="CalibrationLensPage.showImage"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationLensPage.CalibrationLensPage.showImage">[docs]</a>    <span class="k">def</span> <span class="nf">showImage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">item</span><span class="p">:</span>
+          <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="o">.</span><span class="n">currentItem</span><span class="p">()</span>
+          
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">CalibrationImage</span><span class="p">):</span>
+          <span class="n">item</span><span class="o">.</span><span class="n">showCorners</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1"># Capture and add image</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">depthCamera</span><span class="p">:</span>
+                <span class="n">newFileName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lensPath</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.png&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H-%M-%S&#39;</span><span class="p">))</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">CalibrationDataCaptureDialog</span><span class="o">.</span><span class="n">showDialog</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">cameraSystem</span><span class="p">,</span> \
+                  <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">depthCamera</span><span class="p">,</span> <span class="n">newFileName</span><span class="p">,</span>
+                  <span class="s1">&#39;amplitude&#39;</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">errorMessage</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="p">()</span>
+                <span class="n">errorMessage</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;Can&#39;t capture Data. Please ensure that the camera is added correctly. &quot;</span><span class="p">)</span>
+                <span class="n">errorMessage</span><span class="o">.</span><span class="n">setStandardButtons</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">Ok</span><span class="p">)</span>
+                <span class="n">errorMessage</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span>
+                <span class="k">return</span>
+            <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">return</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">addImage</span><span class="p">(</span><span class="n">newFileName</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="CalibrationLensPage.deleteImage"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationLensPage.CalibrationLensPage.deleteImage">[docs]</a>    <span class="k">def</span> <span class="nf">deleteImage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="o">.</span><span class="n">currentItem</span><span class="p">()</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">item</span><span class="p">:</span>
+            <span class="k">return</span>
+        
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">CalibrationImage</span><span class="p">):</span>
+          
+            <span class="n">d</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">question</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="p">,</span> <span class="s1">&#39;Remove Image&#39;</span><span class="p">,</span> \
+                <span class="s1">&#39;Are you sure you want to remove the image?&#39;</span><span class="p">,</span> <span class="n">buttons</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">Yes</span> <span class="o">|</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">No</span><span class="p">)</span>
+          
+            <span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">Yes</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">imageFile</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="o">.</span><span class="n">takeItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="o">.</span><span class="n">row</span><span class="p">(</span><span class="n">item</span><span class="p">))</span>
+        </div>
+<div class="viewcode-block" id="CalibrationLensPage.addImage"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationLensPage.CalibrationLensPage.addImage">[docs]</a>    <span class="k">def</span> <span class="nf">addImage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="o">.</span><span class="n">insertItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrationImages</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">CalibrationImage</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span>    
+                </div>
+<div class="viewcode-block" id="CalibrationLensPage.CheckerBoardCalib"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationLensPage.CalibrationLensPage.CheckerBoardCalib">[docs]</a>    <span class="k">def</span> <span class="nf">CheckerBoardCalib</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ret</span><span class="p">,</span> <span class="n">mtx</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">CheckerBoardLensCalibration</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lensPath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rowValue</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">colValue</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setCalibParams</span><span class="p">(</span><span class="n">mtx</span><span class="p">,</span> <span class="n">dist</span><span class="p">)</span>
+            <span class="n">dist</span> <span class="o">=</span> <span class="n">dist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;cx = </span><span class="si">%f</span><span class="se">\n</span><span class="s2">cy = </span><span class="si">%f</span><span class="se">\n</span><span class="s2">fx = </span><span class="si">%f</span><span class="se">\n</span><span class="s2">fy = </span><span class="si">%f</span><span class="se">\n</span><span class="s2">k1 = </span><span class="si">%f</span><span class="se">\n</span><span class="s2">k2 = </span><span class="si">%f</span><span class="se">\n</span><span class="s2">k3 = </span><span class="si">%f</span><span class="se">\n</span><span class="s2">p1 = </span><span class="si">%f</span><span class="se">\n</span><span class="s2">p2 = </span><span class="si">%f</span><span class="se">\n</span><span class="s2">&quot;</span>\
+            <span class="o">%</span><span class="p">(</span><span class="n">mtx</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="n">mtx</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="n">mtx</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">mtx</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">dist</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dist</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dist</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">dist</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">dist</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">paramsText</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">paramsGroupBox</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrated</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Lens Calibration&quot;</span><span class="p">,</span> <span class="s2">&quot;Cannot perform lens calibration&quot;</span><span class="p">)</span>    
+                </div>
+<div class="viewcode-block" id="CalibrationLensPage.FlatWall"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationLensPage.CalibrationLensPage.FlatWall">[docs]</a>    <span class="k">def</span> <span class="nf">FlatWall</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="n">nearLabel</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Distance from the wall&#39;</span><span class="p">)</span>
+        <span class="n">fileLabel</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Select near source file&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nearDist</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QDoubleSpinBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nearDist</span><span class="o">.</span><span class="n">setRange</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nearDist</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="mf">0.4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nearValue</span> <span class="o">=</span> <span class="mf">0.4</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nearDist</span><span class="o">.</span><span class="n">setSingleStep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">farDist</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QDoubleSpinBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">farDist</span><span class="o">.</span><span class="n">setRange</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">farDist</span><span class="o">.</span><span class="n">setSingleStep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">farDist</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="mf">0.8</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">farValue</span> <span class="o">=</span> <span class="mf">0.8</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">nearLabel</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nearDist</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">farDist</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setDistanceValues</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nearDist</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setDistanceValues</span><span class="p">)</span>
+        
+        <span class="n">fileButton</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s1">&#39;Select File&#39;</span><span class="p">)</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">fileLabel</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">fileButton</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span>
+        <span class="n">fileButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selectFileDialog</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nearFileText</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLineEdit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nearFileText</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nearFileText</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nearFileText</span><span class="p">)</span>
+        
+        <span class="n">farLabel</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Distance from the wall&#39;</span><span class="p">)</span>
+        <span class="n">fileLabel2</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Select far source file&#39;</span><span class="p">)</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">farLabel</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">farDist</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span>
+        
+        <span class="n">fileButton2</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s1">&#39;Select File2&#39;</span><span class="p">)</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">fileLabel2</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">fileButton2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span>
+        <span class="n">fileButton2</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selectFileDialog</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">farFileText</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLineEdit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">farFileText</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">farFileText</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">farFileText</span><span class="p">)</span>    
+        <span class="bp">self</span><span class="o">.</span><span class="n">setCalibrateButton</span><span class="p">()</span>
+        </div>
+<div class="viewcode-block" id="CalibrationLensPage.FlatWallCalib"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationLensPage.CalibrationLensPage.FlatWallCalib">[docs]</a>    <span class="k">def</span> <span class="nf">FlatWallCalib</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ret</span><span class="p">,</span> <span class="n">mtx</span><span class="p">,</span> <span class="n">dist</span> <span class="o">=</span> <span class="n">flatWallLensCalibration</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nearValue</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileName2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">farValue</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ret</span><span class="p">:</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">setCalibParams</span><span class="p">(</span><span class="n">mtx</span><span class="p">,</span> <span class="n">dist</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrated</span> <span class="o">=</span> <span class="bp">True</span>
+            </div>
+<div class="viewcode-block" id="CalibrationLensPage.selectFileDialog"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationLensPage.CalibrationLensPage.selectFileDialog">[docs]</a>    <span class="k">def</span> <span class="nf">selectFileDialog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">depthCamera</span><span class="p">:</span>
+            <span class="n">name</span><span class="p">,</span> <span class="n">_</span>  <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Select VXL file&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="s1">&#39;VXL files (*.vxl)&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">DontUseNativeDialog</span><span class="p">)</span>    
+    <span class="c1">#         name, filter = QtGui.QFileDialog.getOpenFileName(self, &#39;Select CSV File&#39;, filter = &#39;*.csv (CSV Files)&#39;)</span>
+            <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">paths</span><span class="p">[</span><span class="s1">&#39;flatWall&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    
+                    <span class="bp">self</span><span class="o">.</span><span class="n">nearFileText</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">nearFileText</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+                
+                <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">fileName2</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileName2</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">fileName2</span> <span class="o">=</span> <span class="bp">None</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">selectFileDialog</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">farFileText</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName2</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">farFileText</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>    
+                        <span class="bp">self</span><span class="o">.</span><span class="n">calibrateButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">newFileName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lensPath</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="s1">&#39;FlatWall </span><span class="si">%s</span><span class="s1">.vxl&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H-%M-%S&#39;</span><span class="p">))</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">CalibrationDataCaptureDialog</span><span class="o">.</span><span class="n">showDialog</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">cameraSystem</span><span class="p">,</span> \
+                  <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">depthCamera</span><span class="p">,</span> <span class="n">newFileName</span><span class="p">,</span>
+                  <span class="s1">&#39;phase&#39;</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+<span class="c1">#             if data is None:</span>
+<span class="c1">#                 return </span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span> <span class="o">=</span> <span class="n">newFileName</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">nearFileText</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">nearFileText</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fileName2</span> <span class="o">=</span> <span class="n">newFileName</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrateButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">farFileText</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName2</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">farFileText</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+<div class="viewcode-block" id="CalibrationLensPage.setCalibrateButton"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationLensPage.CalibrationLensPage.setCalibrateButton">[docs]</a>    <span class="k">def</span> <span class="nf">setCalibrateButton</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">hlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrateButton</span><span class="p">)</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">hlayout</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">paramsGroupBox</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">paramsGroupBox</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QGroupBox</span><span class="p">(</span><span class="s2">&quot;Calibration Parameters&quot;</span><span class="p">)</span>
+            <span class="n">vlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">paramsGroupBox</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">vlayout</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paramsGroupBox</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">paramsText</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">()</span>
+            <span class="n">vlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paramsText</span><span class="p">)</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">paramsGroupBox</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>    
+            </div>
+<div class="viewcode-block" id="CalibrationLensPage.calibrate"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationLensPage.CalibrationLensPage.calibrate">[docs]</a>    <span class="k">def</span> <span class="nf">calibrate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">eval</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrateType</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">completeChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+        
+        </div>
+<div class="viewcode-block" id="CalibrationLensPage.setValues"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationLensPage.CalibrationLensPage.setValues">[docs]</a>    <span class="k">def</span> <span class="nf">setValues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>    
+        <span class="bp">self</span><span class="o">.</span><span class="n">rowValue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rows</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">colValue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+   </div>
+<div class="viewcode-block" id="CalibrationLensPage.setDistanceValues"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationLensPage.CalibrationLensPage.setDistanceValues">[docs]</a>    <span class="k">def</span> <span class="nf">setDistanceValues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nearValue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nearDist</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">farValue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">farDist</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>    </div>
+<div class="viewcode-block" id="CalibrationLensPage.getValues"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationLensPage.CalibrationLensPage.getValues">[docs]</a>    <span class="k">def</span> <span class="nf">getValues</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rows</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>    
+        </div>
+<div class="viewcode-block" id="CalibrationLensPage.setCalibParams"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationLensPage.CalibrationLensPage.setCalibParams">[docs]</a>    <span class="k">def</span> <span class="nf">setCalibParams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mtx</span><span class="p">,</span> <span class="n">dist</span><span class="p">):</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="n">dist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">fx</span> <span class="o">=</span> <span class="n">mtx</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">fy</span> <span class="o">=</span> <span class="n">mtx</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">cx</span> <span class="o">=</span> <span class="n">mtx</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">cy</span> <span class="o">=</span> <span class="n">mtx</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="n">k1</span> <span class="o">=</span> <span class="n">dist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">k2</span> <span class="o">=</span> <span class="n">dist</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">p1</span> <span class="o">=</span> <span class="n">dist</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">p2</span> <span class="o">=</span> <span class="n">dist</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">k3</span> <span class="o">=</span> <span class="n">dist</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">k1</span> <span class="o">=</span> <span class="n">dist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">k2</span> <span class="o">=</span> <span class="n">dist</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">k3</span> <span class="o">=</span> <span class="n">dist</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">p1</span> <span class="o">=</span> <span class="n">p2</span> <span class="o">=</span> <span class="mi">0</span>    
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">k1</span> <span class="o">=</span> <span class="n">k2</span> <span class="o">=</span> <span class="n">k3</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">p1</span> <span class="o">=</span> <span class="n">p2</span> <span class="o">=</span> <span class="mi">0</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">[</span><span class="s1">&#39;fx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">[</span><span class="s1">&#39;fy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">[</span><span class="s1">&#39;cx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">[</span><span class="s1">&#39;cy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">[</span><span class="s1">&#39;k1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">k1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">[</span><span class="s1">&#39;k2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">k2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">[</span><span class="s1">&#39;p1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">[</span><span class="s1">&#39;p2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">[</span><span class="s1">&#39;k3&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">k3</span>
+ </div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, &#39;Suramya&#39;.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+    </div>
+  </body>
+</html>

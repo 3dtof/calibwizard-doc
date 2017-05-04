@@ -1,0 +1,177 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>calibration.FlatWallLensCalib &mdash; SCAW &#39;0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '&#39;0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SCAW &#39;0.1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><h1 style="font-size: 3em;">Voxel Calibration Wizard</h1></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for calibration.FlatWallLensCalib</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">ComputeAveragePhase</span> <span class="kn">import</span> <span class="n">computeAveragePhases</span>
+<span class="kn">import</span> <span class="nn">Voxel</span>
+<span class="kn">import</span> <span class="nn">scipy.ndimage</span> <span class="kn">as</span> <span class="nn">snd</span> 
+<span class="kn">import</span> <span class="nn">scipy.optimize</span> <span class="kn">as</span> <span class="nn">sopt</span>
+
+<span class="sd">&quot;&quot;&quot;FlatWallLensCalibration: Uses two-distance algorithm for computing lens parameters. </span>
+
+<span class="sd">Takes VXL of a flat wall at two distances as input. Gives lens parameters as the output</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="flatWallLensCalibration"><a class="viewcode-back" href="../../calibration.html#calibration.FlatWallLensCalib.flatWallLensCalibration">[docs]</a><span class="k">def</span> <span class="nf">flatWallLensCalibration</span><span class="p">(</span><span class="n">fileName1</span><span class="p">,</span> <span class="n">distance1</span><span class="p">,</span> <span class="n">fileName2</span><span class="p">,</span> <span class="n">distance2</span><span class="p">,</span> <span class="n">cx</span><span class="o">=</span> <span class="mi">0</span> <span class="p">,</span> <span class="n">cy</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="n">camsys</span> <span class="o">=</span> <span class="n">Voxel</span><span class="o">.</span><span class="n">CameraSystem</span><span class="p">()</span>
+    <span class="n">nearPhase</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">computeAveragePhases</span><span class="p">(</span><span class="n">camsys</span><span class="p">,</span> <span class="n">fileName1</span><span class="p">,</span> <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span>  <span class="n">window</span><span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">farPhase</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">computeAveragePhases</span><span class="p">(</span><span class="n">camsys</span><span class="p">,</span> <span class="n">fileName2</span><span class="p">,</span> <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">window</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">deltaPhase</span> <span class="o">=</span> <span class="n">farPhase</span> <span class="o">-</span> <span class="n">nearPhase</span>
+    <span class="n">deltaPhaseSmooth</span> <span class="o">=</span> <span class="n">snd</span><span class="o">.</span><span class="n">uniform_filter</span> <span class="p">(</span><span class="n">deltaPhase</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
+ <span class="c1"># 1. Compute normal pixel</span>
+    <span class="n">ny</span><span class="p">,</span> <span class="n">nx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">deltaPhaseSmooth</span><span class="p">),</span> <span class="n">deltaPhase</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">rows</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">deltaPhase</span><span class="o">.</span><span class="n">shape</span>
+    <span class="c1"># 2. Construct a set of all possible distances from the Normal Pixel</span>
+     <span class="c1"># a is the set of all squared distances from the normal pixel</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">rows</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">rows</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">columns</span><span class="p">,)))</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">rows</span><span class="p">,)),</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">columns</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">columns</span><span class="p">))</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">ny</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">nx</span><span class="p">)</span>
+    
+    <span class="c1"># a1 is the set of all unique distances from the normal pixel</span>
+    <span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">inverse</span><span class="p">)</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">return_inverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="c1"># a_root is the matrix of all pixel distances from the normal pixel</span>
+    <span class="n">a1Root</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">a1</span><span class="p">)</span>
+    <span class="c1"># inverse1 is the matrix with the index in a1 of a pixel&#39;s distance from the normal pixel</span>
+    <span class="n">inverse1</span> <span class="o">=</span> <span class="n">inverse</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    
+    <span class="c1"># 3. For every distance, take the set of pixels at the same distance from the normal pixel</span>
+    <span class="c1"># and take the mean of the corresponding cosThetas at each distance</span>
+    <span class="n">cosThetas</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">cosThetaMatrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">inverse1</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">a1</span><span class="p">):</span>
+      <span class="n">i</span> <span class="o">=</span> <span class="n">inverse1</span> <span class="o">==</span> <span class="n">index</span>
+      <span class="n">co</span> <span class="o">=</span> <span class="n">deltaPhaseSmooth</span><span class="p">[</span><span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">]</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">deltaPhaseSmooth</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+      <span class="n">cosThetas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">co</span><span class="p">)</span>
+      <span class="n">cosThetaMatrix</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">co</span>
+    
+    <span class="n">cosThetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cosThetas</span><span class="p">)</span>
+    <span class="c1"># This array is now the set of pixel distances vs cosThetas</span>
+    <span class="c1"># We can use this directly to compute per pixel offsets if we like</span>
+    
+    <span class="c1"># Note: there might be some cosThetas &gt; 1. Clamping it for now</span>
+    <span class="n">cosThetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">cosThetas</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">cosThetaMatrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">cosThetaMatrix</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    
+    <span class="c1"># 4. Note: before computing tanThetas, we need to translate these to Cx, Cy - see step 4 in the PPT</span>
+    <span class="n">cosThetas</span> <span class="o">=</span> <span class="n">cosThetas</span><span class="o">*</span><span class="n">deltaPhaseSmooth</span><span class="p">[</span><span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">]</span><span class="o">/</span><span class="n">deltaPhaseSmooth</span><span class="p">[</span><span class="n">cy</span><span class="p">,</span> <span class="n">cx</span><span class="p">]</span>
+    <span class="n">cosThetaMatrix</span> <span class="o">=</span> <span class="n">cosThetaMatrix</span><span class="o">*</span><span class="n">deltaPhaseSmooth</span><span class="p">[</span><span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">]</span><span class="o">/</span><span class="n">deltaPhaseSmooth</span><span class="p">[</span><span class="n">cy</span><span class="p">,</span> <span class="n">cx</span><span class="p">]</span>
+    
+    <span class="n">tanThetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">cosThetas</span><span class="p">))</span>
+    
+    <span class="c1"># 5. Use either scipy.optimize.curve_fit or np.linalg.lstsq to fit the tanTheta function</span>
+    <span class="c1"># x is pixel distance (a1_root)</span>
+    <span class="c1"># and tanThetas is the measured tanTheta</span>
+    <span class="c1"># Note: should we skip a few distances at the beginning?</span>
+    <span class="n">popt</span><span class="p">,</span> <span class="n">pcov</span> <span class="o">=</span> <span class="n">sopt</span><span class="o">.</span><span class="n">curve_fit</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k3</span><span class="p">:</span>  <span class="n">f</span><span class="o">*</span><span class="n">x</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="o">*</span><span class="p">(</span><span class="n">k1</span> <span class="o">+</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="o">*</span><span class="p">(</span><span class="n">k2</span> <span class="o">+</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="o">*</span><span class="n">k3</span><span class="p">))),</span> <span class="n">tanThetas</span><span class="p">,</span> <span class="n">a1Root</span><span class="p">)</span>
+    <span class="c1">#popt[] should now be f, k1, k2, k3</span>
+    <span class="c1"># And can be used for distortion matrix</span>
+    <span class="c1"># p1, p2 are assumed to be 0 (no tangential distortion) and fx, fy are assumed to be equal to f</span>
+    <span class="k">if</span> <span class="n">popt</span> <span class="ow">and</span> <span class="n">pcov</span><span class="p">:</span>
+        <span class="n">mtx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">popt</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="n">cx</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">popt</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">cy</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span> <span class="p">,</span><span class="mi">0</span> <span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">popt</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">popt</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="mf">0.</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">popt</span><span class="p">[</span><span class="mi">3</span><span class="p">]])</span>
+        
+        <span class="k">return</span> <span class="bp">True</span><span class="p">,</span> <span class="n">mtx</span><span class="p">,</span> <span class="n">dist</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, &#39;Suramya&#39;.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+    </div>
+  </body>
+</html>

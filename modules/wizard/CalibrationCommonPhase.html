@@ -1,0 +1,308 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>wizard.CalibrationCommonPhase &mdash; SCAW &#39;0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '&#39;0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SCAW &#39;0.1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><h1 style="font-size: 3em;">Voxel Calibration Wizard</h1></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for wizard.CalibrationCommonPhase</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">PySide</span> <span class="kn">import</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span>
+<span class="kn">from</span> <span class="nn">calibration.CommonPhaseOffsetRawDataSimpleAverage</span> <span class="kn">import</span> <span class="n">commonPhaseOffset</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">CalibrationPage</span> <span class="kn">import</span> <span class="n">CalibrationPage</span>
+
+<div class="viewcode-block" id="CalibrationCommonPhasePage"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationCommonPhase.CalibrationCommonPhasePage">[docs]</a><span class="k">class</span> <span class="nc">CalibrationCommonPhasePage</span><span class="p">(</span><span class="n">CalibrationPage</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the common phase offsets for a particular chipset</span>
+<span class="sd">    </span>
+<span class="sd">    Uses a vxl file of a flat wall and returns the common phase offset. The file can be recorded using Voxel Viewer. </span>
+<span class="sd">    </span>
+<span class="sd">    **Parameters**:</span>
+<span class="sd">        -dealias_en: If the parameter dealias_en is true or false</span>
+<span class="sd">        -fileName1: VXL file pointing to the flat wall, captured using voxel viewer</span>
+<span class="sd">        -modFreq1: Modulation Frequency 1, corresponding to the frequency used in fileName1</span>
+<span class="sd">        -distance: Distance of the camera from the flat wall</span>
+<span class="sd">        -fileName2: VXL file pointing to the flat wall, captured using voxel viewer</span>
+<span class="sd">        -modFreq2: Modulation Frequency 2, corresponding to the frequency used in fileName2</span>
+<span class="sd">        </span>
+<span class="sd">    .. note:: </span>
+<span class="sd">        If dealias_en is true, capture the first vxl using the following method for saving vxl files:</span>
+<span class="sd">            - Open Voxel Viewer</span>
+<span class="sd">            - Set ind_freq_data_en True</span>
+<span class="sd">            - Set ind_freq_data_sel as False</span>
+<span class="sd">            - Capture data (at least 200 frames)</span>
+<span class="sd">        </span>
+<span class="sd">        For second modulation frequency, turn ind_freq_data_sel to True and capture data again.</span>
+<span class="sd">        </span>
+<span class="sd">    - Make sure that the distance of the camera does **not** change while capturing data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">calibrationWizard</span><span class="p">):</span>
+        <span class="nb">super</span> <span class="p">(</span><span class="n">CalibrationCommonPhasePage</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span> <span class="o">=</span> <span class="n">calibrationWizard</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrated</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setTitle</span><span class="p">(</span><span class="s1">&#39;Common Phase Calibration&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setSubTitle</span><span class="p">(</span><span class="s1">&#39;Please provide the two files, distances and modulation frequencies.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fileName2</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">doShow</span>  <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainLayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+<span class="c1">#         If file2 and modulation frequency 2 are not selected, &#39;)</span>
+<div class="viewcode-block" id="CalibrationCommonPhasePage.initializePage"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.initializePage">[docs]</a>    <span class="k">def</span> <span class="nf">initializePage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibLayout</span> <span class="o">=</span> <span class="s1">&#39;self.&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibs</span><span class="p">[</span><span class="s1">&#39;commonPhase&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;()&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrateType</span> <span class="o">=</span> <span class="s1">&#39;self.&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibs</span><span class="p">[</span><span class="s1">&#39;commonPhase&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;Calib()&#39;</span>
+
+        <span class="nb">eval</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibLayout</span><span class="p">)</span>                                
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrateButton</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s1">&#39;Calibrate&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrateButton</span><span class="o">.</span><span class="n">setDisabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">hlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrateButton</span><span class="p">)</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">hlayout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrateButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrate</span><span class="p">)</span>
+        </div>
+<div class="viewcode-block" id="CalibrationCommonPhasePage.FlatWall"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.FlatWall">[docs]</a>    <span class="k">def</span> <span class="nf">FlatWall</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">helperText</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;If you&#39;re using just one modulation frequency, enter the data under fileName1, modulation frequency 1 and distance 1&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">helperText</span><span class="p">)</span>
+        <span class="n">helperText</span><span class="o">.</span><span class="n">setWordWrap</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dealiasEn</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QCheckBox</span><span class="p">(</span><span class="s2">&quot;Dealias Enabled&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dealiasEn</span><span class="o">.</span><span class="n">stateChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">showSecondFrequency</span><span class="p">)</span>
+        <span class="n">hlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dealiasEn</span><span class="p">)</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">hlayout</span><span class="p">)</span>
+        <span class="n">hlayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">button</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s1">&#39;Select File1&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLineEdit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">button</span><span class="p">)</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">hlayout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">button2</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s1">&#39;Select File2&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">button2</span><span class="o">.</span><span class="n">setDisabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">button2</span><span class="p">)</span>
+        <span class="n">hlayout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+        <span class="n">lineLayout</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">lineLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">line</span><span class="p">)</span>
+        <span class="n">lineLayout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line2</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLineEdit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line2</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line2</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+        <span class="n">lineLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">line2</span><span class="p">)</span>
+        <span class="n">lineLayout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">lineLayout</span><span class="p">)</span>
+<span class="c1">#         if self.calibrationWizard.paths[&#39;flatWall&#39;] is not None:</span>
+<span class="c1">#             self.button.setDisabled()</span>
+<span class="c1">#             self.label = QtGui.QLabel()</span>
+<span class="c1">#             pathText = &#39;Path to vxl&#39; +  self.calibrationWizard.paths[&#39;flatWall&#39;]    </span>
+<span class="c1">#             self.label.setText(pathText)</span>
+<span class="c1">#             self.layout.addWidget(self.label)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">button</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selectFileDialog</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">button2</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selectFileDialog</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">freqLabel1</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;ModFreq1&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frequency1</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSpinBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frequency1</span><span class="o">.</span><span class="n">setRange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frequency1</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="mi">40</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">freqLabel2</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;ModFreq2&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frequency2</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QSpinBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frequency2</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frequency2</span><span class="o">.</span><span class="n">setRange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frequency2</span><span class="o">.</span><span class="n">setDisabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modFreq1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frequency1</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modFreq2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frequency2</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>   
+        <span class="n">freqLayout</span><span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">freqLayout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+        <span class="n">freqLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">freqLabel1</span><span class="p">)</span>
+        <span class="n">freqLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frequency1</span><span class="p">)</span>
+        <span class="n">freqLayout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+        <span class="n">freqLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">freqLabel2</span><span class="p">)</span>
+        <span class="n">freqLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frequency2</span><span class="p">)</span>
+        <span class="n">freqLayout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">freqLayout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frequency1</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getValues</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frequency2</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getValues</span><span class="p">)</span>
+        
+        <span class="n">distLabel1</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s1">&#39;Distance&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dist1</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QDoubleSpinBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dist1</span><span class="o">.</span><span class="n">setRange</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dist1</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="mf">0.7</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dist1</span><span class="o">.</span><span class="n">setSingleStep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">distance1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist1</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>   
+        <span class="n">distLayout</span><span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">distLayout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+        <span class="n">distLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">distLabel1</span><span class="p">)</span>
+        <span class="n">distLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dist1</span><span class="p">)</span>
+        <span class="n">distLayout</span><span class="o">.</span><span class="n">addStretch</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">distLayout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dist1</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getValues</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">valueLabel</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainLayout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">)</span>
+        </div>
+<div class="viewcode-block" id="CalibrationCommonPhasePage.cleanupPage"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.cleanupPage">[docs]</a>    <span class="k">def</span> <span class="nf">cleanupPage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clearLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">)</span>    
+        </div>
+<div class="viewcode-block" id="CalibrationCommonPhasePage.selectFileDialog"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.selectFileDialog">[docs]</a>    <span class="k">def</span> <span class="nf">selectFileDialog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+
+        <span class="n">name</span><span class="p">,</span> <span class="n">_</span>  <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Select VXL file&#39;</span><span class="p">,</span> <span class="nb">filter</span> <span class="o">=</span> <span class="s1">&#39;VXL files (*.vxl)&#39;</span><span class="p">)</span>    
+<span class="c1">#         name, filter = QtGui.QFileDialog.getOpenFileName(self, &#39;Select CSV File&#39;, filter = &#39;*.csv (CSV Files)&#39;)</span>
+        <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">paths</span><span class="p">[</span><span class="s1">&#39;flatWall&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dealiasEn</span><span class="o">.</span><span class="n">isChecked</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">calibrateButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">line</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">line</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            
+            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fileName2</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileName2</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">fileName2</span> <span class="o">=</span> <span class="bp">None</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">selectFileDialog</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">line2</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName2</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">line2</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>    
+                    <span class="bp">self</span><span class="o">.</span><span class="n">calibrateButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+<span class="c1">#             if len(name)&gt;1:</span>
+<span class="c1">#                 self.fileName2 = str(name[1])</span>
+<span class="c1">#                 self.calibrationWizard.paths[&#39;flatWall&#39;].append(str(name[1]))</span></div>
+<div class="viewcode-block" id="CalibrationCommonPhasePage.showSecondFrequency"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.showSecondFrequency">[docs]</a>    <span class="k">def</span> <span class="nf">showSecondFrequency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dealiasEn</span><span class="o">.</span><span class="n">isChecked</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">button2</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">frequency2</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileName2</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrateButton</span><span class="o">.</span><span class="n">setDisabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">button2</span><span class="o">.</span><span class="n">setDisabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">frequency2</span><span class="o">.</span><span class="n">setDisabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrateButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span></div>
+<div class="viewcode-block" id="CalibrationCommonPhasePage.calibrate"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.calibrate">[docs]</a>    <span class="k">def</span> <span class="nf">calibrate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">eval</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calibrateType</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibrated</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">completeChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+<span class="c1">#     </span></div>
+<div class="viewcode-block" id="CalibrationCommonPhasePage.FlatWallCalib"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.FlatWallCalib">[docs]</a>    <span class="k">def</span> <span class="nf">FlatWallCalib</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">commonPhaseOffset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">distance1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">modFreq1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileName2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">modFreq2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">camera</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">valueLabel</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">valueLabel</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QLabel</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+            <span class="n">QtGui</span><span class="o">.</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;Cannot get the correct phaseCorr value. Please Check data&quot;</span><span class="p">)</span>
+            
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="n">boo</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">phaseCorr1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">phaseCorr2</span><span class="p">,</span> <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">ret</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;phaseCorr1 = </span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phaseCorr1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">phaseCorr2</span><span class="p">:</span>
+                <span class="n">text</span> <span class="o">+=</span>  <span class="s2">&quot;phaseCorr2 = </span><span class="si">%d</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phaseCorr2</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">valueLabel</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valueLabel</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">[</span><span class="s1">&#39;phase_corr_1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">phaseCorr1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrationWizard</span><span class="o">.</span><span class="n">calibParams</span><span class="p">[</span><span class="s1">&#39;phase_corr_2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">phaseCorr2</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calibrated</span> <span class="o">=</span> <span class="bp">True</span>
+        </div>
+<div class="viewcode-block" id="CalibrationCommonPhasePage.getValues"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.getValues">[docs]</a>    <span class="k">def</span> <span class="nf">getValues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modFreq1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frequency1</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modFreq2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frequency2</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>    
+        <span class="bp">self</span><span class="o">.</span><span class="n">distance1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist1</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>        </div>
+<div class="viewcode-block" id="CalibrationCommonPhasePage.isComplete"><a class="viewcode-back" href="../../wizard.html#wizard.CalibrationCommonPhase.CalibrationCommonPhasePage.isComplete">[docs]</a>    <span class="k">def</span> <span class="nf">isComplete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">calibrated</span>    
+        </div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, &#39;Suramya&#39;.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+    </div>
+  </body>
+</html>

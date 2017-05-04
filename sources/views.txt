@@ -1,0 +1,78 @@
+views package
+=============
+
+Submodules
+----------
+
+views.CustomAction 
+-------------------------
+
+.. automodule:: views.CustomAction
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+views.CustomHistogramLUTWidget 
+-------------------------------------
+
+.. automodule:: views.CustomHistogramLUTWidget
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+views.CustomViewBox 
+--------------------------
+
+.. automodule:: views.CustomViewBox
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+views.DataView 
+---------------------
+
+.. automodule:: views.DataView
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+views.DataView2D 
+-----------------------
+
+.. automodule:: views.DataView2D
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+views.DataViewContainer 
+------------------------------
+
+.. automodule:: views.DataViewContainer
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+views.QxtSpanSlider 
+--------------------------
+
+.. automodule:: views.QxtSpanSlider
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+views.SelectDepthCameraDialog 
+------------------------------------
+
+.. automodule:: views.SelectDepthCameraDialog
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+ contents
+---------------
+
+.. automodule:: views
+    :members:
+    :undoc-members:
+    :show-inheritance:

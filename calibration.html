@@ -1,0 +1,528 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>calibration package &mdash; SCAW &#39;0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="static/default.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '&#39;0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/underscore.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SCAW &#39;0.1.0 documentation" href="index.html" />
+    <link rel="next" title="capture package" href="capture.html" />
+    <link rel="prev" title="CalibrationWizard" href="CalibrationWizard.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="index.html"><h1 style="font-size: 3em;">Voxel Calibration Wizard</h1></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="capture.html" title="capture package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="CalibrationWizard.html" title="CalibrationWizard"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">home</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+ 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">calibration package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-calibration.CalibrationsCommandLine">calibration.CalibrationsCommandLine</a></li>
+<li><a class="reference internal" href="#module-calibration.CheckerboardLensCalibration">calibration.CheckerboardLensCalibration</a></li>
+<li><a class="reference internal" href="#module-calibration.CommonPhaseOffsetComplexAverage">calibration.CommonPhaseOffsetComplexAverage</a></li>
+<li><a class="reference internal" href="#module-calibration.CommonPhaseOffsetRawDataComplexAverage">calibration.CommonPhaseOffsetRawDataComplexAverage</a></li>
+<li><a class="reference internal" href="#module-calibration.CommonPhaseOffsetRawDataSimpleAverage">calibration.CommonPhaseOffsetRawDataSimpleAverage</a></li>
+<li><a class="reference internal" href="#module-calibration.CommonPhaseOffsetSimpleAverage">calibration.CommonPhaseOffsetSimpleAverage</a></li>
+<li><a class="reference internal" href="#module-calibration.ComputeAveragePhase">calibration.ComputeAveragePhase</a></li>
+<li><a class="reference internal" href="#module-calibration.FlatWallLensCalib">calibration.FlatWallLensCalib</a></li>
+<li><a class="reference internal" href="#module-calibration.HDRcommonphaseoffset">calibration.HDRcommonphaseoffset</a></li>
+<li><a class="reference internal" href="#module-calibration.NonLinearityCalibration">calibration.NonLinearityCalibration</a></li>
+<li><a class="reference internal" href="#module-calibration.PerPixelOffset">calibration.PerPixelOffset</a></li>
+<li><a class="reference internal" href="#module-calibration.TemperatureCalibration">calibration.TemperatureCalibration</a></li>
+<li><a class="reference internal" href="#module-calibration.VxlToPng">calibration.VxlToPng</a></li>
+<li><a class="reference internal" href="#calibration-saveconfigfile">calibration.saveConfigFile</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="CalibrationWizard.html"
+                        title="previous chapter">CalibrationWizard</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="capture.html"
+                        title="next chapter">capture package</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="sources/calibration.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="calibration-package">
+<h1>calibration package<a class="headerlink" href="#calibration-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-calibration.CalibrationsCommandLine">
+<span id="calibration-calibrationscommandline"></span><h2>calibration.CalibrationsCommandLine<a class="headerlink" href="#module-calibration.CalibrationsCommandLine" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="calibration.CalibrationsCommandLine.parseArgs">
+<tt class="descclassname">calibration.CalibrationsCommandLine.</tt><tt class="descname">parseArgs</tt><big>(</big><em>args=None</em><big>)</big><a class="reference internal" href="modules/calibration/CalibrationsCommandLine.html#parseArgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.CalibrationsCommandLine.parseArgs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-calibration.CheckerboardLensCalibration">
+<span id="calibration-checkerboardlenscalibration"></span><h2>calibration.CheckerboardLensCalibration<a class="headerlink" href="#module-calibration.CheckerboardLensCalibration" title="Permalink to this headline">¶</a></h2>
+<p>Checkerboard Lens Calibration - uses the open cv algorithm to compute calibration 
+parameters for a lens. Takes PNGs or VXLs as input. Also converts the vxls into pngs.
+Rows and columns of the checkerboard need to be provided.
+Usage:
+python CheckerBoardLensCalibration.py &#8211;file filePath &#8211;rows rows &#8211;cols cols</p>
+<dl class="function">
+<dt id="calibration.CheckerboardLensCalibration.CheckerBoardLensCalibration">
+<tt class="descclassname">calibration.CheckerboardLensCalibration.</tt><tt class="descname">CheckerBoardLensCalibration</tt><big>(</big><em>filePath</em>, <em>rows</em>, <em>cols</em><big>)</big><a class="reference internal" href="modules/calibration/CheckerboardLensCalibration.html#CheckerBoardLensCalibration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.CheckerboardLensCalibration.CheckerBoardLensCalibration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns Lens Parameters and distortion coefficients using images or vxl files of a checkerboard taken in different orientations.</p>
+<blockquote>
+<div>Checkerboard Lens Calibration - uses the open cv algorithm to compute calibration 
+parameters for a lens. Takes PNGs or VXLs as input. Also converts the vxls into pngs.
+Rows and columns of the checkerboard need to be provided.</div></blockquote>
+<ul>
+<li><p class="first"><strong>Parameters</strong> required:</p>
+<div class="highlight-python"><pre>:param filePath: Takes the path of the file with checkerboard images / vxl files
+:param rows: Rows present in the checkerboard
+:param cols: Columns present in the checkerboard</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Use at least ten images of the checkerboard in different orientations to get the correct result</p>
+</div>
+</li>
+</ul>
+</dd></dl>
+
+<dl class="function">
+<dt id="calibration.CheckerboardLensCalibration.parseArgs">
+<tt class="descclassname">calibration.CheckerboardLensCalibration.</tt><tt class="descname">parseArgs</tt><big>(</big><em>args=None</em><big>)</big><a class="reference internal" href="modules/calibration/CheckerboardLensCalibration.html#parseArgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.CheckerboardLensCalibration.parseArgs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parsing the arguments in the command line - this is used to get the parameters using this script</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-calibration.CommonPhaseOffsetComplexAverage">
+<span id="calibration-commonphaseoffsetcomplexaverage"></span><h2>calibration.CommonPhaseOffsetComplexAverage<a class="headerlink" href="#module-calibration.CommonPhaseOffsetComplexAverage" title="Permalink to this headline">¶</a></h2>
+<p>CommonPhaseOffset.py - takes vxl file as input along with modulation frequency and distance to give phaseCorr values. 
+Requires two vxl files - one for each frequency to calculate phase corr 1 and phase corr 2
+&#8216;&#8217;&#8216;</p>
+<p>&#8216;&#8217;&#8216;Example Script:
+python CommonPhaseOffset.py -f &#8220;file.vxl&#8221; -d 0.7 -m 20  -c tintin.ti (-n 10 -g &#8220;file2.vxl&#8221;)
+or 
+python CommonPhaseOffset.py &#8211;file1 &#8220;file.vxl&#8221; &#8211;distance 0.7 &#8211;modFreq1 20 &#8211;chipset tintin.ti (&#8211;modFreq2 10 &#8211;file2 &#8220;file2.vxl&#8221;)</p>
+<dl class="function">
+<dt id="calibration.CommonPhaseOffsetComplexAverage.commonPhaseOffset">
+<tt class="descclassname">calibration.CommonPhaseOffsetComplexAverage.</tt><tt class="descname">commonPhaseOffset</tt><big>(</big><em>file1</em>, <em>distance</em>, <em>modFreq1</em>, <em>cx</em>, <em>cy</em>, <em>file2=None</em>, <em>modFreq2=None</em>, <em>window=4</em>, <em>chipset='ti.tinitn'</em><big>)</big><a class="reference internal" href="modules/calibration/CommonPhaseOffsetComplexAverage.html#commonPhaseOffset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.CommonPhaseOffsetComplexAverage.commonPhaseOffset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the common phase offsets.</p>
+<p>This function calculates the common phase offsets for a given file, taking VXL as input.</p>
+<p><strong>Parameters</strong>:</p>
+<div class="highlight-python"><pre>- file1, file2: File(s) for computing common phase offsets. These should be vxl files of a flat wall. The camera should be almost parallel to the wall.
+- modFreq1, modFreq2 : Modulation Frequency (ies) when the data is captured. If dealiasing is enabled, two modulation frequencies are required
+- cx, cy: The coordinates of the center pixel, found during lens calibration. If cx and cy are not available, the central value (120,160) is taken.
+- window: The window size. By default, a window of 4x4 is required. 
+- chipset: The chipset being used. </pre>
+</div>
+<p><strong>Returns</strong>:</p>
+<div class="highlight-python"><pre>- phase_Corr1: Phase offset value for the first modulation frequency
+- phase_Corr2: Phase offset value for the second modulation frequency</pre>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="calibration.CommonPhaseOffsetComplexAverage.computeAveragePhases">
+<tt class="descclassname">calibration.CommonPhaseOffsetComplexAverage.</tt><tt class="descname">computeAveragePhases</tt><big>(</big><em>camsys</em>, <em>filename</em>, <em>cx=0</em>, <em>cy=0</em>, <em>window=4</em><big>)</big><a class="reference internal" href="modules/calibration/CommonPhaseOffsetComplexAverage.html#computeAveragePhases"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.CommonPhaseOffsetComplexAverage.computeAveragePhases" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the average phases for a given file. Uses the complex average for getting phase value</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="calibration.CommonPhaseOffsetComplexAverage.parseArgs">
+<tt class="descclassname">calibration.CommonPhaseOffsetComplexAverage.</tt><tt class="descname">parseArgs</tt><big>(</big><em>args=None</em><big>)</big><a class="reference internal" href="modules/calibration/CommonPhaseOffsetComplexAverage.html#parseArgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.CommonPhaseOffsetComplexAverage.parseArgs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parsing the arguments in the command line - this is used to get the parameters using this script</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="calibration.CommonPhaseOffsetComplexAverage.wrapPhaseToSignedInteger">
+<tt class="descclassname">calibration.CommonPhaseOffsetComplexAverage.</tt><tt class="descname">wrapPhaseToSignedInteger</tt><big>(</big><em>phase</em><big>)</big><a class="reference internal" href="modules/calibration/CommonPhaseOffsetComplexAverage.html#wrapPhaseToSignedInteger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.CommonPhaseOffsetComplexAverage.wrapPhaseToSignedInteger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keeps the phase offset value between -2048 and 2048</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-calibration.CommonPhaseOffsetRawDataComplexAverage">
+<span id="calibration-commonphaseoffsetrawdatacomplexaverage"></span><h2>calibration.CommonPhaseOffsetRawDataComplexAverage<a class="headerlink" href="#module-calibration.CommonPhaseOffsetRawDataComplexAverage" title="Permalink to this headline">¶</a></h2>
+<p>CommonPhaseOffset.py - takes vxl file as input along with modulation frequency and distance to give phaseCorr values. 
+Requires two vxl files - one for each frequency to calculate phase corr 1 and phase corr 2
+&#8216;&#8217;&#8216;</p>
+<p>&#8216;&#8217;&#8216;Example Script:
+python CommonPhaseOffset.py -f &#8220;file.vxl&#8221; -d 0.7 -m 20  -c tintin.ti (-n 10 -g &#8220;file2.vxl&#8221;)
+or 
+python CommonPhaseOffset.py &#8211;file1 &#8220;file.vxl&#8221; &#8211;distance 0.7 &#8211;modFreq1 20 &#8211;chipset tintin.ti (&#8211;modFreq2 10 &#8211;file2 &#8220;file2.vxl&#8221;)</p>
+<dl class="function">
+<dt id="calibration.CommonPhaseOffsetRawDataComplexAverage.commonPhaseOffset">
+<tt class="descclassname">calibration.CommonPhaseOffsetRawDataComplexAverage.</tt><tt class="descname">commonPhaseOffset</tt><big>(</big><em>file1</em>, <em>distance</em>, <em>modFreq1</em>, <em>cx</em>, <em>cy</em>, <em>file2=None</em>, <em>modFreq2=None</em>, <em>window=4</em>, <em>chipset='ti.tinitn'</em><big>)</big><a class="reference internal" href="modules/calibration/CommonPhaseOffsetRawDataComplexAverage.html#commonPhaseOffset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.CommonPhaseOffsetRawDataComplexAverage.commonPhaseOffset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the common phase offsets.</p>
+<p>This function calculates the common phase offsets for a given file, taking VXL as input.</p>
+<p><strong>Parameters</strong>:</p>
+<div class="highlight-python"><pre>- file1, file2: File(s) for computing common phase offsets. These should be vxl files of a flat wall. The camera should be almost parallel to the wall.
+- modFreq1, modFreq2 : Modulation Frequency (ies) when the data is captured. If dealiasing is enabled, two modulation frequencies are required
+- cx, cy: The coordinates of the center pixel, found during lens calibration. If cx and cy are not available, the central value (120,160) is taken.
+- window: The window size. By default, a window of 4x4 is required. 
+- chipset: The chipset being used. </pre>
+</div>
+<p><strong>Returns</strong>:</p>
+<div class="highlight-python"><pre>- phase_Corr1: Phase offset value for the first modulation frequency
+- phase_Corr2: Phase offset value for the second modulation frequency</pre>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="calibration.CommonPhaseOffsetRawDataComplexAverage.computeAveragePhases">
+<tt class="descclassname">calibration.CommonPhaseOffsetRawDataComplexAverage.</tt><tt class="descname">computeAveragePhases</tt><big>(</big><em>camsys</em>, <em>fileName</em>, <em>window=4</em>, <em>cx=0</em>, <em>cy=0</em><big>)</big><a class="reference internal" href="modules/calibration/CommonPhaseOffsetRawDataComplexAverage.html#computeAveragePhases"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.CommonPhaseOffsetRawDataComplexAverage.computeAveragePhases" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the average phases for a given file. Uses the complex average for getting phase value</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="calibration.CommonPhaseOffsetRawDataComplexAverage.extractPhasesandAmplitudes">
+<tt class="descclassname">calibration.CommonPhaseOffsetRawDataComplexAverage.</tt><tt class="descname">extractPhasesandAmplitudes</tt><big>(</big><em>fileName</em>, <em>camsys</em><big>)</big><a class="reference internal" href="modules/calibration/CommonPhaseOffsetRawDataComplexAverage.html#extractPhasesandAmplitudes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.CommonPhaseOffsetRawDataComplexAverage.extractPhasesandAmplitudes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts just phase and amplitude values from the parsed frames</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="calibration.CommonPhaseOffsetRawDataComplexAverage.extractRawdataFromVXL">
+<tt class="descclassname">calibration.CommonPhaseOffsetRawDataComplexAverage.</tt><tt class="descname">extractRawdataFromVXL</tt><big>(</big><em>filename</em>, <em>camsys</em><big>)</big><a class="reference internal" href="modules/calibration/CommonPhaseOffsetRawDataComplexAverage.html#extractRawdataFromVXL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.CommonPhaseOffsetRawDataComplexAverage.extractRawdataFromVXL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes raw data from vxl file</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="calibration.CommonPhaseOffsetRawDataComplexAverage.parseArgs">
+<tt class="descclassname">calibration.CommonPhaseOffsetRawDataComplexAverage.</tt><tt class="descname">parseArgs</tt><big>(</big><em>args=None</em><big>)</big><a class="reference internal" href="modules/calibration/CommonPhaseOffsetRawDataComplexAverage.html#parseArgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.CommonPhaseOffsetRawDataComplexAverage.parseArgs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parsing the arguments in the command line - this is used to get the parameters using this script</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="calibration.CommonPhaseOffsetRawDataComplexAverage.parseframe">
+<tt class="descclassname">calibration.CommonPhaseOffsetRawDataComplexAverage.</tt><tt class="descname">parseframe</tt><big>(</big><em>frame</em>, <em>rows=240</em>, <em>cols=320</em><big>)</big><a class="reference internal" href="modules/calibration/CommonPhaseOffsetRawDataComplexAverage.html#parseframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.CommonPhaseOffsetRawDataComplexAverage.parseframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses the values given by the group by 16 mode of the code and gives individual frames. Required for using raw data</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="calibration.CommonPhaseOffsetRawDataComplexAverage.wrapPhaseToSignedInteger">
+<tt class="descclassname">calibration.CommonPhaseOffsetRawDataComplexAverage.</tt><tt class="descname">wrapPhaseToSignedInteger</tt><big>(</big><em>phase</em><big>)</big><a class="reference internal" href="modules/calibration/CommonPhaseOffsetRawDataComplexAverage.html#wrapPhaseToSignedInteger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.CommonPhaseOffsetRawDataComplexAverage.wrapPhaseToSignedInteger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keeps the phase offset value between -2048 and 2048</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-calibration.CommonPhaseOffsetRawDataSimpleAverage">
+<span id="calibration-commonphaseoffsetrawdatasimpleaverage"></span><h2>calibration.CommonPhaseOffsetRawDataSimpleAverage<a class="headerlink" href="#module-calibration.CommonPhaseOffsetRawDataSimpleAverage" title="Permalink to this headline">¶</a></h2>
+<p>CommonPhaseOffset.py - takes vxl file as input along with modulation frequency and distance to give phaseCorr values. 
+Requires two vxl files - one for each frequency to calculate phase corr 1 and phase corr 2
+&#8216;&#8217;&#8216;</p>
+<p>&#8216;&#8217;&#8216;Example Script:
+python CommonPhaseOffset.py -f &#8220;file.vxl&#8221; -d 0.7 -m 20  -c tintin.ti (-n 10 -g &#8220;file2.vxl&#8221;)
+or 
+python CommonPhaseOffset.py &#8211;file1 &#8220;file.vxl&#8221; &#8211;distance 0.7 &#8211;modFreq1 20 &#8211;chipset tintin.ti (&#8211;modFreq2 10 &#8211;file2 &#8220;file2.vxl&#8221;)</p>
+<dl class="function">
+<dt id="calibration.CommonPhaseOffsetRawDataSimpleAverage.commonPhaseOffset">
+<tt class="descclassname">calibration.CommonPhaseOffsetRawDataSimpleAverage.</tt><tt class="descname">commonPhaseOffset</tt><big>(</big><em>file1</em>, <em>distance</em>, <em>modFreq1</em>, <em>cx</em>, <em>cy</em>, <em>file2=None</em>, <em>modFreq2=None</em>, <em>window=4</em>, <em>chipset='ti.tinitn'</em><big>)</big><a class="reference internal" href="modules/calibration/CommonPhaseOffsetRawDataSimpleAverage.html#commonPhaseOffset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.CommonPhaseOffsetRawDataSimpleAverage.commonPhaseOffset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the common phase offsets.</p>
+<p>This function calculates the common phase offsets for a given file, taking VXL as input.</p>
+<p><strong>Parameters</strong>:</p>
+<div class="highlight-python"><pre>- file1, file2: File(s) for computing common phase offsets. These should be vxl files of a flat wall. The camera should be almost parallel to the wall.
+- modFreq1, modFreq2 : Modulation Frequency (ies) when the data is captured. If dealiasing is enabled, two modulation frequencies are required
+- cx, cy: The coordinates of the center pixel, found during lens calibration. If cx and cy are not available, the central value (120,160) is taken.
+- window: The window size. By default, a window of 4x4 is required. 
+- chipset: The chipset being used. </pre>
+</div>
+<p><strong>Returns</strong>:</p>
+<div class="highlight-python"><pre>- phase_Corr1: Phase offset value for the first modulation frequency
+- phase_Corr2: Phase offset value for the second modulation frequency</pre>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="calibration.CommonPhaseOffsetRawDataSimpleAverage.computeAveragePhases">
+<tt class="descclassname">calibration.CommonPhaseOffsetRawDataSimpleAverage.</tt><tt class="descname">computeAveragePhases</tt><big>(</big><em>camsys</em>, <em>fileName</em>, <em>window=4</em>, <em>cx=0</em>, <em>cy=0</em><big>)</big><a class="reference internal" href="modules/calibration/CommonPhaseOffsetRawDataSimpleAverage.html#computeAveragePhases"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.CommonPhaseOffsetRawDataSimpleAverage.computeAveragePhases" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the average phases for a given file. Uses simple average for getting phase value</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="calibration.CommonPhaseOffsetRawDataSimpleAverage.extractPhasesandAmplitudes">
+<tt class="descclassname">calibration.CommonPhaseOffsetRawDataSimpleAverage.</tt><tt class="descname">extractPhasesandAmplitudes</tt><big>(</big><em>fileName</em>, <em>camsys</em><big>)</big><a class="reference internal" href="modules/calibration/CommonPhaseOffsetRawDataSimpleAverage.html#extractPhasesandAmplitudes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.CommonPhaseOffsetRawDataSimpleAverage.extractPhasesandAmplitudes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts just phase and amplitude values from the parsed frames</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="calibration.CommonPhaseOffsetRawDataSimpleAverage.extractRawdataFromVXL">
+<tt class="descclassname">calibration.CommonPhaseOffsetRawDataSimpleAverage.</tt><tt class="descname">extractRawdataFromVXL</tt><big>(</big><em>filename</em>, <em>camsys</em><big>)</big><a class="reference internal" href="modules/calibration/CommonPhaseOffsetRawDataSimpleAverage.html#extractRawdataFromVXL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.CommonPhaseOffsetRawDataSimpleAverage.extractRawdataFromVXL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes raw data from vxl file</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="calibration.CommonPhaseOffsetRawDataSimpleAverage.parseArgs">
+<tt class="descclassname">calibration.CommonPhaseOffsetRawDataSimpleAverage.</tt><tt class="descname">parseArgs</tt><big>(</big><em>args=None</em><big>)</big><a class="reference internal" href="modules/calibration/CommonPhaseOffsetRawDataSimpleAverage.html#parseArgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.CommonPhaseOffsetRawDataSimpleAverage.parseArgs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parsing the arguments in the command line - this is used to get the parameters using this script</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="calibration.CommonPhaseOffsetRawDataSimpleAverage.parseframe">
+<tt class="descclassname">calibration.CommonPhaseOffsetRawDataSimpleAverage.</tt><tt class="descname">parseframe</tt><big>(</big><em>frame</em>, <em>rows=240</em>, <em>cols=320</em><big>)</big><a class="reference internal" href="modules/calibration/CommonPhaseOffsetRawDataSimpleAverage.html#parseframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.CommonPhaseOffsetRawDataSimpleAverage.parseframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses the values given by the group by 16 mode of the code and gives individual frames. Required for using raw data</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="calibration.CommonPhaseOffsetRawDataSimpleAverage.wrapPhaseToSignedInteger">
+<tt class="descclassname">calibration.CommonPhaseOffsetRawDataSimpleAverage.</tt><tt class="descname">wrapPhaseToSignedInteger</tt><big>(</big><em>phase</em><big>)</big><a class="reference internal" href="modules/calibration/CommonPhaseOffsetRawDataSimpleAverage.html#wrapPhaseToSignedInteger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.CommonPhaseOffsetRawDataSimpleAverage.wrapPhaseToSignedInteger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keeps the phase offset value between -2048 and 2048</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-calibration.CommonPhaseOffsetSimpleAverage">
+<span id="calibration-commonphaseoffsetsimpleaverage"></span><h2>calibration.CommonPhaseOffsetSimpleAverage<a class="headerlink" href="#module-calibration.CommonPhaseOffsetSimpleAverage" title="Permalink to this headline">¶</a></h2>
+<p>CommonPhaseOffset.py - takes vxl file as input along with modulation frequency and distance to give phaseCorr values. 
+Requires two vxl files - one for each frequency to calculate phase corr 1 and phase corr 2</p>
+<dl class="function">
+<dt id="calibration.CommonPhaseOffsetSimpleAverage.commonPhaseOffset">
+<tt class="descclassname">calibration.CommonPhaseOffsetSimpleAverage.</tt><tt class="descname">commonPhaseOffset</tt><big>(</big><em>file1</em>, <em>distance</em>, <em>modFreq1</em>, <em>cx</em>, <em>cy</em>, <em>file2=None</em>, <em>modFreq2=None</em>, <em>window=4</em>, <em>chipset='ti.tinitn'</em><big>)</big><a class="reference internal" href="modules/calibration/CommonPhaseOffsetSimpleAverage.html#commonPhaseOffset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.CommonPhaseOffsetSimpleAverage.commonPhaseOffset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="calibration.CommonPhaseOffsetSimpleAverage.computeAveragePhases">
+<tt class="descclassname">calibration.CommonPhaseOffsetSimpleAverage.</tt><tt class="descname">computeAveragePhases</tt><big>(</big><em>camsys</em>, <em>filename</em>, <em>cx=0</em>, <em>cy=0</em>, <em>window=4</em><big>)</big><a class="reference internal" href="modules/calibration/CommonPhaseOffsetSimpleAverage.html#computeAveragePhases"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.CommonPhaseOffsetSimpleAverage.computeAveragePhases" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="calibration.CommonPhaseOffsetSimpleAverage.parseArgs">
+<tt class="descclassname">calibration.CommonPhaseOffsetSimpleAverage.</tt><tt class="descname">parseArgs</tt><big>(</big><em>args=None</em><big>)</big><a class="reference internal" href="modules/calibration/CommonPhaseOffsetSimpleAverage.html#parseArgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.CommonPhaseOffsetSimpleAverage.parseArgs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="calibration.CommonPhaseOffsetSimpleAverage.wrapPhaseToSignedInteger">
+<tt class="descclassname">calibration.CommonPhaseOffsetSimpleAverage.</tt><tt class="descname">wrapPhaseToSignedInteger</tt><big>(</big><em>phase</em><big>)</big><a class="reference internal" href="modules/calibration/CommonPhaseOffsetSimpleAverage.html#wrapPhaseToSignedInteger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.CommonPhaseOffsetSimpleAverage.wrapPhaseToSignedInteger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-calibration.ComputeAveragePhase">
+<span id="calibration-computeaveragephase"></span><h2>calibration.ComputeAveragePhase<a class="headerlink" href="#module-calibration.ComputeAveragePhase" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="calibration.ComputeAveragePhase.computeAveragePhases">
+<tt class="descclassname">calibration.ComputeAveragePhase.</tt><tt class="descname">computeAveragePhases</tt><big>(</big><em>camsys</em>, <em>filename</em>, <em>cx=0</em>, <em>cy=0</em>, <em>window=4</em><big>)</big><a class="reference internal" href="modules/calibration/ComputeAveragePhase.html#computeAveragePhases"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.ComputeAveragePhase.computeAveragePhases" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-calibration.FlatWallLensCalib">
+<span id="calibration-flatwalllenscalib"></span><h2>calibration.FlatWallLensCalib<a class="headerlink" href="#module-calibration.FlatWallLensCalib" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="calibration.FlatWallLensCalib.flatWallLensCalibration">
+<tt class="descclassname">calibration.FlatWallLensCalib.</tt><tt class="descname">flatWallLensCalibration</tt><big>(</big><em>fileName1</em>, <em>distance1</em>, <em>fileName2</em>, <em>distance2</em>, <em>cx=0</em>, <em>cy=0</em><big>)</big><a class="reference internal" href="modules/calibration/FlatWallLensCalib.html#flatWallLensCalibration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.FlatWallLensCalib.flatWallLensCalibration" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-calibration.HDRcommonphaseoffset">
+<span id="calibration-hdrcommonphaseoffset"></span><h2>calibration.HDRcommonphaseoffset<a class="headerlink" href="#module-calibration.HDRcommonphaseoffset" title="Permalink to this headline">¶</a></h2>
+<p>HDRcommonPhaseOffset.py - takes vxl file as input along with modulation frequency and distance to give phaseCorr values. 
+Requires two vxl files - one for each frequency to calculate phase corr 1 and phase corr 2
+Make sure that hdr_scale is greater than zero before recording the vxl (only works for tintin at this point of time)</p>
+<dl class="function">
+<dt id="calibration.HDRcommonphaseoffset.computeHDRAveragePhases">
+<tt class="descclassname">calibration.HDRcommonphaseoffset.</tt><tt class="descname">computeHDRAveragePhases</tt><big>(</big><em>camsys</em>, <em>filename</em>, <em>cx=0</em>, <em>cy=0</em>, <em>window=4</em>, <em>chipset='tintin.ti'</em><big>)</big><a class="reference internal" href="modules/calibration/HDRcommonphaseoffset.html#computeHDRAveragePhases"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.HDRcommonphaseoffset.computeHDRAveragePhases" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes average phases for the HDR frame</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="calibration.HDRcommonphaseoffset.hdrCommonPhaseOffset">
+<tt class="descclassname">calibration.HDRcommonphaseoffset.</tt><tt class="descname">hdrCommonPhaseOffset</tt><big>(</big><em>fileName1</em>, <em>distance</em>, <em>modFreq1</em>, <em>cx=0</em>, <em>cy=0</em>, <em>fileName2=None</em>, <em>modFreq2=None</em>, <em>window=4</em>, <em>chipset='tintin.ti'</em><big>)</big><a class="reference internal" href="modules/calibration/HDRcommonphaseoffset.html#hdrCommonPhaseOffset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.HDRcommonphaseoffset.hdrCommonPhaseOffset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates HDR phase offsets for ti chipsets.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="calibration.HDRcommonphaseoffset.parseArgs">
+<tt class="descclassname">calibration.HDRcommonphaseoffset.</tt><tt class="descname">parseArgs</tt><big>(</big><em>args=None</em><big>)</big><a class="reference internal" href="modules/calibration/HDRcommonphaseoffset.html#parseArgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.HDRcommonphaseoffset.parseArgs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="calibration.HDRcommonphaseoffset.wrapPhaseToSignedInteger">
+<tt class="descclassname">calibration.HDRcommonphaseoffset.</tt><tt class="descname">wrapPhaseToSignedInteger</tt><big>(</big><em>phase</em><big>)</big><a class="reference internal" href="modules/calibration/HDRcommonphaseoffset.html#wrapPhaseToSignedInteger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.HDRcommonphaseoffset.wrapPhaseToSignedInteger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Phase offset should be between more than -2048 and less than 2048</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-calibration.NonLinearityCalibration">
+<span id="calibration-nonlinearitycalibration"></span><h2>calibration.NonLinearityCalibration<a class="headerlink" href="#module-calibration.NonLinearityCalibration" title="Permalink to this headline">¶</a></h2>
+<p>The following program computes the non-linearity correction coefficients using csv as the input</p>
+<dl class="function">
+<dt id="calibration.NonLinearityCalibration.NonLinearityCalibration">
+<tt class="descclassname">calibration.NonLinearityCalibration.</tt><tt class="descname">NonLinearityCalibration</tt><big>(</big><em>filename</em>, <em>modFreq</em>, <em>modFreq2</em>, <em>phaseCorr=0</em>, <em>phaseCorr2=0</em><big>)</big><a class="reference internal" href="modules/calibration/NonLinearityCalibration.html#NonLinearityCalibration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.NonLinearityCalibration.NonLinearityCalibration" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function computes non linearity coefficients.</p>
+<dl class="docutils">
+<dt><strong>Parameters</strong>::</dt>
+<dd>-fileName: CSV file containing data of measured distance and captured phase
+-phaseCorr: The phase offset value for the given modulation frequency
+-modFreq: The modulation frequency at which data is captured.</dd>
+<dt><strong>Returns</strong>::</dt>
+<dd>-Non linearity coefficients for the given profile</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="calibration.NonLinearityCalibration.getCoefficients">
+<tt class="descclassname">calibration.NonLinearityCalibration.</tt><tt class="descname">getCoefficients</tt><big>(</big><em>measuredPhase</em>, <em>distancesToPhase</em>, <em>phaseCorr</em><big>)</big><a class="reference internal" href="modules/calibration/NonLinearityCalibration.html#getCoefficients"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.NonLinearityCalibration.getCoefficients" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="calibration.NonLinearityCalibration.parseArgs">
+<tt class="descclassname">calibration.NonLinearityCalibration.</tt><tt class="descname">parseArgs</tt><big>(</big><em>args=None</em><big>)</big><a class="reference internal" href="modules/calibration/NonLinearityCalibration.html#parseArgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.NonLinearityCalibration.parseArgs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-calibration.PerPixelOffset">
+<span id="calibration-perpixeloffset"></span><h2>calibration.PerPixelOffset<a class="headerlink" href="#module-calibration.PerPixelOffset" title="Permalink to this headline">¶</a></h2>
+<p>This file calculates the phase offsets and saves it as an npy file.
+It also returns the bin file of the offsets. 
+Usage:
+python PerPixelOffset.py -f &#8220;file.vxl&#8221; -n &#8220;profileName&#8221;
+or 
+python PerPixelOffset.py &#8211;file &#8220;file.vxl&#8221; &#8211;name &#8220;profileName&#8221;</p>
+<dl class="function">
+<dt id="calibration.PerPixelOffset.computeAveragePhases">
+<tt class="descclassname">calibration.PerPixelOffset.</tt><tt class="descname">computeAveragePhases</tt><big>(</big><em>camsys</em>, <em>filename</em>, <em>window=0</em><big>)</big><a class="reference internal" href="modules/calibration/PerPixelOffset.html#computeAveragePhases"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.PerPixelOffset.computeAveragePhases" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the average phases for all pixels for a given file</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="calibration.PerPixelOffset.parseArgs">
+<tt class="descclassname">calibration.PerPixelOffset.</tt><tt class="descname">parseArgs</tt><big>(</big><em>args=None</em><big>)</big><a class="reference internal" href="modules/calibration/PerPixelOffset.html#parseArgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.PerPixelOffset.parseArgs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="calibration.PerPixelOffset.perPixelOffset">
+<tt class="descclassname">calibration.PerPixelOffset.</tt><tt class="descname">perPixelOffset</tt><big>(</big><em>fileName</em>, <em>pathToSave=None</em>, <em>profileName=None</em><big>)</big><a class="reference internal" href="modules/calibration/PerPixelOffset.html#perPixelOffset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.PerPixelOffset.perPixelOffset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes pixelwise phase offset for all pixels. Returns a numpy file containing the pixelwise offsets as well as the bin file</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="calibration.PerPixelOffset.wrapPhaseToSignedInteger">
+<tt class="descclassname">calibration.PerPixelOffset.</tt><tt class="descname">wrapPhaseToSignedInteger</tt><big>(</big><em>phase</em><big>)</big><a class="reference internal" href="modules/calibration/PerPixelOffset.html#wrapPhaseToSignedInteger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.PerPixelOffset.wrapPhaseToSignedInteger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-calibration.TemperatureCalibration">
+<span id="calibration-temperaturecalibration"></span><h2>calibration.TemperatureCalibration<a class="headerlink" href="#module-calibration.TemperatureCalibration" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="calibration.TemperatureCalibration.TemperatureCalibration">
+<tt class="descclassname">calibration.TemperatureCalibration.</tt><tt class="descname">TemperatureCalibration</tt><big>(</big><em>csvFile</em><big>)</big><a class="reference internal" href="modules/calibration/TemperatureCalibration.html#TemperatureCalibration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.TemperatureCalibration.TemperatureCalibration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates temperature calibration offsets (coeff_illum, coeff_sensor), taking csv file as input.</p>
+<p>Takes a CSV file containing phase values at temperatures for illumination and sensor. Gives coeff_illum and coeff_sensor as output
+Uses a least squares fit to compute temperature calibration</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="calibration.TemperatureCalibration.parseArgs">
+<tt class="descclassname">calibration.TemperatureCalibration.</tt><tt class="descname">parseArgs</tt><big>(</big><em>args=None</em><big>)</big><a class="reference internal" href="modules/calibration/TemperatureCalibration.html#parseArgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.TemperatureCalibration.parseArgs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-calibration.VxlToPng">
+<span id="calibration-vxltopng"></span><h2>calibration.VxlToPng<a class="headerlink" href="#module-calibration.VxlToPng" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="calibration.VxlToPng.vxltoPng">
+<tt class="descclassname">calibration.VxlToPng.</tt><tt class="descname">vxltoPng</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="modules/calibration/VxlToPng.html#vxltoPng"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#calibration.VxlToPng.vxltoPng" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts VXL file to a PNG using amplitude data. Uses open cv libraries</p>
+</dd></dl>
+
+</div>
+<div class="section" id="calibration-saveconfigfile">
+<h2>calibration.saveConfigFile<a class="headerlink" href="#calibration-saveconfigfile" title="Permalink to this headline">¶</a></h2>
+<hr class="docutils" />
+<span class="target" id="module-calibration"></span></div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="capture.html" title="capture package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="CalibrationWizard.html" title="CalibrationWizard"
+             >previous</a> |</li>
+        <li><a href="index.html">home</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+ 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, &#39;Suramya&#39;.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+    </div>
+  </body>
+</html>
